@@ -58,10 +58,6 @@ app.get("/logout", (req, res) => {
   res.redirect("/");
 });
 
-app.get('/vercel', (req, res) => {
-  res.redirect('https://skulmart-store-o6o3b26do.vercel.app/sellers/visualsbyjolan')
-})
-
 const getStore = require("./middlewares/getstore");
 app.use(getStore);
 

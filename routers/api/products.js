@@ -49,13 +49,13 @@ router.get("/categories", async (req, res) => {
 });
 
 router.get("/categories/:category", async (req, res) => {
-  const categories = await Product.find({
-    // store_id: req.store_id,
+  const products = await Product.find({
+    store_id: req.store_id,
     visible: true,
     category: req.params.category,
   });
 
-  res.json(categories);
+  res.json(products);
 });
 
 // @title GET request product
@@ -63,17 +63,17 @@ router.get("/categories/:category", async (req, res) => {
 // @access public
 
 router.get("/query", async (req, res, next) => {
-  const { search, category } = req.query;
+  const { q } = req.query;
 
   const products = await Product.find({
     store_id: req.store_id,
     visible: true,
   });
 
-  if (search) {
+  if (q) {
     // clear whitespaces (%20), change query to small letters, and test query with small letters
     let searchRegex = new RegExp(
-      `${search.replace("%20", "").toLowerCase()}`,
+      `${q.replace("%20", "").toLowerCase()}`,
       "ig"
     );
 
