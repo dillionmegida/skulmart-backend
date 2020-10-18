@@ -114,9 +114,6 @@ app.use("/reset_password/", resetPasswords);
 
 app.use("/api/admin", admin);
 
-const subdomain = require("./middlewares/subdomain");
-app.use(subdomain(mainMeta, storeMeta, adminMeta));
-
 // @title Listen port set to 5000
 
 const port = process.env.PORT || 5000;
