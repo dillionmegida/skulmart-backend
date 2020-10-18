@@ -44,8 +44,11 @@ router.post("/login", async (req, res) => {
     });
   }
 
+  // console.log({seller})
+
   // setting a session of seller_id for the logged in seller
   req.session.seller_id = seller._id;
+  console.log(req.session);
 
   return res.json({
     message: "Seller authenticated 👍",
@@ -54,9 +57,9 @@ router.post("/login", async (req, res) => {
 
 router.get("/me", async (req, res) => {
   if (!req.seller) return res.sendStatus(403);
+  res.json(req.seller);
   // const seller = await Seller.findOne({ email: "dillionmegida@gmail.com" });
   // res.json(seller);
-  res.json(req.seller);
 });
 
 router.get("/isLoggedIn", (req, res) => {

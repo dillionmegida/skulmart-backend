@@ -72,10 +72,7 @@ router.get("/query", async (req, res, next) => {
 
   if (q) {
     // clear whitespaces (%20), change query to small letters, and test query with small letters
-    let searchRegex = new RegExp(
-      `${q.replace("%20", "").toLowerCase()}`,
-      "ig"
-    );
+    let searchRegex = new RegExp(`${q.replace("%20", "").toLowerCase()}`, "ig");
 
     const filteredProducts = products.filter((product) =>
       searchRegex.test(product.name)
@@ -99,19 +96,17 @@ router.get("/query", async (req, res, next) => {
 // @access public
 
 router.get("/:id", async (req, res) => {
-  try {
-    const product = await Product.findOne({
-      _id: req.params.id,
-      store_id: req.store_id,
-      visible: true,
-    });
-    return res.json(product);
-  } catch (err) {
+  const product = await Product.findOne({
+    _id: req.params.id,
+    store_id: req.store_id,
+    visible: true,
+  });
+  if (product === null)
     return res.status(404).json({
       error: "Invalid id",
       message: "No product with that id exists",
     });
-  }
+  return res.json(product);
 });
 
 // @title GET request product

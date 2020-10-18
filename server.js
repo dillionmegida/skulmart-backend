@@ -47,6 +47,7 @@ const sessionConfig = {
     maxAge: 31 * 24 * 60 * 60 * 100,
     // secure: true,
     domain: "skulmart.com",
+    // domain: "localhost",
   },
 };
 
@@ -55,7 +56,7 @@ app.use(session(sessionConfig));
 // log out any logged in seller
 app.get("/logout", (req, res) => {
   req.session.destroy();
-  res.redirect("/");
+  // res.redirect("/");
 });
 
 const getStore = require("./middlewares/getstore");
@@ -69,6 +70,7 @@ app.get("/cleanups", async (req, res) => {
 app.use(async (req, _, next) => {
   // if session does not exist, go to next function
   // seller_id is attached to the session when the seller logs in
+  console.log(req.session);
   if (!req.session.seller_id) {
     req.seller = null;
     return next();
