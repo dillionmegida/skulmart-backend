@@ -6,10 +6,9 @@ const { shuffleArray } = require("../../functions/arrays");
 const Product = require("../../models/Product");
 const Store = require("../../models/Store");
 
-const isSellerLoggedIn = require("../../middlewares/isSellerLoggedIn");
-
 const multer = require("multer");
 const Seller = require("../../models/Seller");
+const isAuthenticated = require("../../middlewares/isAuthenticated");
 var upload = multer({ dest: "uploads/" });
 
 const cloudinary = require("cloudinary").v2;
@@ -17,9 +16,11 @@ const cloudinary = require("cloudinary").v2;
 // ipInfo is gotten from express-ip middleware
 const userAgentIP = (req) => req.ipInfo.ip;
 
-// @title GET request products
-// @desc fetch all products from mongoose document
-// @access public
+/*
+ *
+ * PUBLIC ROUTES
+ *
+ */
 
 router.get("/", async (req, res) => {
   const products = await Product.find({
@@ -28,10 +29,6 @@ router.get("/", async (req, res) => {
   });
   return res.json(shuffleArray(products));
 });
-
-// @title GET request product categories
-// @desc fetch categories from mongoose document of product collections
-// @access public
 
 router.get("/categories", async (req, res) => {
   const categories = await Product.find({
@@ -57,10 +54,6 @@ router.get("/categories/:category", async (req, res) => {
 
   res.json(products);
 });
-
-// @title GET request product
-// @desc fetch products from mongoose document by query
-// @access public
 
 router.get("/query", async (req, res, next) => {
   const { q } = req.query;
@@ -91,10 +84,6 @@ router.get("/query", async (req, res, next) => {
   next();
 });
 
-// @title GET request product
-// @desc fetch single product from mongoose document by id
-// @access public
-
 router.get("/:id", async (req, res) => {
   const product = await Product.findOne({
     _id: req.params.id,
@@ -108,10 +97,6 @@ router.get("/:id", async (req, res) => {
     });
   return res.json(product);
 });
-
-// @title GET request product
-// @desc fetch products from mongoose document by seller id
-// @access public
 
 router.get("/seller/:id", async (req, res) => {
   try {
@@ -128,10 +113,6 @@ router.get("/seller/:id", async (req, res) => {
     });
   }
 });
-
-// @title UPDATE request product views
-// @desc update product views in mongoose document
-// @access public
 
 router.get("/views/:id", async (req, res) => {
   const id = req.params.id;
@@ -166,13 +147,15 @@ router.get("/views/:id", async (req, res) => {
   }
 });
 
-// @title POST request product
-// @desc upload new product to mongoose document
-// @access public
+/*
+ *
+ * PRIVATE ROUTES
+ *
+ */
 
 router.post(
   "/",
-  isSellerLoggedIn,
+  isAuthenticated,
   upload.single("prodImage"),
   async (req, res) => {
     try {
@@ -260,11 +243,7 @@ router.post(
   }
 );
 
-// @title DELETE request product
-// @desc delete product from mongoose document
-// @access public
-
-router.delete("/:id", isSellerLoggedIn, async (req, res) => {
+router.delete("/:id", isAuthenticated, async (req, res) => {
   try {
     const product = await Product.findOneAndDelete({
       _id: req.params.id,
@@ -288,13 +267,9 @@ router.delete("/:id", isSellerLoggedIn, async (req, res) => {
   }
 });
 
-// @title UPDATE request product
-// @desc update product in mongoose document
-// @access public
-
 router.post(
   "/update/:id",
-  isSellerLoggedIn,
+  isAuthenticated,
   upload.single("prodImage"),
   async (req, res) => {
     let {

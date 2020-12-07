@@ -15,7 +15,6 @@ const multer = require("multer");
 var upload = multer({ dest: "uploads/" });
 
 const { FREE_PLAN, SILVER_PLAN } = require("../../constants/subscriptionTypes");
-const isSellerLoggedIn = require("../../middlewares/isSellerLoggedIn");
 
 const cloudinary = require("cloudinary").v2;
 
@@ -24,10 +23,14 @@ const Product = require("../../models/Product");
 const Store = require("../../models/Store");
 const EmailConfirmation = require("../../models/EmailConfirmation");
 const ResetPassword = require("../../models/ResetPassword");
+const isAuthenticated = require("../../middlewares/isAuthenticated");
+const { getToken } = require("../../functions/token");
 
-// @title GET request sellers
-// @desc fetch all sellers from mongoose document
-// @access public
+/*
+ *
+ * PUBLIC ROUTES
+ *
+ */
 
 router.get("/", async (req, res) => {
   const sellers = await Seller.find({
@@ -36,10 +39,6 @@ router.get("/", async (req, res) => {
   }).select("-password");
   return res.json(sellers);
 });
-
-// @title GET request seller
-// @desc fetch single seller from mongoose document by username
-// @access public
 
 router.get("/:username", async (req, res) => {
   const seller = await Seller.findOne({
@@ -57,10 +56,6 @@ router.get("/:username", async (req, res) => {
   return res.json(seller);
 });
 
-// @title GET request seller
-// @desc fetch single seller from mongoose document by id
-// @access public
-
 router.get("/id/:id", async (req, res) => {
   const id = req.params.id;
   const seller = await Seller.findOne({
@@ -77,10 +72,6 @@ router.get("/id/:id", async (req, res) => {
   }
   res.json(seller);
 });
-
-// @title GET request product
-// @desc fetch products from mongoose document by search query
-// @access public
 
 router.get("/search/:query", async (req, res) => {
   // clear whitespaces (%20), change query to small letters, and test query with small letters
@@ -102,10 +93,6 @@ router.get("/search/:query", async (req, res) => {
     });
   }
 });
-
-// @title POST request seller
-// @desc upload new seller to mongoose document
-// @access public
 
 router.post("/", upload.single("avatar"), async (req, res) => {
   try {
@@ -185,6 +172,8 @@ router.post("/", upload.single("avatar"), async (req, res) => {
 
     await newEmailToBeConfirmed.save();
 
+    const token = getToken({ _id: newSeller._id });
+
     const sendEmailResponse = await sendEmailConfirmation(
       generatedHash,
       email,
@@ -192,16 +181,18 @@ router.post("/", upload.single("avatar"), async (req, res) => {
       store_name,
       "welcome"
     );
+
     if (!sendEmailResponse.error) {
       // then the email went successfully
       res.json({
+        token,
         message:
           "Account Created Successfully 💛. Please check your email to confirm your email address then login",
       });
     } else {
       // well the seller was still saved even if email wasn't sent
       console.log(
-        "Email confirmation could't be sent >> ",
+        "Email confirmation couldn't be sent >> ",
         sendEmailResponse.error
       );
     }
@@ -213,10 +204,6 @@ router.post("/", upload.single("avatar"), async (req, res) => {
     });
   }
 });
-
-// @title POST request seller
-// @desc resend confirmation link to email address
-// @access public
 
 router.post("/resend_confirmation_link", async (req, res) => {
   let { email } = req.body;
@@ -281,10 +268,6 @@ router.post("/resend_confirmation_link", async (req, res) => {
   }
 });
 
-// @title POST request seller
-// @desc resend confirmation link to email address
-// @access public
-
 router.post("/reset_password", async (req, res) => {
   let { email } = req.body;
   email = email.trim();
@@ -299,8 +282,6 @@ router.post("/reset_password", async (req, res) => {
         message: `'${email}' was not the email you inserted during your registration process`,
       });
     }
-
-    req.session.destroy();
 
     const existingResetPassword = await ResetPassword.findOne({
       seller_id: seller._id,
@@ -349,11 +330,13 @@ router.post("/reset_password", async (req, res) => {
   }
 });
 
-// @title DELETE request seller
-// @desc delete seller from mongoose document by id
-// @access public
+/*
+ *
+ * PRIVATE ROUTES
+ *
+ */
 
-router.delete("/", isSellerLoggedIn, async (req, res) => {
+router.delete("/", isAuthenticated, async (req, res) => {
   try {
     const seller = await Seller.findOne({
       _id: req.seller._id,
@@ -375,7 +358,6 @@ router.delete("/", isSellerLoggedIn, async (req, res) => {
       _id: seller._id,
     });
 
-    req.session.destroy();
     res.json({
       message: "Successfully deleted user",
     });
@@ -388,13 +370,9 @@ router.delete("/", isSellerLoggedIn, async (req, res) => {
   }
 });
 
-// @title UPDATE request seller
-// @desc update seller in mongoose document by id
-// @access public
-
 router.post(
   "/update",
-  isSellerLoggedIn,
+  isAuthenticated,
   upload.single("avatar"),
   async (req, res) => {
     let {
@@ -479,11 +457,7 @@ router.post(
   }
 );
 
-// @title UPDATE request seller email
-// @desc update seller email in mongoose document by id
-// @access public
-
-router.post("/update/email/", isSellerLoggedIn, async (req, res) => {
+router.post("/update/email/", isAuthenticated, async (req, res) => {
   let { email } = req.body;
   email = email.trim();
 
@@ -509,8 +483,6 @@ router.post("/update/email/", isSellerLoggedIn, async (req, res) => {
         email_confirm: false,
       },
     });
-
-    req.session.destroy(); // log the user out
 
     const generatedHash = randomNumber();
 
@@ -549,7 +521,7 @@ router.post("/update/email/", isSellerLoggedIn, async (req, res) => {
   }
 });
 
-router.get("/subscription/initialize", isSellerLoggedIn, (req, res) => {
+router.get("/subscription/initialize", isAuthenticated, (req, res) => {
   const { subscriptionType } = req.query;
 
   let price;
@@ -742,7 +714,7 @@ router.post("/subscription/activate", async (req, res) => {
 // @desc update seller password in mongoose document by id
 // @access public
 
-router.post("/update/password", isSellerLoggedIn, async (req, res) => {
+router.post("/update/password", isAuthenticated, async (req, res) => {
   const { old_password, new_password } = req.body;
 
   const seller = await Seller.findOne({

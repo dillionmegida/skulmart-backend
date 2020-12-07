@@ -1,4 +1,3 @@
-const { siteName } = require("../config/siteDetails");
 const Store = require("../models/Store");
 const path = require("path");
 

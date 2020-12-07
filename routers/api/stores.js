@@ -3,18 +3,10 @@ const router = express.Router();
 
 const Store = require("../../models/Store");
 
-// @title GET request stores
-// @desc fetch all stores from mongoose document
-// @access public
-
 router.get("/", async (req, res) => {
   const stores = await Store.find();
   return res.json(stores);
 });
-
-// @title GET request store
-// @desc fetch store from mongoose document by id
-// @access public
 
 router.get("/:id", async (req, res) => {
   // try is used at the top because if a wrong id is used, a cast ID error by mongo is produced
@@ -28,10 +20,6 @@ router.get("/:id", async (req, res) => {
     });
   }
 });
-
-// @title GET request store
-// @desc fetch store from mongoose document by storename
-// @access public
 
 router.get("/name/:shortname", async (req, res) => {
   const store = await Store.findOne({ shortname: req.params.shortname });

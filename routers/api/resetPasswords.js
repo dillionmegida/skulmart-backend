@@ -3,12 +3,7 @@ const router = express.Router();
 
 const ResetPassword = require("../../models/ResetPassword");
 const Seller = require("../../models/Seller");
-const Store = require("../../models/Store");
 const { bcryptPromise } = require("../../functions/strings");
-
-// @title GET request hash
-// @desc update seller_id email confirm field to true with hash
-// @access public
 
 router.get("/:hash", async (req, res) => {
   const hash = await ResetPassword.findOne({
