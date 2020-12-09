@@ -5,7 +5,7 @@ const resetPassword = async (generatedHash, email, name, store) => {
   const subject = `Reset your password on ${siteName}`;
   const html = `
         <h2>Hi ${name} 👋</h2>
-        <p>A password reset link was sent for your ${email} from ${store} store.<br/>
+        <p>A password reset link was sent for your email (${email}) from ${store} store.<br/>
         Click the button below to reset your password.</p>
         <a
             style='
