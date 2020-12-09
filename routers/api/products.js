@@ -9,6 +9,7 @@ const Store = require("../../models/Store");
 const multer = require("multer");
 const Seller = require("../../models/Seller");
 const isAuthenticated = require("../../middlewares/isAuthenticated");
+const getAuthUser = require("../../functions/getAuthUser");
 var upload = multer({ dest: "uploads/" });
 
 const cloudinary = require("cloudinary").v2;
@@ -159,9 +160,9 @@ router.post(
   upload.single("prodImage"),
   async (req, res) => {
     try {
-      let { name, desc, category, price, store_name } = req.body;
+      let { name, desc, category, price } = req.body;
 
-      const loggedInSellerId = req.seller._id;
+      const loggedInSellerId = getAuthUser(req)._id;
 
       const { subscription_type: subscriptionType } = await Seller.findOne({
         _id: loggedInSellerId,
@@ -197,7 +198,7 @@ router.post(
       }
 
       const store = await Store.findOne({
-        shortname: store_name.toLowerCase(),
+        shortname: req.store_name.toLowerCase(),
       });
 
       if (store === null) {
@@ -286,10 +287,12 @@ router.post(
     category = category.toLowerCase().trim();
     desc = desc.trim();
 
+    const authUser = getAuthUser(req)
+
     try {
       const existingProduct = await Product.findOne({
         name,
-        seller_id: req.seller._id,
+        seller_id: authUser,
       });
       if (existingProduct && existingProduct._id !== req.params.id) {
         // then there is an existing product with the name
@@ -298,7 +301,7 @@ router.post(
         });
       }
 
-      const store = await Store.findOne({ shortname: store_name });
+      const store = await Store.findOne({ shortname: req.store_name });
 
       if (store === null) {
         // then the store does not exist
@@ -346,7 +349,7 @@ router.post(
           category,
           price,
           store_id: store._id,
-          seller_id: req.seller._id,
+          seller_id: authUser,
         },
       });
 

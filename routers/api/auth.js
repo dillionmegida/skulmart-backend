@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const Seller = require("../../models/Seller");
 const { getToken } = require("../../functions/token");
 const isAuthenticated = require("../../middlewares/isAuthenticated");
+const getAuthUser = require('../../functions/getAuthUser')
 
 router.post("/login", async (req, res) => {
   let { usernameOrEmail, password } = req.body;
@@ -50,9 +51,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/me", isAuthenticated, async (req, res) => {
-  res.json(req.user._doc);
-  // the properties of the user are in _doc
-  // after the middleware, express configures the object
+  res.json(getAuthUser(req))
 });
 
 module.exports = router;

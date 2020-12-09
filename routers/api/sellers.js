@@ -58,19 +58,20 @@ router.get("/:username", async (req, res) => {
 
 router.get("/id/:id", async (req, res) => {
   const id = req.params.id;
-  const seller = await Seller.findOne({
-    _id: id,
-    store_id: req.store_id,
-    subscription_type: { $ne: null },
-  }).select("-password");
-  if (seller === null) {
+  try {
+    const seller = await Seller.findOne({
+      _id: id,
+      store_id: req.store_id,
+      subscription_type: { $ne: null },
+    }).select("-password");
+    res.json(seller);
+  } catch {
     // then seller does not exist
     return res.status(404).json({
       error: "Invalid id",
       message: "No seller with that id exists",
     });
   }
-  res.json(seller);
 });
 
 router.get("/search/:query", async (req, res) => {

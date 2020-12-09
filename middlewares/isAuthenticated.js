@@ -5,9 +5,7 @@ module.exports = async function isAuthTokenValid(req, res, next) {
   const token = getTokenFromCookie(req);
 
   const tokenString = token ? token.split(" ")[1] : undefined;
-  if (!token || !tokenString) {
-    return res.status(401).json({ message: "auth token invalid" });
-  }
+
   if (!token || !tokenString)
     return res.status(401).json({ message: "auth token invalid" });
 

@@ -17,7 +17,7 @@ module.exports = async function getStore(req, res, next) {
 
   // then store does not exist
   // TODO redirect instead of sending file
-  if (!store) return res.sendFile(path.join(__dirname, "../store404.html"));
+  // if (!store) return res.sendFile(path.join(__dirname, "../store404.html"));
 
   req.store_id = store._id;
 
