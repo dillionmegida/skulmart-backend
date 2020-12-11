@@ -2,13 +2,14 @@ const Store = require("../models/Store");
 const siteDetails = require("../config/siteDetails");
 
 module.exports = async function getStore(req, res, next) {
-  const { main = null } = req.headers;
-  const subdomain = req.get("host").split(".skulmart")[0];
+  const { store_name, main = null } = req.headers;
+  // console.log(req)
+  // const subdomain = req.get("origin").split(".skulmart")[0];
 
-  const store_name =
-    subdomain === "localhost:5000" ? /* then we're on dev */ "kwasu" : subdomain;
+  // const store_name =
+  //   subdomain === "localhost:5000" ? /* then we're on dev */ "kwasu" : subdomain;
 
-  console.log({ subdomain, store_name });
+  // console.log({ subdomain, store_name });
 
   if (main !== null)
     // then API requests are coming from the main app
@@ -20,7 +21,7 @@ module.exports = async function getStore(req, res, next) {
   // }
 
   const store = await Store.findOne({ shortname: store_name });
-  console.log({ store });
+  // console.log({ store });
 
   // then store does not exist
   if (!store)
