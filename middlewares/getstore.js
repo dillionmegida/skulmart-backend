@@ -3,10 +3,10 @@ const siteDetails = require("../config/siteDetails");
 
 module.exports = async function getStore(req, res, next) {
   const { main = null } = req.headers;
-  const subdomain = req.hostname.split(".skulmart")[0];
+  const subdomain = req.get("host").split(".skulmart")[0];
 
   const store_name =
-    subdomain === "localhost" ? /* then we're on dev */ "kwasu" : subdomain;
+    subdomain === "localhost:5000" ? /* then we're on dev */ "kwasu" : subdomain;
 
   console.log({ subdomain, store_name });
 
