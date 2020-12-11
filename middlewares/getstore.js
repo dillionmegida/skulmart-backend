@@ -2,14 +2,11 @@ const Store = require("../models/Store");
 const siteDetails = require("../config/siteDetails");
 
 module.exports = async function getStore(req, res, next) {
-  const { store_name = null, main = null } = req.headers;
+  const { main = null } = req.headers;
+  const subdomain = req.hostname.split(".skulmart")[0];
 
-  if (store_name == null) {
-    // then request isn't coming from the store site
-    // cuz if it was, it would be sending the store_name in the headers
-    const _store_name = req.hostname.split(".skulmart")[0];
-    res.redirect(siteDetails.domain + "/no-store?store=" + _store_name);
-  }
+  const store_name =
+    subdomain === "localhost" ? /* then we're on dev */ "kwasu" : subdomain;
 
   if (main !== null)
     // then API requests are coming from the main app
