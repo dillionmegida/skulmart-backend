@@ -25,6 +25,8 @@ const EmailConfirmation = require("../../models/EmailConfirmation");
 const ResetPassword = require("../../models/ResetPassword");
 const isAuthenticated = require("../../middlewares/isAuthenticated");
 const { getToken } = require("../../functions/token");
+const SellerNotificationMessage = require("../../models/SellerNotificationMessage");
+const getAuthUser = require("../../functions/getAuthUser");
 
 /*
  *
@@ -473,12 +475,14 @@ router.post("/update/email/", isAuthenticated, async (req, res) => {
     });
   }
 
+  const sellerId = getAuthUser(req)._id;
+
   const existingSeller = await Seller.findOne({
-    _id: req.seller._id,
+    _id: sellerId,
   });
 
   try {
-    await Seller.findByIdAndUpdate(req.seller._id, {
+    await Seller.findByIdAndUpdate(sellerId, {
       $set: {
         email,
         email_confirm: false,
@@ -489,7 +493,7 @@ router.post("/update/email/", isAuthenticated, async (req, res) => {
 
     const newEmailToBeConfirmed = new EmailConfirmation({
       generatedHash,
-      seller_id: req.seller._id,
+      seller_id: sellerId,
     });
 
     await newEmailToBeConfirmed.save();
@@ -533,10 +537,12 @@ router.get("/subscription/initialize", isAuthenticated, (req, res) => {
 
   const amount = helper.addFeesTo(price);
 
+  const seller = getAuthUser(req);
+
   paystack.transaction
     .initialize({
       amount,
-      email: req.seller.email,
+      email: seller.email,
       metadata: {
         custom_fields: [{ subscription_type: subscriptionType }],
       },
@@ -584,10 +590,11 @@ router.get("/subscription/callback", async (req, res) => {
 
     let sellerId, subscriptionReference;
 
-    if (req.seller) {
+    const seller = getAuthUser(req);
+    if (seller) {
       // which is expected
-      sellerId = req.seller._id;
-      subscriptionReference = req.seller.subscription_reference;
+      sellerId = seller._id;
+      subscriptionReference = seller.subscription_reference;
     } else {
       // just in case
       const seller = await Seller.findOne({
@@ -638,10 +645,10 @@ router.get("/subscription/callback", async (req, res) => {
       }
     );
 
-    if (req.seller) {
+    if (seller) {
       // then the seller is logged in
       // useful to redirect the seller to the store site
-      const { store_name } = req.seller;
+      const { store_name } = seller;
       res.redirect(
         `http://${store_name}.skulmart.com/dashboard?subscriptionStatus=success`
       );
@@ -718,8 +725,10 @@ router.post("/subscription/activate", async (req, res) => {
 router.post("/update/password", isAuthenticated, async (req, res) => {
   const { old_password, new_password } = req.body;
 
+  const authUser = getAuthUser(req);
+
   const seller = await Seller.findOne({
-    _id: req.seller._id,
+    _id: authUser._id,
   });
 
   // compare old password
@@ -734,7 +743,7 @@ router.post("/update/password", isAuthenticated, async (req, res) => {
   try {
     const encryptedPassword = await bcryptPromise(new_password);
 
-    await Seller.findByIdAndUpdate(req.seller._id, {
+    await Seller.findByIdAndUpdate(seller._id, {
       $set: {
         password: encryptedPassword,
       },
@@ -749,6 +758,44 @@ router.post("/update/password", isAuthenticated, async (req, res) => {
       error: err,
       message: "Error occured! Please try again.",
     });
+  }
+});
+
+router.get("/notifications/all", isAuthenticated, async (req, res) => {
+  const allNotifications = await SellerNotificationMessage.find();
+
+  const sellerId = getAuthUser(req)._id;
+  const unreadNotifications = allNotifications.filter((n) => {
+    return !n.viewedIds.includes(sellerId);
+  });
+  res.json(unreadNotifications);
+});
+
+router.get("/notifications/:id", isAuthenticated, async (req, res) => {
+  const { id = null } = req.params;
+
+  const sellerId = getAuthUser(req)._id;
+  if (id) {
+    try {
+      const notification = await SellerNotificationMessage.findById(id);
+      const viewedIds = notification.viewedIds.includes(sellerId)
+        ? [...notification.viewedIds]
+        : [...notification.viewedIds].concat(sellerId);
+      await SellerNotificationMessage.findByIdAndUpdate(id, {
+        $set: {
+          viewedIds: [...viewedIds],
+        },
+      });
+      return res.json({
+        message: "",
+      });
+    } catch (err) {
+      console.log("Error occurred during reading notification >> ");
+      res.status(400).json({
+        error: err,
+        message: "Error occured! Please try again.",
+      });
+    }
   }
 });
 
