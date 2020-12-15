@@ -3,6 +3,7 @@ const sendMail = require("./mails");
 const siteDetails = require("./config/siteDetails");
 const { FREE_PLAN } = require("./constants/subscriptionTypes");
 const { siteName } = require("./config/siteDetails");
+const SellerNotificationMessage = require("./models/SellerNotificationMessage");
 
 // const changeSubToNullForUnverified = async () => {
 //   const unverified = await Seller.find({
@@ -70,6 +71,36 @@ const cleanups = async () => {
   // await changeSubToNullForUnverified();
   // await tellSubscribedItIsFree();
   // await tellUnsubscribedItIsFree();
+  // await SellerNotificationMessage.insertMany([
+  //   {
+  //     title: "This is the first notification",
+  //     message: "Do the needful",
+  //     viewedIds: [],
+  //   },
+  //   {
+  //     title: "This is the second notification",
+  //     message: "Do the needful I say again",
+  //     viewedIds: [],
+  //   },
+  // ]);
+//     await SellerNotificationMessage.insertMany([
+//       {
+//         title: "🎉🎉 The Notifications Feature",
+//         message: `We want to reduce the communication barrier between us and you. So now we have the <b>Notifications Feature</b>.
+
+// With this, we can easily inform you of the new features we're including on our platform so you can start using them.
+
+// If we also notice issues on your account, this will be a fast way to reach out to you so you can resolve them.
+
+// Keep enjoying our platform : )
+
+// We hope to serve you the best.
+// `,
+//       },
+//     ]);
+  // const notifications = await SellerNotificationMessage.find();
+  // console.log({notifications})
+  // await SellerNotificationMessage.deleteMany();
   console.log("ended cleanup");
 };
 

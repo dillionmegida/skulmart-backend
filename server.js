@@ -31,12 +31,15 @@ const getStore = require("./middlewares/getstore");
 app.get("/test", async (req, res) => {
 
   // get all verified emails
-  const emails = await Seller.find({email_confirm: true}).select("email");
-  let emailString = "";
-  for (let i = 0; i < emails.length; i++) {
-    emailString = emailString + emails[i].email + ",";
-  }
-  console.log({ emailString });
+  // const emails = await Seller.find({email_confirm: true}).select("email");
+  // let emailString = "";
+  // for (let i = 0; i < emails.length; i++) {
+  //   emailString = emailString + emails[i].email + ",";
+  // }
+  // console.log({ emailString });
+
+  await cleanups();
+
 });
 
 app.use(getStore);
