@@ -13,6 +13,7 @@ const getAuthUser = require("../../functions/getAuthUser");
 var upload = multer({ dest: "uploads/" });
 
 const cloudinary = require("cloudinary").v2;
+const { PRODUCTS_PER_PAGE } = require("../../constants");
 
 // ipInfo is gotten from express-ip middleware
 const userAgentIP = (req) => req.ipInfo.ip;
@@ -24,11 +25,25 @@ const userAgentIP = (req) => req.ipInfo.ip;
  */
 
 router.get("/", async (req, res) => {
-  const products = await Product.find({
+  const { page: _page = 0 } = req.query;
+  const page = parseInt(_page);
+  const totalCount = await Product.countDocuments({
     store_id: req.store_id,
     visible: true,
   });
-  return res.json(shuffleArray(products));
+  const products = await Product.find({
+    store_id: req.store_id,
+    visible: true,
+  })
+    .limit(PRODUCTS_PER_PAGE)
+    .skip(page * PRODUCTS_PER_PAGE);
+
+  const totalPages = Math.ceil(totalCount / PRODUCTS_PER_PAGE) - 1; // since pages start from 0;
+
+  return res.json({
+    data: shuffleArray(products),
+    totalPages,
+  });
 });
 
 router.get("/categories", async (req, res) => {
@@ -287,7 +302,7 @@ router.post(
     category = category.toLowerCase().trim();
     desc = desc.trim();
 
-    const authUser = getAuthUser(req)
+    const authUser = getAuthUser(req);
 
     try {
       const existingProduct = await Product.findOne({
