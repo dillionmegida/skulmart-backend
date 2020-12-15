@@ -60,13 +60,27 @@ router.get("/categories", async (req, res) => {
 });
 
 router.get("/categories/:category", async (req, res) => {
-  const products = await Product.find({
+  const { page: _page } = req.query;
+  const page = parseInt(_page);
+
+  const { category } = req.params;
+
+  const criteria = {
     store_id: req.store_id,
     visible: true,
-    category: req.params.category,
-  });
+    category,
+  };
 
-  res.json(products);
+  const totalCount = await Product.countDocuments({ ...criteria });
+  const totalPages = Math.ceil(totalCount / PRODUCTS_PER_PAGE) - 1; // since pages start from 0;
+
+  const products = await Product.find({
+    ...criteria,
+  })
+    .limit(PRODUCTS_PER_PAGE)
+    .skip(page * PRODUCTS_PER_PAGE);
+
+  res.json({ data: products, totalPages });
 });
 
 router.get("/query", async (req, res, next) => {
@@ -74,7 +88,7 @@ router.get("/query", async (req, res, next) => {
 
   if (q) {
     // clear whitespaces (%20), change query to small letters, and test query with small letters
-    const qLowerCase = q.replace("%20", "").toLowerCase()
+    const qLowerCase = q.replace("%20", "").toLowerCase();
     let searchRegex = new RegExp(`${qLowerCase}`, "ig");
 
     const criteria = {
