@@ -55,7 +55,12 @@ router.get("/:username", async (req, res) => {
       message: "No seller with that username",
     });
   }
-  return res.json(seller);
+  const totalProducts = await Product.countDocuments({
+    store_id: req.store_id,
+    visible: true,
+    seller_id: seller._id,
+  });
+  return res.json({ seller, totalProducts });
 });
 
 router.get("/id/:id", async (req, res) => {
