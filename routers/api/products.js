@@ -26,15 +26,13 @@ const userAgentIP = (req) => req.ipInfo.ip;
 
 router.get("/", async (req, res) => {
   const { page: _page = 0 } = req.query;
+  const criteria = {
+    store_id: req.store_id,
+    visible: true,
+  };
   const page = parseInt(_page);
-  const totalCount = await Product.countDocuments({
-    store_id: req.store_id,
-    visible: true,
-  });
-  const products = await Product.find({
-    store_id: req.store_id,
-    visible: true,
-  })
+  const totalCount = await Product.countDocuments({ ...criteria });
+  const products = await Product.find({ ...criteria })
     .limit(PRODUCTS_PER_PAGE)
     .skip(page * PRODUCTS_PER_PAGE);
 
@@ -72,32 +70,30 @@ router.get("/categories/:category", async (req, res) => {
 });
 
 router.get("/query", async (req, res, next) => {
-  const { q } = req.query;
-
-  const products = await Product.find({
-    store_id: req.store_id,
-    visible: true,
-  });
+  const { q = null, page: _page } = req.query;
 
   if (q) {
     // clear whitespaces (%20), change query to small letters, and test query with small letters
-    let searchRegex = new RegExp(`${q.replace("%20", "").toLowerCase()}`, "ig");
+    const qLowerCase = q.replace("%20", "").toLowerCase()
+    let searchRegex = new RegExp(`${qLowerCase}`, "ig");
 
-    const filteredProducts = products.filter((product) =>
-      searchRegex.test(product.name)
-    );
+    const criteria = {
+      store_id: req.store_id,
+      visible: true,
+      name: { $regex: searchRegex },
+    };
+    const page = parseInt(_page);
+    const totalCount = await Product.countDocuments({ ...criteria });
+    const totalPages = Math.ceil(totalCount / PRODUCTS_PER_PAGE) - 1; // since pages start from 0;
 
-    return res.json(filteredProducts);
+    const products = await Product.find({
+      ...criteria,
+    })
+      .limit(PRODUCTS_PER_PAGE)
+      .skip(page * PRODUCTS_PER_PAGE);
+
+    res.json({ data: products, totalPages });
   }
-
-  if (category) {
-    const filteredProducts = products.filter(
-      (product) => product.category === category
-    );
-    if (filteredProducts.length > 0) return res.json(filteredProducts);
-  }
-
-  next();
 });
 
 router.get("/:id", async (req, res) => {
