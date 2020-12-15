@@ -126,12 +126,24 @@ router.get("/:id", async (req, res) => {
 
 router.get("/seller/:id", async (req, res) => {
   try {
-    const products = await Product.find({
-      seller_id: req.params.id,
+    const { page: _page } = req.query;
+    const page = parseInt(_page);
+
+    const criteria = {
       store_id: req.store_id,
       visible: true,
-    });
-    res.json(products);
+      seller_id: req.params.id,
+    };
+
+    const totalCount = await Product.countDocuments({ ...criteria });
+    const totalPages = Math.ceil(totalCount / PRODUCTS_PER_PAGE) - 1; // since pages start from 0;
+
+    const products = await Product.find({
+      ...criteria,
+    })
+      .limit(PRODUCTS_PER_PAGE)
+      .skip(page * PRODUCTS_PER_PAGE);
+    res.json({ products, totalPages });
   } catch (err) {
     res.status(404).json({
       error: err,
