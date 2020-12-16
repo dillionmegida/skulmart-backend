@@ -1,5 +1,4 @@
 const router = require("./auth");
-const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const sendEmailConfirmation = require("../../mails/emailConfirmation");
 const resetPassword = require("../../mails/resetPassword");
@@ -27,6 +26,7 @@ const isAuthenticated = require("../../middlewares/isAuthenticated");
 const { getToken } = require("../../functions/token");
 const SellerNotificationMessage = require("../../models/SellerNotificationMessage");
 const getAuthUser = require("../../functions/getAuthUser");
+const { SELLERS_PER_PAGE } = require("../../constants");
 
 /*
  *
@@ -35,11 +35,23 @@ const getAuthUser = require("../../functions/getAuthUser");
  */
 
 router.get("/", async (req, res) => {
-  const sellers = await Seller.find({
+  const { page: _page = 0 } = req.query;
+  const criteria = {
     store_id: req.store_id,
     email_confirm: true,
-  }).select("-password");
-  return res.json(sellers);
+  };
+  const page = parseInt(_page);
+  const totalCount = await Seller.countDocuments({ ...criteria });
+  const sellers = await Seller.find({
+    ...criteria,
+  })
+    .select("-password")
+    .limit(SELLERS_PER_PAGE)
+    .skip(page * SELLERS_PER_PAGE);
+
+  const totalPages = Math.ceil(totalCount / SELLERS_PER_PAGE) - 1; // since pages start from 0;
+
+  return res.json({ sellers, totalPages });
 });
 
 router.get("/:username", async (req, res) => {
@@ -81,19 +93,30 @@ router.get("/id/:id", async (req, res) => {
   }
 });
 
-router.get("/search/:query", async (req, res) => {
+router.get("/search/query", async (req, res) => {
+  const { q = null, page: _page } = req.query;
+  let searchRegex = new RegExp(`${q.replace("%20", "").toLowerCase()}`, "ig");
+  const criteria = {
+    store_id: req.store_id,
+    email_confirm: true,
+    $or: [
+      {
+        fullname: { $regex: searchRegex },
+      },
+      {
+        brand_name: { $regex: searchRegex },
+      },
+    ],
+  };
+  const page = parseInt(_page);
+  const totalCount = await Seller.countDocuments({ ...criteria });
   // clear whitespaces (%20), change query to small letters, and test query with small letters
-  let searchRegex = new RegExp(
-    `${req.params.query.replace("%20", "").toLowerCase()}`,
-    "ig"
-  );
   try {
-    const sellers = await Seller.find({ store_id: req.store_id });
-    const filteredSellers = sellers.filter(
-      (seller) =>
-        searchRegex.test(seller.fullname) || searchRegex.test(seller.brand_name)
-    );
-    res.json(filteredSellers);
+    const sellers = await Seller.find({ ...criteria })
+      .limit(SELLERS_PER_PAGE)
+      .skip(page * SELLERS_PER_PAGE);
+    const totalPages = Math.ceil(totalCount / SELLERS_PER_PAGE) - 1; // since pages start from 0;;
+    res.json({ sellers, totalPages });
   } catch (err) {
     res.status(400).json({
       error: err,

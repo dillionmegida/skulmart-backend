@@ -13,6 +13,7 @@ const getAuthUser = require("../../functions/getAuthUser");
 var upload = multer({ dest: "uploads/" });
 
 const cloudinary = require("cloudinary").v2;
+const { PRODUCTS_PER_PAGE } = require("../../constants");
 
 // ipInfo is gotten from express-ip middleware
 const userAgentIP = (req) => req.ipInfo.ip;
@@ -24,11 +25,23 @@ const userAgentIP = (req) => req.ipInfo.ip;
  */
 
 router.get("/", async (req, res) => {
-  const products = await Product.find({
+  const { page: _page = 0 } = req.query;
+  const criteria = {
     store_id: req.store_id,
     visible: true,
+  };
+  const page = parseInt(_page);
+  const totalCount = await Product.countDocuments({ ...criteria });
+  const products = await Product.find({ ...criteria })
+    .limit(PRODUCTS_PER_PAGE)
+    .skip(page * PRODUCTS_PER_PAGE);
+
+  const totalPages = Math.ceil(totalCount / PRODUCTS_PER_PAGE) - 1; // since pages start from 0;
+
+  return res.json({
+    data: shuffleArray(products),
+    totalPages,
   });
-  return res.json(shuffleArray(products));
 });
 
 router.get("/categories", async (req, res) => {
@@ -47,42 +60,54 @@ router.get("/categories", async (req, res) => {
 });
 
 router.get("/categories/:category", async (req, res) => {
-  const products = await Product.find({
+  const { page: _page } = req.query;
+  const page = parseInt(_page);
+
+  const { category } = req.params;
+
+  const criteria = {
     store_id: req.store_id,
     visible: true,
-    category: req.params.category,
-  });
+    category,
+  };
 
-  res.json(products);
+  const totalCount = await Product.countDocuments({ ...criteria });
+  const totalPages = Math.ceil(totalCount / PRODUCTS_PER_PAGE) - 1; // since pages start from 0;
+
+  const products = await Product.find({
+    ...criteria,
+  })
+    .limit(PRODUCTS_PER_PAGE)
+    .skip(page * PRODUCTS_PER_PAGE);
+
+  res.json({ data: products, totalPages });
 });
 
 router.get("/query", async (req, res, next) => {
-  const { q } = req.query;
-
-  const products = await Product.find({
-    store_id: req.store_id,
-    visible: true,
-  });
+  const { q = null, page: _page } = req.query;
 
   if (q) {
     // clear whitespaces (%20), change query to small letters, and test query with small letters
-    let searchRegex = new RegExp(`${q.replace("%20", "").toLowerCase()}`, "ig");
+    const qLowerCase = q.replace("%20", "").toLowerCase();
+    let searchRegex = new RegExp(`${qLowerCase}`, "ig");
 
-    const filteredProducts = products.filter((product) =>
-      searchRegex.test(product.name)
-    );
+    const criteria = {
+      store_id: req.store_id,
+      visible: true,
+      name: { $regex: searchRegex },
+    };
+    const page = parseInt(_page);
+    const totalCount = await Product.countDocuments({ ...criteria });
+    const totalPages = Math.ceil(totalCount / PRODUCTS_PER_PAGE) - 1; // since pages start from 0;
 
-    return res.json(filteredProducts);
+    const products = await Product.find({
+      ...criteria,
+    })
+      .limit(PRODUCTS_PER_PAGE)
+      .skip(page * PRODUCTS_PER_PAGE);
+
+    res.json({ data: products, totalPages });
   }
-
-  if (category) {
-    const filteredProducts = products.filter(
-      (product) => product.category === category
-    );
-    if (filteredProducts.length > 0) return res.json(filteredProducts);
-  }
-
-  next();
 });
 
 router.get("/:id", async (req, res) => {
@@ -101,12 +126,24 @@ router.get("/:id", async (req, res) => {
 
 router.get("/seller/:id", async (req, res) => {
   try {
-    const products = await Product.find({
-      seller_id: req.params.id,
+    const { page: _page } = req.query;
+    const page = parseInt(_page);
+
+    const criteria = {
       store_id: req.store_id,
       visible: true,
-    });
-    res.json(products);
+      seller_id: req.params.id,
+    };
+
+    const totalCount = await Product.countDocuments({ ...criteria });
+    const totalPages = Math.ceil(totalCount / PRODUCTS_PER_PAGE) - 1; // since pages start from 0;
+
+    const products = await Product.find({
+      ...criteria,
+    })
+      .limit(PRODUCTS_PER_PAGE)
+      .skip(page * PRODUCTS_PER_PAGE);
+    res.json({ products, totalPages });
   } catch (err) {
     res.status(404).json({
       error: err,
@@ -287,7 +324,7 @@ router.post(
     category = category.toLowerCase().trim();
     desc = desc.trim();
 
-    const authUser = getAuthUser(req)
+    const authUser = getAuthUser(req);
 
     try {
       const existingProduct = await Product.findOne({

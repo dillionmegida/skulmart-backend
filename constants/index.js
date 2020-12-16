@@ -1,0 +1,4 @@
+const PRODUCTS_PER_PAGE = 10;
+const SELLERS_PER_PAGE = 10;
+
+module.exports = { PRODUCTS_PER_PAGE, SELLERS_PER_PAGE };
