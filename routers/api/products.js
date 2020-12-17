@@ -39,7 +39,7 @@ router.get("/", async (req, res) => {
   const totalPages = Math.ceil(totalCount / PRODUCTS_PER_PAGE) - 1; // since pages start from 0;
 
   return res.json({
-    data: shuffleArray(products),
+    products: shuffleArray(products),
     totalPages,
   });
 });
@@ -80,7 +80,7 @@ router.get("/categories/:category", async (req, res) => {
     .limit(PRODUCTS_PER_PAGE)
     .skip(page * PRODUCTS_PER_PAGE);
 
-  res.json({ data: products, totalPages });
+  res.json({ products, totalPages });
 });
 
 router.get("/query", async (req, res, next) => {
@@ -106,7 +106,7 @@ router.get("/query", async (req, res, next) => {
       .limit(PRODUCTS_PER_PAGE)
       .skip(page * PRODUCTS_PER_PAGE);
 
-    res.json({ data: products, totalPages });
+    res.json({ products, totalPages });
   }
 });
 
