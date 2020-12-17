@@ -1,4 +1,4 @@
-const PRODUCTS_PER_PAGE = 10;
-const SELLERS_PER_PAGE = 10;
+const PRODUCTS_PER_PAGE = 20;
+const SELLERS_PER_PAGE = 20;
 
 module.exports = { PRODUCTS_PER_PAGE, SELLERS_PER_PAGE };
