@@ -24,6 +24,7 @@ const userAgentIP = (req) => req.ipInfo.ip;
  *
  */
 
+// Get all products from a store
 router.get("/", async (req, res) => {
   const { page: _page = 0 } = req.query;
   const criteria = {
@@ -44,21 +45,18 @@ router.get("/", async (req, res) => {
   });
 });
 
+// Get all categories
+// categories are fetched this way to ensure that
+// there is at least a product with that category
 router.get("/categories", async (req, res) => {
   const categories = await Product.find({
     store_id: req.store_id,
     visible: true,
-  }).select("category");
-
-  const filteredCategories = [];
-  categories.forEach(({ category }) => {
-    if (!filteredCategories.includes(category)) {
-      filteredCategories.push(category);
-    }
-  });
-  return res.json(filteredCategories);
+  }).distinct("category");
+  return res.json({ categories });
 });
 
+// Get products by category
 router.get("/categories/:category", async (req, res) => {
   const { page: _page } = req.query;
   const page = parseInt(_page);
@@ -83,6 +81,7 @@ router.get("/categories/:category", async (req, res) => {
   res.json({ products, totalPages });
 });
 
+// Get products by query
 router.get("/query", async (req, res, next) => {
   const { q = null, page: _page } = req.query;
 
@@ -110,6 +109,7 @@ router.get("/query", async (req, res, next) => {
   }
 });
 
+// Get product by id
 router.get("/:id", async (req, res) => {
   const product = await Product.findOne({
     _id: req.params.id,
@@ -121,9 +121,10 @@ router.get("/:id", async (req, res) => {
       error: "Invalid id",
       message: "No product with that id exists",
     });
-  return res.json(product);
+  return res.json({ product });
 });
 
+// Get products by seller
 router.get("/seller/:id", async (req, res) => {
   try {
     const { page: _page } = req.query;
@@ -152,6 +153,7 @@ router.get("/seller/:id", async (req, res) => {
   }
 });
 
+// Update the number of views of a product
 router.get("/views/:id", async (req, res) => {
   const id = req.params.id;
   const ip = userAgentIP(req);
@@ -191,6 +193,7 @@ router.get("/views/:id", async (req, res) => {
  *
  */
 
+// Add a new product
 router.post(
   "/",
   isAuthenticated,
@@ -281,6 +284,7 @@ router.post(
   }
 );
 
+// Delete a product
 router.delete("/:id", isAuthenticated, async (req, res) => {
   try {
     const product = await Product.findOneAndDelete({
@@ -305,6 +309,7 @@ router.delete("/:id", isAuthenticated, async (req, res) => {
   }
 });
 
+// Update a product
 router.post(
   "/update/:id",
   isAuthenticated,
