@@ -49,11 +49,32 @@ router.get("/", async (req, res) => {
 // categories are fetched this way to ensure that
 // there is at least a product with that category
 router.get("/categories", async (req, res) => {
-  const categories = await Product.find({
+  const { page: _page } = req.query;
+  const page = parseInt(_page);
+
+  const criteria = {
     store_id: req.store_id,
     visible: true,
-  }).distinct("category");
-  return res.json({ categories });
+  };
+
+  const totalCount = await Product.countDocuments({ ...criteria });
+  const totalPages = Math.ceil(totalCount / PRODUCTS_PER_PAGE) - 1; // since pages start from 0;
+
+  const products = await Product.find({
+    ...criteria,
+  })
+    .select("category")
+    .limit(PRODUCTS_PER_PAGE * (page + 1));
+
+  const categories = [];
+
+  products.forEach(({ category }) => {
+    if (!categories.includes(category)) {
+      categories.push(category);
+    }
+  });
+
+  return res.json({ categories, totalPages });
 });
 
 // Get products by category
@@ -69,16 +90,13 @@ router.get("/categories/:category", async (req, res) => {
     category,
   };
 
-  const totalCount = await Product.countDocuments({ ...criteria });
-  const totalPages = Math.ceil(totalCount / PRODUCTS_PER_PAGE) - 1; // since pages start from 0;
-
   const products = await Product.find({
     ...criteria,
   })
     .limit(PRODUCTS_PER_PAGE)
     .skip(page * PRODUCTS_PER_PAGE);
 
-  res.json({ products, totalPages });
+  res.json({ products });
 });
 
 // Get products by query
