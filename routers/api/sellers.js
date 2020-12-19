@@ -34,6 +34,7 @@ const { SELLERS_PER_PAGE } = require("../../constants");
  *
  */
 
+// Get all sellers in a store
 router.get("/", async (req, res) => {
   const { page: _page = 0 } = req.query;
   const criteria = {
@@ -54,6 +55,7 @@ router.get("/", async (req, res) => {
   return res.json({ sellers, totalPages });
 });
 
+// Get seller by username
 router.get("/:username", async (req, res) => {
   const seller = await Seller.findOne({
     username: req.params.username,
@@ -75,6 +77,7 @@ router.get("/:username", async (req, res) => {
   return res.json({ seller, totalProducts });
 });
 
+// Get seller by id
 router.get("/id/:id", async (req, res) => {
   const id = req.params.id;
   try {
@@ -83,7 +86,7 @@ router.get("/id/:id", async (req, res) => {
       store_id: req.store_id,
       subscription_type: { $ne: null },
     }).select("-password");
-    res.json(seller);
+    res.json({ seller });
   } catch {
     // then seller does not exist
     return res.status(404).json({
@@ -93,6 +96,7 @@ router.get("/id/:id", async (req, res) => {
   }
 });
 
+// Get sellers by query
 router.get("/search/query", async (req, res) => {
   const { q = null, page: _page } = req.query;
   let searchRegex = new RegExp(`${q.replace("%20", "").toLowerCase()}`, "ig");
@@ -125,6 +129,7 @@ router.get("/search/query", async (req, res) => {
   }
 });
 
+// Create new seller
 router.post("/", upload.single("avatar"), async (req, res) => {
   try {
     let {
@@ -236,6 +241,7 @@ router.post("/", upload.single("avatar"), async (req, res) => {
   }
 });
 
+// Resend email confirmation link
 router.post("/resend_confirmation_link", async (req, res) => {
   let { email } = req.body;
   email = email.trim();
@@ -299,6 +305,7 @@ router.post("/resend_confirmation_link", async (req, res) => {
   }
 });
 
+// Reset password request
 router.post("/reset_password", async (req, res) => {
   let { email } = req.body;
   email = email.trim();
@@ -367,6 +374,7 @@ router.post("/reset_password", async (req, res) => {
  *
  */
 
+// Delete seller
 router.delete("/", isAuthenticated, async (req, res) => {
   try {
     const seller = await Seller.findOne({
@@ -401,6 +409,7 @@ router.delete("/", isAuthenticated, async (req, res) => {
   }
 });
 
+// Update seller
 router.post(
   "/update",
   isAuthenticated,
@@ -488,6 +497,7 @@ router.post(
   }
 );
 
+// Update seller email
 router.post("/update/email/", isAuthenticated, async (req, res) => {
   let { email } = req.body;
   email = email.trim();
@@ -746,10 +756,7 @@ router.post("/subscription/activate", async (req, res) => {
   // }
 });
 
-// @title UPDATE request seller email
-// @desc update seller password in mongoose document by id
-// @access public
-
+// Update seller password
 router.post("/update/password", isAuthenticated, async (req, res) => {
   const { old_password, new_password } = req.body;
 
@@ -789,6 +796,7 @@ router.post("/update/password", isAuthenticated, async (req, res) => {
   }
 });
 
+// Get all notifications for seller
 router.get("/notifications/all", isAuthenticated, async (req, res) => {
   const allNotifications = await SellerNotificationMessage.find();
 
@@ -796,9 +804,10 @@ router.get("/notifications/all", isAuthenticated, async (req, res) => {
   const unreadNotifications = allNotifications.filter((n) => {
     return !n.viewedIds.includes(sellerId);
   });
-  res.json(unreadNotifications);
+  res.json({ notifications: unreadNotifications });
 });
 
+// Get notification
 router.get("/notifications/:id", isAuthenticated, async (req, res) => {
   const { id = null } = req.params;
 

@@ -5,8 +5,9 @@ const bcrypt = require("bcryptjs");
 const Seller = require("../../models/Seller");
 const { getToken } = require("../../functions/token");
 const isAuthenticated = require("../../middlewares/isAuthenticated");
-const getAuthUser = require('../../functions/getAuthUser')
+const getAuthUser = require("../../functions/getAuthUser");
 
+// Log in seller
 router.post("/login", async (req, res) => {
   let { usernameOrEmail, password } = req.body;
 
@@ -51,7 +52,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.get("/me", isAuthenticated, async (req, res) => {
-  res.json(getAuthUser(req))
+  res.json(getAuthUser(req));
 });
 
 module.exports = router;

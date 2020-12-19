@@ -57,9 +57,6 @@ router.get("/categories", async (req, res) => {
     visible: true,
   };
 
-  const totalCount = await Product.countDocuments({ ...criteria });
-  const totalPages = Math.ceil(totalCount / PRODUCTS_PER_PAGE) - 1; // since pages start from 0;
-
   const products = await Product.find({
     ...criteria,
   })
@@ -74,7 +71,7 @@ router.get("/categories", async (req, res) => {
     }
   });
 
-  return res.json({ categories, totalPages });
+  return res.json({ categories });
 });
 
 // Get products by category
@@ -90,13 +87,16 @@ router.get("/categories/:category", async (req, res) => {
     category,
   };
 
+  const totalCount = await Product.countDocuments({ ...criteria });
+  const totalPages = Math.ceil(totalCount / PRODUCTS_PER_PAGE) - 1; // since pages start from 0;
+
   const products = await Product.find({
     ...criteria,
   })
     .limit(PRODUCTS_PER_PAGE)
     .skip(page * PRODUCTS_PER_PAGE);
 
-  res.json({ products });
+  res.json({ products, totalPages });
 });
 
 // Get products by query
