@@ -6,7 +6,9 @@
   "types": "types.d.ts",
   "scripts": {
     "start": "node",
-    "server": "nodemon"
+    "server": "nodemon",
+    "build": "tsc",
+    "postinstall": "npm run build"
   },
   "author": "Dillion Megida",
   "license": "MIT",
