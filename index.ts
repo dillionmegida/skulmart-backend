@@ -5,7 +5,7 @@ import cors from "cors";
 import { config } from "dotenv";
 config();
 
-import("database");
+import("./database");
 import("helpers/dashboard-monitor");
 
 import expressip from "express-ip";
