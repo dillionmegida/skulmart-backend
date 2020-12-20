@@ -13,7 +13,7 @@ import expressip from "express-ip";
 // cloudinary configurations
 import { v2 as cloudinary } from "cloudinary";
 
-import cleanups from "cleanups";
+import cleanups from "./cleanups";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
