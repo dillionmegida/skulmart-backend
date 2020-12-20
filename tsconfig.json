@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "lib": ["es6", "dom", "es2017"],
+    "rootDir": "./",
+    "outDir": "./build",
+    "esModuleInterop": true,
+    "strict": true,
+    "typeRoots": ["./node_modules/@types", "./types.d.ts"],
+
+    "baseUrl": ".",
+    "paths": {
+      "config/*": ["config/*"],
+      "express-ip": ["customTypes/express-ip"],
+      "paystack-api": ["customTypes/paystack-api"],
+      "sharpdashboard-sdk-node": ["customTypes/sharpdashboard-sdk-node"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}
