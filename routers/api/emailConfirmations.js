@@ -20,7 +20,10 @@ router.get("/:hash", async (req, res) => {
 
   if (hash === null) {
     // then the hash does not exist
-    return res.redirect("/");
+    return res.json({
+      error: true,
+      message: "Link has expired",
+    });
   }
 
   const seller_id = hash.seller_id;
@@ -62,9 +65,9 @@ router.get("/:hash", async (req, res) => {
 
     // whether a welcome email is able to sent or not, redirect to email_confirmed
     // because seller email has already been confirmed
-    res.redirect(
-      `http://${storeName}.skulmart.com/email_confirmed?email=${confirmedSeller.email}`
-    );
+    res.json({
+      redirectTo: `http://${storeName}.skulmart.com/email_confirmed?email=${confirmedSeller.email}`,
+    });
   } else {
     res.json(400).json({
       error: "Could not verify email",

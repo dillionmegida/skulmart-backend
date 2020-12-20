@@ -3,7 +3,6 @@ const siteDetails = require("../config/siteDetails");
 
 module.exports = async function getStore(req, res, next) {
   const { store_name, main = null } = req.headers;
-  // console.log(req)
 
   if (main !== null)
     // then API requests are coming from the main app
