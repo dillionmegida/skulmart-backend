@@ -20,10 +20,6 @@
       "models/*": ["models/*"],
       "routers/*": ["routers/*"],
       "utils/*": ["utils/*"],
-      "./*": ["./*"],
-      "express-ip": ["customTypes/express-ip"],
-      "paystack-api": ["customTypes/paystack-api"],
-      "sharpdashboard-sdk-node": ["customTypes/sharpdashboard-sdk-node"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],
