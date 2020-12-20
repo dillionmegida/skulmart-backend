@@ -83,21 +83,21 @@ const cleanups = async () => {
   //     viewedIds: [],
   //   },
   // ]);
-//     await SellerNotificationMessage.insertMany([
-//       {
-//         title: "🎉🎉 The Notifications Feature",
-//         message: `We want to reduce the communication barrier between us and you. So now we have the <b>Notifications Feature</b>.
+  //     await SellerNotificationMessage.insertMany([
+  //       {
+  //         title: "🎉🎉 The Notifications Feature",
+  //         message: `We want to reduce the communication barrier between us and you. So now we have the <b>Notifications Feature</b>.
 
-// With this, we can easily inform you of the new features we're including on our platform so you can start using them.
+  // With this, we can easily inform you of the new features we're including on our platform so you can start using them.
 
-// If we also notice issues on your account, this will be a fast way to reach out to you so you can resolve them.
+  // If we also notice issues on your account, this will be a fast way to reach out to you so you can resolve them.
 
-// Keep enjoying our platform : )
+  // Keep enjoying our platform : )
 
-// We hope to serve you the best.
-// `,
-//       },
-//     ]);
+  // We hope to serve you the best.
+  // `,
+  //       },
+  //     ]);
   // const notifications = await SellerNotificationMessage.find();
   // console.log({notifications})
   // await SellerNotificationMessage.deleteMany();
