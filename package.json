@@ -2,12 +2,13 @@
   "name": "market-hub-server",
   "version": "1.0.0",
   "description": "The server for Market-Hub",
-  "main": "index.ts",
+  "main": "build/index.js",
   "scripts": {
     "start": "node build/index.js",
     "server": "nodemon",
     "build": "tsc",
-    "postinstall": "npm run build"
+    "postinstall": "npm run build",
+    "deploy": "git add . && git commit -m 'Heroku deploy' && git push heroku master"
   },
   "author": "Dillion Megida",
   "license": "MIT",
@@ -53,6 +54,7 @@
       "."
     ],
     "exec": "node -r tsconfig-paths/register -r ts-node/register ./index.ts",
-    "ext": "ts, js"
+    "ext": "ts, js",
+    "engines": { "node": "12.16.3" }
   }
 }
