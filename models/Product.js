@@ -34,6 +34,14 @@ const productSchema = new Schema(
       required: true,
       min: 0,
     },
+    quantity: {
+      type: Number,
+      default: 1,
+    },
+    quantity_sold: {
+      type: Number,
+      default: 0,
+    },
     views: {
       type: Object,
       default: {

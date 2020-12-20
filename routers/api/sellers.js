@@ -26,7 +26,7 @@ const isAuthenticated = require("../../middlewares/isAuthenticated");
 const { getToken } = require("../../functions/token");
 const SellerNotificationMessage = require("../../models/SellerNotificationMessage");
 const getAuthUser = require("../../functions/getAuthUser");
-const { SELLERS_PER_PAGE } = require("../../constants");
+const { SELLERS_PER_PAGE, PRODUCTS_PER_PAGE } = require("../../constants");
 
 /*
  *
@@ -373,6 +373,36 @@ router.post("/reset_password", async (req, res) => {
  * PRIVATE ROUTES
  *
  */
+
+// Get all products of logged in seller
+router.get("/products/all", isAuthenticated, async (req, res) => {
+  try {
+    const { page: _page } = req.query;
+    const page = parseInt(_page);
+
+    const criteria = {
+      store_id: req.store_id,
+      visible: true,
+      seller_id: getAuthUser(req)._id,
+    };
+
+    const totalCount = await Product.countDocuments({ ...criteria });
+    const totalPages = Math.ceil(totalCount / PRODUCTS_PER_PAGE) - 1; // since pages start from 0;
+
+    const products = await Product.find({
+      ...criteria,
+    })
+      .limit(PRODUCTS_PER_PAGE)
+      .skip(page * PRODUCTS_PER_PAGE);
+
+    res.json({ products, totalPages });
+  } catch (err) {
+    res.status(404).json({
+      error: err,
+      message: "Error. Coudn't load products",
+    });
+  }
+});
 
 // Delete seller
 router.delete("/", isAuthenticated, async (req, res) => {

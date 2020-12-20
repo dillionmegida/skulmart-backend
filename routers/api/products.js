@@ -30,6 +30,9 @@ router.get("/", async (req, res) => {
   const criteria = {
     store_id: req.store_id,
     visible: true,
+    quantity: {
+      $gt: 0,
+    },
   };
   const page = parseInt(_page);
   const totalCount = await Product.countDocuments({ ...criteria });
@@ -55,6 +58,9 @@ router.get("/categories", async (req, res) => {
   const criteria = {
     store_id: req.store_id,
     visible: true,
+    quantity: {
+      $gt: 0,
+    },
   };
 
   const products = await Product.find({
@@ -85,6 +91,9 @@ router.get("/categories/:category", async (req, res) => {
     store_id: req.store_id,
     visible: true,
     category,
+    quantity: {
+      $gt: 0,
+    },
   };
 
   const totalCount = await Product.countDocuments({ ...criteria });
@@ -112,6 +121,9 @@ router.get("/query", async (req, res, next) => {
       store_id: req.store_id,
       visible: true,
       name: { $regex: searchRegex },
+      quantity: {
+        $gt: 0,
+      },
     };
     const page = parseInt(_page);
     const totalCount = await Product.countDocuments({ ...criteria });
@@ -152,6 +164,9 @@ router.get("/seller/:id", async (req, res) => {
       store_id: req.store_id,
       visible: true,
       seller_id: req.params.id,
+      quantity: {
+        $gt: 0,
+      },
     };
 
     const totalCount = await Product.countDocuments({ ...criteria });
@@ -196,6 +211,7 @@ router.get("/views/:id", async (req, res) => {
           },
         });
       }
+      res.json({});
     }
   } catch (err) {
     res.status(404).json({
@@ -218,7 +234,7 @@ router.post(
   upload.single("prodImage"),
   async (req, res) => {
     try {
-      let { name, desc, category, price } = req.body;
+      let { name, desc, category, price, quantity } = req.body;
 
       const loggedInSellerId = getAuthUser(req)._id;
 
@@ -242,6 +258,7 @@ router.post(
       name = capitalize(name.trim());
       category = category.toLowerCase().trim();
       desc = desc.trim();
+      quantity = parseInt(quantity);
 
       // Check if the same name has been posted by the same seller
       const existingProduct = await Product.findOne({
@@ -285,6 +302,7 @@ router.post(
         store_id: store._id,
         seller_id: loggedInSellerId,
         visible: true,
+        quantity,
       });
 
       await newProduct.save();
@@ -338,14 +356,15 @@ router.post(
       desc,
       category,
       price,
-      store_name,
       img_public_id,
       img_url,
+      quantity,
     } = req.body;
 
     name = capitalize(name.trim());
     category = category.toLowerCase().trim();
     desc = desc.trim();
+    quantity = parseInt(quantity);
 
     const authUser = getAuthUser(req);
 
@@ -410,6 +429,7 @@ router.post(
           price,
           store_id: store._id,
           seller_id: authUser,
+          quantity,
         },
       });
 
