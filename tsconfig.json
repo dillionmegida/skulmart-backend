@@ -19,7 +19,7 @@
       "middlewares/*": ["middlewares/*"],
       "models/*": ["models/*"],
       "routers/*": ["routers/*"],
-      "utils/*": ["utils/*"],
+      "utils/*": ["utils/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],
