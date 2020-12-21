@@ -1,3 +1,4 @@
+//@ts-ignore
 import { SharpDashBoard } from "sharpdashboard-sdk-node";
 import Sellers from "../models/Seller";
 

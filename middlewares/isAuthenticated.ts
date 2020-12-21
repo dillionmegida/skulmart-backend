@@ -17,7 +17,7 @@ export default async function isAuthTokenValid(req: any, res: any, next: any) {
     if (!user) {
       return res.status(401).json({ message: "auth token invalid" });
     }
-    req.user = { ...user };
+    req.user = Object.create(user);
     next();
   } catch {
     return res.status(401).json({ message: "auth token invalid" });

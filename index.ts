@@ -8,6 +8,7 @@ config();
 import("./database");
 import("helpers/dashboard-monitor");
 
+//@ts-ignore
 import expressip from "express-ip";
 
 // cloudinary configurations
@@ -54,6 +55,8 @@ app.get("/cleanups", async (req: any, res: any) => {
 
 import products from "routers/api/products";
 import sellers from "routers/api/sellers";
+import users from "routers/api/users";
+import buyers from "routers/api/buyers";
 import stores from "routers/api/stores";
 import emailConfirmations from "routers/api/emailConfirmations";
 import resetPasswords from "routers/api/resetPasswords";
@@ -66,6 +69,7 @@ import Seller from "models/Seller";
 app.use("/api/products/", products);
 app.use("/api/sellers/", sellers);
 app.use("/api/stores/", stores);
+app.use("/api/users/", users);
 app.use("/confirm_email/", emailConfirmations);
 app.use("/reset_password/", resetPasswords);
 

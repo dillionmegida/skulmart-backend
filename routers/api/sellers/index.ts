@@ -1,33 +1,34 @@
-import router from "routers/api/auth";
+import express from "express";
+const router = express.Router();
 import bcrypt from "bcryptjs";
-import sendEmailConfirmation from "../../mails/emailConfirmation";
-import resetPassword from "../../mails/resetPassword";
+import resetPassword from "mails/resetPassword";
 import confirmChangedEmail from "mails/confirmChangedEmail";
-import { capitalize, bcryptPromise } from "utils/strings";
 import { randomNumber } from "utils/numbers";
+import sendEmailConfirmation from "mails/emailConfirmation";
 
 const paystackKey = process.env.PAYSTACK_SECRET_KEY;
 
+//@ts-ignore
 import _paystack from "paystack-api";
 const paystack = _paystack(paystackKey);
 
 import multer from "multer";
 var upload = multer({ dest: "uploads/" });
 
-import { FREE_PLAN, SILVER_PLAN } from "../../constants/subscriptionTypes";
+import { FREE_PLAN, SILVER_PLAN } from "constants/subscriptionTypes";
 
 import { v2 as cloudinary } from "cloudinary";
 
-import Seller from "../../models/Seller";
-import Product from "../../models/Product";
-import Store from "../../models/Store";
-import EmailConfirmation from "../../models/EmailConfirmation";
-import ResetPassword from "../../models/ResetPassword";
-import isAuthenticated from "../../middlewares/isAuthenticated";
+import Seller from "models/Seller";
+import Product from "models/Product";
+import Store from "models/Store";
+import EmailConfirmation from "models/EmailConfirmation";
+import ResetPassword from "models/ResetPassword";
+import isAuthenticated from "middlewares/isAuthenticated";
 import { getToken } from "utils/token";
-import SellerNotificationMessage from "../../models/SellerNotificationMessage";
-import getAuthUser from "utils/getAuthUser";
-import { SELLERS_PER_PAGE, PRODUCTS_PER_PAGE } from "../../constants";
+import SellerNotificationMessage from "models/SellerNotificationMessage";
+import { SELLERS_PER_PAGE, PRODUCTS_PER_PAGE } from "constants/index";
+import { capitalize, bcryptPromise } from "utils/strings";
 
 /*
  *
@@ -126,125 +127,6 @@ router.get("/search/query", async (req: any, res: any) => {
     res.status(400).json({
       error: err,
       message: "No seller matched that query",
-    });
-  }
-});
-
-// Create new seller
-router.post("/", upload.single("avatar"), async (req: any, res: any) => {
-  try {
-    let {
-      fullname,
-      brand_name,
-      username,
-      brand_desc,
-      whatsapp,
-      email,
-      password,
-      store_name,
-    } = req.body;
-
-    // confirm formats of inputs
-    fullname = capitalize(fullname.trim());
-    brand_name = capitalize(brand_name.trim());
-    // remove spaces - though this is handled in the client side already but just incase
-    username = username.trim().replace(/\s/g, "").toLowerCase();
-    email = email.trim();
-
-    // check if seller already exists by username and email address
-    const seller = await Seller.findOne({ $or: [{ username }, { email }] });
-
-    if (seller) {
-      // return if user exists
-      if (seller.username === username) {
-        return res.status(400).json({
-          message: `Seller with username '${username}' already exists.`,
-        });
-      }
-      if (seller.email === email) {
-        if (seller.email === email) {
-          return res.status(400).json({
-            message: `Seller with email '${email}' already exists.`,
-          });
-        }
-      }
-    }
-
-    const store = await Store.findOne({
-      shortname: store_name.toLowerCase(),
-    });
-
-    if (!store)
-      return res.status(400).json({
-        message: "Store does not exist",
-      });
-
-    const { _id: store_id, shortname } = store;
-
-    const { public_id, url } = await cloudinary.uploader.upload(req.file.path, {
-      public_id: req.file.filename,
-      folder: "market-hub/user_images",
-    });
-
-    // create an object of the body entry
-    const newSeller = new Seller({
-      img: { public_id, url },
-      fullname,
-      brand_name,
-      username,
-      brand_desc,
-      whatsapp,
-      email,
-      password,
-      store_id,
-      store_name: shortname,
-    });
-
-    newSeller.password = await bcryptPromise(newSeller.password);
-
-    await newSeller.save();
-
-    const generatedHash = randomNumber();
-
-    // seller_id would be sent with email, so that on verification, the email_confirm field would be true
-    const seller_id = newSeller._id;
-
-    const newEmailToBeConfirmed = new EmailConfirmation({
-      generatedHash,
-      seller_id,
-    });
-
-    await newEmailToBeConfirmed.save();
-
-    const token = getToken({ _id: newSeller._id });
-
-    const sendEmailResponse = await sendEmailConfirmation({
-      generatedHash,
-      email,
-      name: fullname,
-      store: store_name,
-      type: "welcome",
-    });
-
-    if (!sendEmailResponse.error) {
-      // then the email went successfully
-      res.json({
-        token,
-        message:
-          "Account Created Successfully 💛. Please check your email to confirm your email address then login",
-      });
-    } else {
-      // well the seller was still saved even if email wasn't sent
-      console.log(
-        "Email confirmation couldn't be sent >> ",
-        sendEmailResponse.error
-      );
-    }
-  } catch (err) {
-    console.log("An error occured during seller creation >> ", err);
-    res.status(500).json({
-      error: err,
-      message: "Error occured. Please try again",
     });
   }
 });
@@ -397,7 +279,7 @@ router.get("/products/all", isAuthenticated, async (req: any, res: any) => {
     const criteria = {
       store_id: req.store_id,
       visible: true,
-      seller_id: getAuthUser(req)._id,
+      seller_id: req.user._id,
     };
 
     const totalCount = await Product.countDocuments({ ...criteria });
@@ -436,7 +318,7 @@ router.delete("/", isAuthenticated, async (req: any, res: any) => {
       store_id: req.store_id,
     });
 
-    cloudinary.uploader.destroy(seller.img.public_id, (error) => {
+    cloudinary.uploader.destroy(seller.img.public_id, (error: any) => {
       if (error) {
         console.log("Could not delete seller image >> ", error);
       }
@@ -562,7 +444,7 @@ router.post("/update/email/", isAuthenticated, async (req: any, res: any) => {
     });
   }
 
-  const sellerId = getAuthUser(req)._id;
+  const sellerId = req.user._id;
 
   const existingSeller = await Seller.findOne({
     _id: sellerId,
@@ -632,7 +514,7 @@ router.get(
 
     const amount = helper.addFeesTo(price);
 
-    const seller = getAuthUser(req);
+    const seller = req.user;
 
     type PaystackResponse = {
       data: {
@@ -692,7 +574,7 @@ router.get("/subscription/callback", async (req: any, res: any) => {
 
     let sellerId, subscriptionReference;
 
-    const seller = getAuthUser(req);
+    const seller = req.user;
     if (seller) {
       // which is expected
       sellerId = seller._id;
@@ -824,7 +706,7 @@ router.post("/subscription/activate", async (req: any, res: any) => {
 router.post("/update/password", isAuthenticated, async (req: any, res: any) => {
   const { old_password, new_password } = req.body;
 
-  const authUser = getAuthUser(req);
+  const authUser = req.user;
 
   const seller = await Seller.findOne({
     _id: authUser._id,
@@ -872,7 +754,7 @@ router.get(
   async (req: any, res: any) => {
     const allNotifications = await SellerNotificationMessage.find();
 
-    const sellerId = getAuthUser(req)._id;
+    const sellerId = req.user._id;
     const unreadNotifications = allNotifications.filter((n) => {
       return !n.viewedIds.includes(sellerId);
     });
@@ -887,7 +769,7 @@ router.get(
   async (req: any, res: any) => {
     const { id = null } = req.params;
 
-    const sellerId = getAuthUser(req)._id;
+    const sellerId = req.user._id;
     if (id) {
       try {
         const notification = await SellerNotificationMessage.findById(id);

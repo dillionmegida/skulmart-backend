@@ -9,7 +9,6 @@ import Store from "models/Store";
 import multer from "multer";
 import Seller from "models/Seller";
 import isAuthenticated from "middlewares/isAuthenticated";
-import getAuthUser from "utils/getAuthUser";
 var upload = multer({ dest: "uploads/" });
 
 import { v2 as cloudinary } from "cloudinary";
@@ -237,7 +236,7 @@ router.post(
     try {
       let { name, desc, category, price, quantity } = req.body;
 
-      const loggedInSellerId = getAuthUser(req)._id;
+      const loggedInSellerId = req.user._id;
 
       const response = await Seller.findOne({
         _id: loggedInSellerId,
@@ -376,7 +375,7 @@ router.post(
     desc = desc.trim();
     quantity = parseInt(quantity);
 
-    const authUser = getAuthUser(req);
+    const authUser = req.user;
 
     try {
       const existingProduct = await Product.findOne({
