@@ -7,6 +7,11 @@ const BuyerSchema: Schema = new Schema(
       type: Object,
       required: true,
     },
+    // type differentiates Seller from Buyer
+    type: {
+      type: String,
+      default: "buyer",
+    },
     fullname: {
       type: String,
       required: true,

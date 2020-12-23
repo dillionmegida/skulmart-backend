@@ -14,6 +14,11 @@ const SellerSchema: Schema = new Schema(
     brand_name: {
       type: String,
     },
+    // type differentiates Seller from Buyer
+    type: {
+      type: String,
+      default: "seller",
+    },
     username: {
       type: String,
       required: true,
