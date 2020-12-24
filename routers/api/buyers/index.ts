@@ -2,7 +2,7 @@ import express from "express";
 const router = express.Router();
 import bcrypt from "bcryptjs";
 import sendEmailConfirmation from "mails/emailConfirmation";
-import resetPassword from "mails/resetPassword";
+import resetPassword from "mails/resetPasswordEmail";
 import confirmChangedEmail from "mails/confirmChangedEmail";
 import { capitalize, bcryptPromise } from "utils/strings";
 import { randomNumber } from "utils/numbers";
@@ -338,7 +338,7 @@ router.get("/products/all", isAuthenticated, async (req: any, res: any) => {
 router.delete("/", isAuthenticated, async (req: any, res: any) => {
   try {
     const seller = await Seller.findOne({
-      _id: req.seller._id,
+      _id: req.user._id,
       store_id: req.store_id,
     });
 
@@ -348,7 +348,7 @@ router.delete("/", isAuthenticated, async (req: any, res: any) => {
       });
 
     await Product.deleteMany({
-      seller_id: req.seller._id,
+      seller_id: req.user._id,
       store_id: req.store_id,
     });
 
@@ -397,10 +397,10 @@ router.post(
 
     const existingSeller = await Seller.findOne({
       username,
-      _id: req.seller_id,
+      _id: req.user._id,
     });
 
-    if (existingSeller && existingSeller._id !== req.seller._id) {
+    if (existingSeller && existingSeller._id !== req.user._id) {
       // then there is an seller product with the name
       return res.status(400).json({
         message: `Seller with the username '${username}' already exists`,
@@ -435,7 +435,7 @@ router.post(
 
     try {
       await Seller.findOneAndUpdate(
-        { _id: req.seller._id, store_id: req.store_id },
+        { _id: req.user._id, store_id: req.store_id },
         {
           $set: {
             img: {
@@ -701,7 +701,7 @@ router.post("/subscription/activate", async (req: any, res: any) => {
   // const { type } = req.body;
 
   // try {
-  //   const sellerId = req.seller._id;
+  //   const sellerId = req.user._id;
 
   //   let subscriptionType;
 

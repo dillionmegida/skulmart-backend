@@ -1,18 +1,18 @@
 import sendMail from ".";
 import { siteName } from "config/siteDetails";
 
-type ResetPasswordArgs = {
+type ResetPasswordEmailArgs = {
   generatedHash: string;
   email: string;
   name: string;
   store: string;
 };
-const resetPassword = async ({
+const resetPasswordEmail = async ({
   generatedHash,
   email,
   name,
   store,
-}: ResetPasswordArgs) => {
+}: ResetPasswordEmailArgs) => {
   const subject = `Reset your password on ${siteName}`;
   const html = `
         <h2>Hi ${name} 👋</h2>
@@ -32,7 +32,7 @@ const resetPassword = async ({
             font-size: 16px;
             text-decoration: none;
             '
-            href='https://${store}.skulmart.com/reset_password/${generatedHash}'
+            href='https://${store}.skulmart.com/reset_password?hash=${generatedHash}'
             title='Reset your password on ${siteName}'
         >
             Reset Password
@@ -58,4 +58,4 @@ const resetPassword = async ({
   };
 };
 
-export default resetPassword;
+export default resetPasswordEmail;

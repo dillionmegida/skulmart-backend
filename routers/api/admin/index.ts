@@ -3,12 +3,12 @@ const router = Router();
 
 import bcrypt from "bcryptjs";
 
-import Admin from "../../models/Admin";
+import Admin from "models/Admin";
 import Seller from "models/Seller";
-import Store from "../../models/Store";
-import Product from "../../models/Product";
+import Store from "models/Store";
+import Product from "models/Product";
 
-import isAdminLoggedIn from "../../middlewares/isAdminLoggedIn";
+import isAdminLoggedIn from "middlewares/isAdminLoggedIn";
 
 router.post("/login", async (req: any, res: any) => {
   const { email, password } = req.body;

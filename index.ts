@@ -58,7 +58,6 @@ import sellers from "routers/api/sellers";
 import users from "routers/api/users";
 import buyers from "routers/api/buyers";
 import stores from "routers/api/stores";
-import emailConfirmations from "routers/api/emailConfirmations";
 
 import admin from "routers/api/admin";
 import Seller from "models/Seller";
@@ -69,7 +68,6 @@ app.use("/api/products/", products);
 app.use("/api/sellers/", sellers);
 app.use("/api/stores/", stores);
 app.use("/api/users/", users);
-app.use("/confirm_email/", emailConfirmations);
 
 app.use("/api/admin", admin);
 

@@ -1,7 +1,6 @@
 import express from "express";
 const router = express.Router();
 import bcrypt from "bcryptjs";
-import confirmChangedEmail from "mails/confirmChangedEmail";
 import { randomNumber } from "utils/numbers";
 
 const paystackKey = process.env.PAYSTACK_SECRET_KEY;
@@ -19,10 +18,8 @@ import { v2 as cloudinary } from "cloudinary";
 
 import Seller from "models/Seller";
 import Product from "models/Product";
-import Store from "models/Store";
 import EmailConfirmation from "models/EmailConfirmation";
 import isAuthenticated from "middlewares/isAuthenticated";
-import { getToken } from "utils/token";
 import SellerNotificationMessage from "models/SellerNotificationMessage";
 import { SELLERS_PER_PAGE, PRODUCTS_PER_PAGE } from "constants/index";
 import { capitalize, bcryptPromise } from "utils/strings";
@@ -160,206 +157,6 @@ router.get("/products/all", isAuthenticated, async (req: any, res: any) => {
     res.status(404).json({
       error: err,
       message: "Error. Coudn't load products",
-    });
-  }
-});
-
-// Delete seller
-router.delete("/", isAuthenticated, async (req: any, res: any) => {
-  try {
-    const seller = await Seller.findOne({
-      _id: req.seller._id,
-      store_id: req.store_id,
-    });
-
-    if (!seller)
-      return res.status(400).json({
-        message: "Seller not found",
-      });
-
-    await Product.deleteMany({
-      seller_id: req.seller._id,
-      store_id: req.store_id,
-    });
-
-    cloudinary.uploader.destroy(seller.img.public_id, (error: any) => {
-      if (error) {
-        console.log("Could not delete seller image >> ", error);
-      }
-    });
-
-    await Seller.deleteOne({
-      _id: seller._id,
-    });
-
-    res.json({
-      message: "Successfully deleted user",
-    });
-  } catch (err) {
-    console.log("Could not delete seller >> ", err);
-    return res.status(400).json({
-      error: err,
-      message: "No seller with that id",
-    });
-  }
-});
-
-// Update seller
-router.post(
-  "/update",
-  isAuthenticated,
-  upload.single("avatar"),
-  async (req: any, res: any) => {
-    let {
-      fullname,
-      brand_name,
-      username,
-      brand_desc,
-      whatsapp,
-      img_public_id,
-      img_url,
-    } = req.body;
-
-    fullname = capitalize(fullname.trim());
-    brand_name = capitalize(brand_name.trim());
-    // remove spaces - though this is handled in the client side already but just incase
-    username = username.trim().replace(/\s/g, "").toLowerCase();
-
-    const existingSeller = await Seller.findOne({
-      username,
-      _id: req.seller_id,
-    });
-
-    if (existingSeller && existingSeller._id !== req.seller._id) {
-      // then there is an seller product with the name
-      return res.status(400).json({
-        message: `Seller with the username '${username}' already exists`,
-      });
-    }
-
-    // former image details
-    let public_id = img_public_id;
-    let url = img_url;
-
-    if (req.file !== undefined) {
-      // then a new image was selected
-
-      // delete the previous image stored
-      await cloudinary.uploader.destroy(public_id, (error: any) => {
-        if (error) {
-          // then previous image was not deleted
-          console.log("Previous image could not be deleted >> ", error);
-          // still continue the update process, even if image was not deleted
-        }
-      });
-
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        public_id: req.file.filename,
-        folder: "market-hub/user_images",
-      });
-
-      // change image details to the new image
-      public_id = result.public_id;
-      url = result.url;
-    }
-
-    try {
-      await Seller.findOneAndUpdate(
-        { _id: req.seller._id, store_id: req.store_id },
-        {
-          $set: {
-            img: {
-              public_id,
-              url,
-            },
-            fullname,
-            brand_name,
-            username,
-            brand_desc,
-            whatsapp,
-          },
-        }
-      );
-      return res.json({
-        message: "Updated account successfully",
-      });
-    } catch (err) {
-      res.status(400).json({
-        error: err,
-        message: "No seller with that id",
-      });
-    }
-  }
-);
-
-// Update seller email
-router.post("/update/email/", isAuthenticated, async (req: any, res: any) => {
-  let { email } = req.body;
-  email = email.trim();
-
-  const existingSellerEmail = await Seller.findOne({
-    email,
-  });
-
-  if (existingSellerEmail !== null) {
-    // that means the new email used has been registered already
-    return res.status(400).json({
-      message: `Seller with the email '${email}' already exists`,
-    });
-  }
-
-  const sellerId = req.user._id;
-
-  const existingSeller = await Seller.findOne({
-    _id: sellerId,
-  });
-
-  if (!existingSeller)
-    return res.status(400).json({
-      message: "Seller not found",
-    });
-
-  try {
-    await Seller.findByIdAndUpdate(sellerId, {
-      $set: {
-        email,
-        email_confirm: false,
-      },
-    });
-
-    const generatedHash = randomNumber();
-
-    const newEmailToBeConfirmed = new EmailConfirmation({
-      generatedHash,
-      seller_id: sellerId,
-    });
-
-    await newEmailToBeConfirmed.save();
-
-    const sendEmailResponse = await confirmChangedEmail({
-      generatedHash,
-      email,
-      name: existingSeller.fullname,
-    });
-
-    if (!sendEmailResponse.error) {
-      // then the email went successfully
-      res.json({
-        message:
-          "Email changed Successfully 💛. Please check your email to confirm your new email address then login",
-      });
-    } else {
-      // well the seller was still saved even if email wasn't sent
-      console.log(
-        "Email confirmation during changing email process could't be sent >> ",
-        sendEmailResponse.error
-      );
-    }
-  } catch (err) {
-    console.log("Error sending email during changing email process >> ", err);
-    res.status(400).json({
-      error: err,
-      message: "Error occured. Please try again",
     });
   }
 });
@@ -531,7 +328,7 @@ router.post("/subscription/activate", async (req: any, res: any) => {
   // const { type } = req.body;
 
   // try {
-  //   const sellerId = req.seller._id;
+  //   const sellerId = req.user._id;
 
   //   let subscriptionType;
 
