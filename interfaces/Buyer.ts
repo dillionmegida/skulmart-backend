@@ -10,4 +10,5 @@ export default interface BuyerInterface extends Document {
   email_confirm: boolean;
   store_id: string;
   store_name: string;
+  type: "buyer";
 }

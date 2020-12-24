@@ -67,6 +67,8 @@ import SellerNotificationMessage from "models/SellerNotificationMessage";
 
 const cleanups = async () => {
   console.log("started cleanup");
+  // const sellers = await Seller.find()
+  // console.log({sellers})
   // await changeSubToNullForUnverified();
   // await tellSubscribedItIsFree();
   // await tellUnsubscribedItIsFree();

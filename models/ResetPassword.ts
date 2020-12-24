@@ -7,9 +7,8 @@ const ResetPassWordSchema: Schema = new Schema(
       type: String,
       required: true,
     },
-    seller_id: {
+    user_id: {
       type: Schema.Types.ObjectId,
-      ref: "Seller",
       required: true,
     },
   },

@@ -1,10 +1,8 @@
 import express from "express";
 const router = express.Router();
 import bcrypt from "bcryptjs";
-import resetPassword from "mails/resetPassword";
 import confirmChangedEmail from "mails/confirmChangedEmail";
 import { randomNumber } from "utils/numbers";
-import sendEmailConfirmation from "mails/emailConfirmation";
 
 const paystackKey = process.env.PAYSTACK_SECRET_KEY;
 
@@ -23,7 +21,6 @@ import Seller from "models/Seller";
 import Product from "models/Product";
 import Store from "models/Store";
 import EmailConfirmation from "models/EmailConfirmation";
-import ResetPassword from "models/ResetPassword";
 import isAuthenticated from "middlewares/isAuthenticated";
 import { getToken } from "utils/token";
 import SellerNotificationMessage from "models/SellerNotificationMessage";
@@ -127,139 +124,6 @@ router.get("/search/query", async (req: any, res: any) => {
     res.status(400).json({
       error: err,
       message: "No seller matched that query",
-    });
-  }
-});
-
-// Resend email confirmation link
-router.post("/resend_confirmation_link", async (req: any, res: any) => {
-  let { email } = req.body;
-  email = email.trim();
-
-  const seller = await Seller.findOne({ email });
-
-  try {
-    if (seller === null) {
-      // then email does not exist
-      return res.status(400).json({
-        error: "Unable to find email",
-        message: `'${email}' was not the email you inserted during your registration process`,
-      });
-    }
-
-    if (seller.email_confirm === true) {
-      return res.json({
-        message: "Your email address has been confirmed already",
-      });
-    }
-
-    const existingEmailConfirmation = await EmailConfirmation.findOne({
-      seller_id: seller._id,
-    });
-
-    // TODO just incase the emailConfirmation document was not saved
-
-    // if (existingEmailConfirmation === null) {
-    //   // then an email confirmation document was not saved for this email, which is almost never possible
-    //   const generatedHash = randomNumber();
-    //   const newEmailToBeConfirmed = new EmailConfirmation({
-    //     generatedHash,
-    //     seller_id: seller._id,
-    //   });
-
-    //   await newEmailToBeConfirmed.save();
-
-    if (!existingEmailConfirmation)
-      return res.status(400).json({ message: "Confirmation hash not found" });
-
-    const sendEmailResponse = await sendEmailConfirmation({
-      generatedHash: existingEmailConfirmation.generatedHash,
-      email: seller.email,
-      name: seller.fullname,
-      store: seller.store_name,
-    });
-
-    if (!sendEmailResponse.error) {
-      // then the email went successfully
-      res.json({
-        message:
-          "Confirmation link sent 💛. Please check your email to confirm your email address then login",
-      });
-    } else {
-      console.log(
-        "Email confirmation could't be sent >> ",
-        sendEmailResponse.error
-      );
-    }
-  } catch (err) {
-    console.log("An error occured while resending confirmation link >> ", err);
-    res.status(500).json({
-      error: err,
-      message: "Error occured. Please try again",
-    });
-  }
-});
-
-// Reset password request
-router.post("/reset_password", async (req: any, res: any) => {
-  let { email } = req.body;
-  email = email.trim();
-
-  const seller = await Seller.findOne({ email });
-
-  try {
-    if (seller === null) {
-      // then email does not exist
-      return res.status(400).json({
-        error: "Unable to find email",
-        message: `'${email}' was not the email you inserted during your registration process`,
-      });
-    }
-
-    const existingResetPassword = await ResetPassword.findOne({
-      seller_id: seller._id,
-    });
-
-    let hash;
-
-    if (existingResetPassword === null) {
-      const generatedHash = randomNumber();
-      const newPasswordReset = new ResetPassword({
-        generatedHash,
-        seller_id: seller._id,
-      });
-
-      await newPasswordReset.save();
-
-      hash = generatedHash;
-    }
-    // then a password reset document was saved already
-    else hash = existingResetPassword.generatedHash;
-
-    const sendEmailResponse = await resetPassword({
-      generatedHash: hash,
-      email,
-      name: seller.fullname,
-      store: seller.store_name,
-    });
-
-    if (!sendEmailResponse.error) {
-      // then the email went successfully
-      res.json({
-        message:
-          "Password reset link sent 💛. Please check your email to reset your password",
-      });
-    } else {
-      console.log(
-        "Password reset could't be sent >> ",
-        sendEmailResponse.error
-      );
-    }
-  } catch (err) {
-    console.log("An error occured while send password reset link >> ", err);
-    res.status(500).json({
-      error: err,
-      message: "Error occured. Please try again",
     });
   }
 });

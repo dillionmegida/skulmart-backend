@@ -16,4 +16,5 @@ export default interface SellerInterface extends Document {
   password: string;
   store_id: string;
   store_name: string;
+  type: "seller";
 }

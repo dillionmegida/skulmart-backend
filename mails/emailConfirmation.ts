@@ -7,6 +7,7 @@ type EmailConfirmationArgs = {
   store: string;
   type?: string;
   name: string;
+  user_type: "buyer" | "seller";
 };
 const emailConfirmation = async ({
   generatedHash,
@@ -14,11 +15,13 @@ const emailConfirmation = async ({
   name,
   store,
   type = "",
+  user_type,
 }: EmailConfirmationArgs) => {
   const subject = `Confirm your email address on ${siteName}`;
   const html = `
         <h2>Hi ${name} 👋</h2>
-        <p>Please confirm your email address (${email}) which you used for ${store} store on ${siteName}.</p>
+        <p>Please confirm your email address (${email})
+          which you used when registering as a ${user_type} for ${store} store on ${siteName}.</p>
         <a
             style='
             margin: 5px 0;
