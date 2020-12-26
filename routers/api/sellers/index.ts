@@ -1,7 +1,5 @@
 import express from "express";
 const router = express.Router();
-import bcrypt from "bcryptjs";
-import { randomNumber } from "utils/numbers";
 
 const paystackKey = process.env.PAYSTACK_SECRET_KEY;
 
@@ -9,20 +7,13 @@ const paystackKey = process.env.PAYSTACK_SECRET_KEY;
 import _paystack from "paystack-api";
 const paystack = _paystack(paystackKey);
 
-import multer from "multer";
-var upload = multer({ dest: "uploads/" });
-
 import { FREE_PLAN, SILVER_PLAN } from "constants/subscriptionTypes";
-
-import { v2 as cloudinary } from "cloudinary";
 
 import Seller from "models/Seller";
 import Product from "models/Product";
-import EmailConfirmation from "models/EmailConfirmation";
 import isAuthenticated from "middlewares/isAuthenticated";
 import SellerNotificationMessage from "models/SellerNotificationMessage";
 import { SELLERS_PER_PAGE, PRODUCTS_PER_PAGE } from "constants/index";
-import { capitalize, bcryptPromise } from "utils/strings";
 
 /*
  *
@@ -361,51 +352,6 @@ router.post("/subscription/activate", async (req: any, res: any) => {
   //     message: "Unable to subscribe",
   //   });
   // }
-});
-
-// Update seller password
-router.post("/update/password", isAuthenticated, async (req: any, res: any) => {
-  const { old_password, new_password } = req.body;
-
-  const authUser = req.user;
-
-  const seller = await Seller.findOne({
-    _id: authUser._id,
-  });
-
-  if (!seller)
-    return res.status(400).json({
-      message: "Seller not found",
-    });
-
-  // compare old password
-  const isMatch = await bcrypt.compare(old_password, seller.password);
-  if (!isMatch) {
-    // they they don't match
-    return res.status(400).json({
-      error: "Wrong credentials",
-      message: "Old password is incorrect",
-    });
-  }
-  try {
-    const encryptedPassword = await bcryptPromise(new_password);
-
-    await Seller.findByIdAndUpdate(seller._id, {
-      $set: {
-        password: encryptedPassword,
-      },
-    });
-
-    return res.json({
-      message: "Successfully updated password",
-    });
-  } catch (err) {
-    console.log("Error occurred during password update process >> ");
-    res.status(400).json({
-      error: err,
-      message: "Error occured! Please try again.",
-    });
-  }
 });
 
 // Get all notifications for seller

@@ -56,18 +56,16 @@ app.get("/cleanups", async (req: any, res: any) => {
 import products from "routers/api/products";
 import sellers from "routers/api/sellers";
 import users from "routers/api/users";
-import buyers from "routers/api/buyers";
 import stores from "routers/api/stores";
 
 import admin from "routers/api/admin";
-import Seller from "models/Seller";
 
 // api routes
 
-app.use("/api/products/", products);
-app.use("/api/sellers/", sellers);
-app.use("/api/stores/", stores);
-app.use("/api/users/", users);
+app.use("/api/products", products);
+app.use("/api/sellers", sellers);
+app.use("/api/stores", stores);
+app.use("/api/users", users);
 
 app.use("/api/admin", admin);
 

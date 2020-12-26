@@ -13,7 +13,6 @@ import resetPasswordEmail from "mails/resetPasswordEmail";
 import confirmChangedEmail from "mails/confirmChangedEmail";
 import welcomeEmail from "mails/welcomeEmail";
 
-
 import { v2 as cloudinary } from "cloudinary";
 
 import multer from "multer";
@@ -25,173 +24,418 @@ import BuyerInterface from "interfaces/Buyer";
 import SellerInterface from "interfaces/Seller";
 import Product from "models/Product";
 import { FREE_PLAN } from "constants/subscriptionTypes";
+import userTypeRequired from "middlewares/userTypeRequired";
+import chalk from "chalk";
+import { CLOUDINARY_USER_IMAGES_FOLDER } from "constants/index";
 
 var upload = multer({ dest: "uploads/" });
 
+// Get authenticated user
+router.get("/me", isAuthenticated, async (req: any, res: any) => {
+  res.json(req.user);
+});
+
 // Create new user
-router.post("/", upload.single("avatar"), async (req: any, res: any) => {
-  const body: SellerInterface | BuyerInterface = { ...req.body };
+router.post(
+  "/",
+  upload.single("avatar"),
+  userTypeRequired,
+  async (req: any, res: any) => {
+    const body: SellerInterface | BuyerInterface = { ...req.body };
 
-  try {
-    let { store_name } = body;
+    try {
+      const { store_name } = req;
 
-    const store = await Store.findOne({
-      shortname: store_name.toLowerCase(),
-    });
-
-    if (!store)
-      return res.status(400).json({
-        message: "Store does not exist",
+      const store = await Store.findOne({
+        shortname: store_name.toLowerCase(),
       });
 
-    const { _id: store_id, shortname } = store;
-
-    let user = null;
-
-    if (body.type !== "seller" && body.type !== "buyer")
-      return {
-        error: true,
-        message: "User type not specified",
-      };
-
-    const { public_id, url } = await cloudinary.uploader.upload(req.file.path, {
-      public_id: req.file.filename,
-      folder: "market-hub/user_images",
-    });
-
-    if (body.type === "buyer") {
-      let { fullname, email, password } = body;
-
-      // confirm formats of inputs
-      fullname = capitalize(fullname.trim());
-      email = email.trim();
-
-      const buyer = await Buyer.findOne({ email });
-
-      // check if user already exists by username and email address
-
-      if (buyer) {
-        // return if user exists
+      if (!store)
         return res.status(400).json({
-          message: `User with email '${email}' already exists.`,
+          message: "Store does not exist",
         });
-      }
 
-      // create an object of the body entry
-      const newBuyer = new Buyer({
-        img: { public_id, url },
-        fullname,
-        email,
-        password,
-        store_id,
-        store_name: shortname,
-      });
+      const { _id: store_id, shortname } = store;
 
-      newBuyer.password = await bcryptPromise(newBuyer.password);
+      let user = null;
 
-      await newBuyer.save();
+      const { public_id, url } = await cloudinary.uploader.upload(
+        req.file.path,
+        {
+          public_id: req.file.filename,
+          folder: "CLOUDINARY_USER_IMAGES_FOLDER",
+        }
+      );
 
-      user = Object.create(newBuyer);
-    } else if (body.type === "seller") {
-      let {
-        fullname,
-        brand_name,
-        username,
-        brand_desc,
-        whatsapp,
-        email,
-        password,
-      } = body;
+      if (body.user_type === "buyer") {
+        let { fullname, email, password } = body;
 
-      // confirm formats of inputs
-      fullname = capitalize(fullname.trim());
-      brand_name = capitalize(brand_name.trim());
-      // remove spaces - though this is handled in the client side already but just incase
-      username = username.trim().replace(/\s/g, "").toLowerCase();
-      email = email.trim();
+        // confirm formats of inputs
+        fullname = capitalize(fullname.trim());
+        email = email.trim();
 
-      const seller = await Seller.findOne({ $or: [{ username }, { email }] });
-
-      // check if user already exists by username and email address
-
-      if (seller) {
-        // return if user exists
-        if (seller.username === username) {
+        // check if user already exists
+        const buyer = await Buyer.findOne({ email });
+        if (buyer) {
+          // return if user exists
           return res.status(400).json({
-            message: `Seller with username '${username}' already exists.`,
+            message: `User with email '${email}' already exists.`,
           });
         }
-        if (seller.email === email) {
+
+        const seller = await Seller.findOne({ email });
+        if (seller) {
+          // return if user exists
           return res.status(400).json({
-            message: `Seller with email '${email}' already exists.`,
+            message: `User with email '${email}' already exists.`,
           });
         }
+
+        // create an object of the body entry
+        const newBuyer = new Buyer({
+          img: { public_id, url },
+          fullname,
+          email,
+          password,
+          store_id,
+          store_name: shortname,
+        });
+
+        newBuyer.password = await bcryptPromise(newBuyer.password);
+
+        await newBuyer.save();
+
+        user = Object.create(newBuyer);
+      } else if (body.user_type === "seller") {
+        let {
+          fullname,
+          brand_name,
+          username,
+          brand_desc,
+          whatsapp,
+          email,
+          password,
+        } = body;
+
+        // confirm formats of inputs
+        fullname = capitalize(fullname.trim());
+        brand_name = capitalize(brand_name.trim());
+        // remove spaces - though this is handled in the client side already but just incase
+        username = username.trim().replace(/\s/g, "").toLowerCase();
+        email = email.trim();
+
+        const seller = await Seller.findOne({ $or: [{ username }, { email }] });
+
+        // check if user already exists by username and email address
+        if (seller) {
+          // return if user exists
+          if (seller.username === username) {
+            return res.status(400).json({
+              message: `Seller with username '${username}' already exists.`,
+            });
+          }
+          if (seller.email === email) {
+            return res.status(400).json({
+              message: `Seller with email '${email}' already exists.`,
+            });
+          }
+        }
+
+        const buyer = await Buyer.findOne({ email });
+        if (buyer) {
+          // return if user exists
+          return res.status(400).json({
+            message: `User with email '${email}' already exists.`,
+          });
+        }
+
+        const newSeller = new Seller({
+          img: { public_id, url },
+          fullname,
+          brand_name,
+          username,
+          brand_desc,
+          whatsapp,
+          email,
+          password,
+          store_id,
+          store_name: shortname,
+        });
+
+        newSeller.password = await bcryptPromise(newSeller.password);
+
+        await newSeller.save();
+
+        user = Object.create(newSeller);
       }
 
-      const newSeller = new Seller({
-        img: { public_id, url },
-        fullname,
-        brand_name,
-        username,
-        brand_desc,
-        whatsapp,
-        email,
-        password,
-        store_id,
-        store_name: shortname,
+      const generatedHash = randomNumber();
+
+      const newEmailToBeConfirmed = new EmailConfirmation({
+        generatedHash,
+        // user_id would be sent with email, so that on verification, the email_confirm field would be true
+        user_id: user._id,
+        user_type: body.user_type,
       });
 
-      newSeller.password = await bcryptPromise(newSeller.password);
+      await newEmailToBeConfirmed.save();
 
-      await newSeller.save();
+      const token = getToken({ _id: user._id });
 
-      user = Object.create(newSeller);
+      const sendEmailResponse = await sendEmailConfirmation({
+        generatedHash,
+        email: user.email,
+        name: user.fullname,
+        store: store_name,
+        user_type: body.user_type,
+        type: "welcome",
+      });
+
+      if (!sendEmailResponse.error) {
+        // then the email went successfully
+        res.json({
+          token,
+          message:
+            "Account Created Successfully 💛. Please check your email to confirm your email address.",
+        });
+      } else {
+        // well the seller was still saved even if email wasn't sent
+        console.log(
+          chalk.red(
+            "Email confirmation couldn't be sent >> ",
+            sendEmailResponse.error
+          )
+        );
+      }
+    } catch (err) {
+      console.log(chalk.red("An error occured during user creation >> ", err));
+      res.status(500).json({
+        error: err,
+        message: "Error occured. Please try again",
+      });
     }
+  }
+);
 
-    const generatedHash = randomNumber();
+// Update user
+router.post(
+  "/update",
+  isAuthenticated,
+  upload.single("avatar"),
+  userTypeRequired,
+  async (req: any, res: any) => {
+    const body = { ...req.body } as
+      | (BuyerInterface & {
+          img_public_id: string;
+          img_url: string;
+        })
+      | (SellerInterface & {
+          img_public_id: string;
+          img_url: string;
+        });
 
-    const newEmailToBeConfirmed = new EmailConfirmation({
-      generatedHash,
-      // user_id would be sent with email, so that on verification, the email_confirm field would be true
-      user_id: user._id,
-      user_type: body.type,
-    });
+    try {
+      const { store_name } = req;
 
-    await newEmailToBeConfirmed.save();
-
-    const token = getToken({ _id: user._id });
-
-    const sendEmailResponse = await sendEmailConfirmation({
-      generatedHash,
-      email: user.email,
-      name: user.fullname,
-      store: store_name,
-      user_type: body.type,
-      type: "welcome",
-    });
-
-    if (!sendEmailResponse.error) {
-      // then the email went successfully
-      res.json({
-        token,
-        message:
-          "Account Created Successfully 💛. Please check your email to confirm your email address.",
+      const store = await Store.findOne({
+        shortname: store_name.toLowerCase(),
       });
-    } else {
-      // well the seller was still saved even if email wasn't sent
+
+      if (!store)
+        return res.status(400).json({
+          message: "Store does not exist",
+        });
+
+      // former image details
+      let public_id = body.img_public_id as any;
+      let url = body.img_url as any;
+
+      if (req.file !== undefined) {
+        // then a new image was selected
+
+        // delete the previous image stored
+        await cloudinary.uploader.destroy(public_id, (error: any) => {
+          if (error) {
+            // then previous image was not deleted
+            console.log(
+              chalk.red("Previous image could not be deleted >> ", error)
+            );
+            // still continue the update process, even if image was not deleted
+          }
+        });
+
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          public_id: req.file.filename,
+          folder: CLOUDINARY_USER_IMAGES_FOLDER,
+        });
+
+        // change image details to the new image
+        public_id = result.public_id;
+        url = result.url;
+      }
+
+      if (body.user_type === "seller") {
+        let { fullname, brand_name, username, brand_desc, whatsapp } = body;
+
+        const existingUser = await Seller.findOne({
+          username,
+          _id: req.user._id,
+        });
+
+        if (
+          existingUser &&
+          existingUser._id.toString() !== req.user._id.toString()
+        ) {
+          // then there is an seller with the name
+          return res.status(400).json({
+            message: `Seller with the username '${username}' already exists`,
+          });
+        }
+
+        fullname = capitalize(fullname.trim());
+        brand_name = capitalize(brand_name.trim());
+        // remove spaces - though this is handled in the client side already but just incase
+        username = username.trim().replace(/\s/g, "").toLowerCase();
+
+        await Seller.findOneAndUpdate(
+          { _id: req.user._id, store_id: req.store_id },
+          {
+            $set: {
+              img: {
+                public_id,
+                url,
+              },
+              fullname,
+              brand_name,
+              username,
+              brand_desc,
+              whatsapp,
+            },
+          }
+        );
+      } else if (body.user_type === "buyer") {
+        let { fullname } = body;
+
+        fullname = capitalize(fullname.trim());
+
+        await Buyer.findOneAndUpdate(
+          { _id: req.user._id, store_id: req.store_id },
+          {
+            $set: {
+              img: {
+                public_id,
+                url,
+              },
+              fullname,
+            },
+          }
+        );
+      }
+      return res.json({
+        message: "Updated account successfully",
+      });
+    } catch (err) {
+      console.log(chalk.red("Error updating user info >> ", err));
+      res.status(400).json({
+        error: err,
+        message: "No user with that id",
+      });
+    }
+  }
+);
+
+// Email confirmation
+router.get("/confirm_email/:hash", async (req: any, res: any) => {
+  console.log("yo");
+  const { type: typeOfEmailConfirmation = "" } = req.query;
+  const hash = await EmailConfirmation.findOne({
+    generatedHash: req.params.hash,
+  });
+
+  if (hash === null) {
+    // then the hash does not exist
+    return res.json({
+      error: true,
+      message: "Link has expired",
+    });
+  }
+
+  const { user_id, user_type } = hash;
+
+  let updateEmailStatus = null;
+
+  if (user_type === "buyer") {
+    updateEmailStatus = await Buyer.findByIdAndUpdate(user_id, {
+      $set: {
+        email_confirm: true,
+      },
+    });
+  } else if (user_type === "seller") {
+    updateEmailStatus = await Seller.findByIdAndUpdate(user_id, {
+      $set: {
+        email_confirm: true,
+        subscription_type: FREE_PLAN.name,
+      },
+    });
+  }
+
+  if (updateEmailStatus) {
+    // then email has been confirmed
+    // delete the hash collection from database
+    try {
+      await EmailConfirmation.findByIdAndDelete(hash._id);
+    } catch (err) {
       console.log(
-        "Email confirmation couldn't be sent >> ",
-        sendEmailResponse.error
+        chalk.red("Confirmed email hash could not be deleted >> ", err)
       );
     }
-  } catch (err) {
-    console.log("An error occured during user creation >> ", err);
-    res.status(500).json({
-      error: err,
-      message: "Error occured. Please try again",
+
+    // get user details
+    let confirmedUser = null;
+
+    if (user_type === "seller") {
+      confirmedUser = await Seller.findById(user_id);
+    } else if (user_type === "buyer") {
+      confirmedUser = await Buyer.findById(user_id);
+    }
+
+    if (!confirmedUser)
+      return res.status(404).json({ message: "User not found" });
+
+    const store = await Store.findById(confirmedUser.store_id);
+
+    if (!store)
+      return res.status(404).json({ message: "Store of user not found" });
+
+    if (typeOfEmailConfirmation === "welcome") {
+      const sendEmailResponse = await welcomeEmail({
+        email: confirmedUser.email,
+        name: confirmedUser.fullname,
+        store: store.shortname,
+      });
+
+      if (sendEmailResponse.error) {
+        // then the email didn't go successfully
+        console.log(chalk.red(sendEmailResponse.error));
+      }
+    }
+
+    // whether a welcome email is able to be sent or not, redirect to email_confirmed
+    // because seller email has already been confirmed
+    res.json({
+      redirectTo: `http://${store.shortname}.skulmart.com/email_confirmed?email=${confirmedUser.email}`,
+    });
+  } else {
+    res.json(400).json({
+      error: "Could not verify email",
+      message: "Seller's email address could not be verified",
     });
   }
 });
+
+// used userTypeRequired manually in the above requests because
+// req.body will return an empty object is multer does not do its work
+router.use(userTypeRequired);
 
 // Log in user
 router.post("/login", async (req: any, res: any) => {
@@ -249,10 +493,6 @@ router.post("/login", async (req: any, res: any) => {
     token,
     message: "Authenticated 👍",
   });
-});
-
-router.get("/me", isAuthenticated, async (req: any, res: any) => {
-  res.json(req.user);
 });
 
 // Resend email confirmation link
@@ -324,12 +564,16 @@ router.post("/resend_confirmation_link", async (req: any, res: any) => {
       });
     } else {
       console.log(
-        "Email confirmation could't be sent >> ",
-        sendEmailResponse.error
+        chalk.red(
+          "Email confirmation could't be sent >> ",
+          sendEmailResponse.error
+        )
       );
     }
   } catch (err) {
-    console.log("An error occured while resending confirmation link >> ", err);
+    console.log(
+      chalk.red("An error occured while resending confirmation link >> ", err)
+    );
     res.status(500).json({
       error: err,
       message: "Error occured. Please try again",
@@ -400,12 +644,13 @@ router.post("/reset_password", async (req: any, res: any) => {
       });
     } else {
       console.log(
-        "Password reset could't be sent >> ",
-        sendEmailResponse.error
+        chalk.red("Password reset could't be sent >> ", sendEmailResponse.error)
       );
     }
   } catch (err) {
-    console.log("An error occured while send password reset link >> ", err);
+    console.log(
+      chalk.red("An error occured while send password reset link >> ", err)
+    );
     res.status(500).json({
       error: err,
       message: "Error occured. Please try again",
@@ -491,7 +736,7 @@ router.post("/reset_password/:hash", async (req: any, res: any) => {
   try {
     await ResetPassword.findByIdAndDelete(hash._id);
   } catch (err) {
-    console.log("Password reset hash could not be deleted >> ", err);
+    console.log(chalk.red("Password reset hash could not be deleted >> ", err));
   }
 
   const newPassword = await bcryptPromise(password);
@@ -515,123 +760,6 @@ router.post("/reset_password/:hash", async (req: any, res: any) => {
   });
 });
 
-// Update user
-router.post(
-  "/update",
-  isAuthenticated,
-  upload.single("avatar"),
-  async (req: any, res: any) => {
-    const body = { ...req.body } as
-      | (BuyerInterface & { img_public_id: string; img_url: string })
-      | (SellerInterface & { img_public_id: string; img_url: string });
-
-    try {
-      let { store_name } = body;
-
-      const store = await Store.findOne({
-        shortname: store_name.toLowerCase(),
-      });
-
-      if (!store)
-        return res.status(400).json({
-          message: "Store does not exist",
-        });
-
-      if (body.type !== "seller" && body.type !== "buyer")
-        return res.status(400).json({ message: "User type not specified" });
-
-      // former image details
-      let public_id = body.img_public_id as any;
-      let url = body.img_url as any;
-
-      if (req.file !== undefined) {
-        // then a new image was selected
-
-        // delete the previous image stored
-        await cloudinary.uploader.destroy(public_id, (error: any) => {
-          if (error) {
-            // then previous image was not deleted
-            console.log("Previous image could not be deleted >> ", error);
-            // still continue the update process, even if image was not deleted
-          }
-        });
-
-        const result = await cloudinary.uploader.upload(req.file.path, {
-          public_id: req.file.filename,
-          folder: "market-hub/user_images",
-        });
-
-        // change image details to the new image
-        public_id = result.public_id;
-        url = result.url;
-      }
-
-      if (body.type === "seller") {
-        let { fullname, brand_name, username, brand_desc, whatsapp } = body;
-
-        const existingUser = await Seller.findOne({
-          username,
-          _id: req.user._id,
-        });
-
-        if (existingUser && existingUser._id !== req.user._id) {
-          // then there is an seller with the name
-          return res.status(400).json({
-            message: `Seller with the username '${username}' already exists`,
-          });
-        }
-
-        fullname = capitalize(fullname.trim());
-        brand_name = capitalize(brand_name.trim());
-        // remove spaces - though this is handled in the client side already but just incase
-        username = username.trim().replace(/\s/g, "").toLowerCase();
-
-        await Seller.findOneAndUpdate(
-          { _id: req.user._id, store_id: req.store_id },
-          {
-            $set: {
-              img: {
-                public_id,
-                url,
-              },
-              fullname,
-              brand_name,
-              username,
-              brand_desc,
-              whatsapp,
-            },
-          }
-        );
-      } else if (body.type === "buyer") {
-        let { fullname } = body;
-
-        fullname = capitalize(fullname.trim());
-
-        await Buyer.findOneAndUpdate(
-          { _id: req.user._id, store_id: req.store_id },
-          {
-            $set: {
-              img: {
-                public_id,
-                url,
-              },
-              fullname,
-            },
-          }
-        );
-      }
-      return res.json({
-        message: "Updated account successfully",
-      });
-    } catch (err) {
-      res.status(400).json({
-        error: err,
-        message: "No user with that id",
-      });
-    }
-  }
-);
-
 // Update seller email
 router.post("/update/email", isAuthenticated, async (req: any, res: any) => {
   let { email, user_type } = req.body as {
@@ -641,11 +769,6 @@ router.post("/update/email", isAuthenticated, async (req: any, res: any) => {
   email = email.trim();
 
   let existingUserEmail: SellerInterface | BuyerInterface | null = null;
-
-  if (user_type !== "seller" && user_type !== "buyer")
-    return res.status(400).json({
-      message: "User type not specified",
-    });
 
   if (user_type === "seller") {
     existingUserEmail = await Seller.findOne({
@@ -724,15 +847,86 @@ router.post("/update/email", isAuthenticated, async (req: any, res: any) => {
     } else {
       // well the seller was still saved even if email wasn't sent
       console.log(
-        "Email confirmation during changing email process could't be sent >> ",
-        sendEmailResponse.error
+        chalk.red(
+          "Email confirmation during changing email process could't be sent >> ",
+          sendEmailResponse.error
+        )
       );
     }
   } catch (err) {
-    console.log("Error sending email during changing email process >> ", err);
+    console.log(
+      chalk.red("Error sending email during changing email process >> ", err)
+    );
     res.status(400).json({
       error: err,
       message: "Error occured. Please try again",
+    });
+  }
+});
+
+// Update user password
+router.post("/update/password", isAuthenticated, async (req: any, res: any) => {
+  const body = { ...req.body } as {
+    old_password: string;
+    new_password: string;
+    user_type: "seller" | "buyer";
+  };
+
+  const { old_password, new_password, user_type } = body;
+
+  const authUser = req.user;
+
+  let user: BuyerInterface | SellerInterface | null = null;
+
+  if (user_type === "seller") {
+    user = await Seller.findOne({
+      _id: authUser._id,
+    });
+  } else if (user_type === "buyer") {
+    user = await Buyer.findOne({
+      _id: authUser._id,
+    });
+  }
+
+  if (!user)
+    return res.status(400).json({
+      message: "User not found",
+    });
+
+  // compare old password
+  const isMatch = await bcrypt.compare(old_password, user.password);
+  if (!isMatch) {
+    // they they don't match
+    return res.status(400).json({
+      error: "Wrong credentials",
+      message: "Old password is incorrect",
+    });
+  }
+  try {
+    const encryptedPassword = await bcryptPromise(new_password);
+
+    if (user_type === "seller") {
+      await Seller.findByIdAndUpdate(user._id, {
+        $set: {
+          password: encryptedPassword,
+        },
+      });
+    } else if (user_type === "buyer") {
+      await Buyer.findByIdAndUpdate(user._id, {
+        $set: {
+          password: encryptedPassword,
+        },
+      });
+    }
+
+    return res.json({
+      message: "Successfully updated password",
+    });
+  } catch (err) {
+    console.log(chalk.red("Error occurred during password update process >> "));
+    res.status(400).json({
+      error: err,
+      message: "Error occured! Please try again.",
     });
   }
 });
@@ -750,11 +944,11 @@ router.delete("/", isAuthenticated, async (req: any, res: any) => {
     // delete saved profile picture
     cloudinary.uploader.destroy(user.img.public_id, (error: any) => {
       if (error) {
-        console.log("Could not delete user image >> ", error);
+        console.log(chalk.red("Could not delete user image >> ", error));
       }
     });
 
-    if (user.type === "seller") {
+    if (user.user_type === "seller") {
       await Product.deleteMany({
         seller_id: user._id,
         store_id: req.store_id,
@@ -763,7 +957,7 @@ router.delete("/", isAuthenticated, async (req: any, res: any) => {
       await Seller.deleteOne({
         _id: user._id,
       });
-    } else if (user.type === "buyer") {
+    } else if (user.user_type === "buyer") {
       await Buyer.deleteOne({
         _id: user._id,
       });
@@ -773,96 +967,10 @@ router.delete("/", isAuthenticated, async (req: any, res: any) => {
       message: "Successfully deleted user",
     });
   } catch (err) {
-    console.log("Could not delete user >> ", err);
+    console.log(chalk.red("Could not delete user >> ", err));
     return res.status(400).json({
       error: err,
       message: "No user with that id",
-    });
-  }
-});
-
-// Email confirmation
-router.get("/confirm_email/:hash", async (req: any, res: any) => {
-  const { type: typeOfEmailConfirmation = "" } = req.query;
-  const hash = await EmailConfirmation.findOne({
-    generatedHash: req.params.hash,
-  });
-
-  if (hash === null) {
-    // then the hash does not exist
-    return res.json({
-      error: true,
-      message: "Link has expired",
-    });
-  }
-
-  const { user_id, user_type } = hash;
-
-  let updateEmailStatus = null;
-
-  if (user_type === "buyer") {
-    updateEmailStatus = await Buyer.findByIdAndUpdate(user_id, {
-      $set: {
-        email_confirm: true,
-      },
-    });
-  } else if (user_type === "seller") {
-    updateEmailStatus = await Seller.findByIdAndUpdate(user_id, {
-      $set: {
-        email_confirm: true,
-        subscription_type: FREE_PLAN.name,
-      },
-    });
-  }
-
-  if (updateEmailStatus) {
-    // then email has been confirmed
-    // delete the hash collection from database
-    try {
-      await EmailConfirmation.findByIdAndDelete(hash._id);
-    } catch (err) {
-      console.log("Confirmed email hash could not be deleted >> ", err);
-    }
-
-    // get user details
-    let confirmedUser = null;
-
-    if (user_type === "seller") {
-      confirmedUser = await Seller.findById(user_id);
-    } else if (user_type === "buyer") {
-      confirmedUser = await Buyer.findById(user_id);
-    }
-
-    if (!confirmedUser)
-      return res.status(404).json({ message: "User not found" });
-
-    const store = await Store.findById(confirmedUser.store_id);
-
-    if (!store)
-      return res.status(404).json({ message: "Store of user not found" });
-
-    if (typeOfEmailConfirmation === "welcome") {
-      const sendEmailResponse = await welcomeEmail({
-        email: confirmedUser.email,
-        name: confirmedUser.fullname,
-        store: store.shortname,
-      });
-
-      if (sendEmailResponse.error) {
-        // then the email didn't go successfully
-        console.log(sendEmailResponse.error);
-      }
-    }
-
-    // whether a welcome email is able to be sent or not, redirect to email_confirmed
-    // because seller email has already been confirmed
-    res.json({
-      redirectTo: `http://${store.shortname}.skulmart.com/email_confirmed?email=${confirmedUser.email}`,
-    });
-  } else {
-    res.json(400).json({
-      error: "Could not verify email",
-      message: "Seller's email address could not be verified",
     });
   }
 });

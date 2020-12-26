@@ -12,7 +12,10 @@ import isAuthenticated from "middlewares/isAuthenticated";
 var upload = multer({ dest: "uploads/" });
 
 import { v2 as cloudinary } from "cloudinary";
-import { PRODUCTS_PER_PAGE } from "constants/index";
+import {
+  CLOUDINARY_PRODUCT_IMAGES_FOLDER,
+  PRODUCTS_PER_PAGE,
+} from "constants/index";
 import { FREE_PLAN, SILVER_PLAN } from "constants/subscriptionTypes";
 
 // ipInfo is gotten from express-ip middleware
@@ -299,7 +302,7 @@ router.post(
         req.file.path,
         {
           public_id: req.file.filename,
-          folder: "market-hub/product_images",
+          folder: CLOUDINARY_PRODUCT_IMAGES_FOLDER,
         }
       );
 
@@ -418,7 +421,7 @@ router.post(
 
         const result = await cloudinary.uploader.upload(req.file.path, {
           public_id: req.file.filename,
-          folder: "market-hub/product_images",
+          folder: CLOUDINARY_PRODUCT_IMAGES_FOLDER,
         });
 
         // change image details to the new image

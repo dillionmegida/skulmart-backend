@@ -14,8 +14,7 @@ const SellerSchema: Schema = new Schema(
     brand_name: {
       type: String,
     },
-    // type differentiates Seller from Buyer
-    type: {
+    user_type: {
       type: String,
       default: "seller",
     },
@@ -58,6 +57,7 @@ const SellerSchema: Schema = new Schema(
     },
     password: {
       type: String,
+      required: true,
     },
     store_id: {
       type: Schema.Types.ObjectId,

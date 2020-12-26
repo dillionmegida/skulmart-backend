@@ -7,8 +7,7 @@ const BuyerSchema: Schema = new Schema(
       type: Object,
       required: true,
     },
-    // type differentiates Seller from Buyer
-    type: {
+    user_type: {
       type: String,
       default: "buyer",
     },
@@ -30,6 +29,10 @@ const BuyerSchema: Schema = new Schema(
       required: true,
     },
     store_name: {
+      type: String,
+      required: true,
+    },
+    password: {
       type: String,
       required: true,
     },

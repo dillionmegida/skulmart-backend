@@ -6,7 +6,7 @@ const mailgun = _mailgun({
   domain,
 });
 import { siteName, email } from "config/siteDetails";
-import MAILGUN_EMAIL from "constants";
+import { MAILGUN_EMAIL } from "constants/index";
 
 type SendMailArgs = {
   receiver: string;
