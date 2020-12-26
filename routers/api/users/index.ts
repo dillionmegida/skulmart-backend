@@ -6,14 +6,12 @@ import bcrypt from "bcryptjs";
 import Seller from "models/Seller";
 import { getToken } from "utils/token";
 import isAuthenticated from "middlewares/isAuthenticated";
-import { capitalize, bcryptPromise } from "utils/strings";
+import { capitalize, bcryptPromise, replaceString } from "utils/strings";
 import sendEmailConfirmation from "mails/emailConfirmation";
 import ResetPassword from "models/ResetPassword";
 import resetPasswordEmail from "mails/resetPasswordEmail";
 import confirmChangedEmail from "mails/confirmChangedEmail";
 import welcomeEmail from "mails/welcomeEmail";
-
-import { v2 as cloudinary } from "cloudinary";
 
 import multer from "multer";
 import Store from "models/Store";
@@ -27,6 +25,7 @@ import { FREE_PLAN } from "constants/subscriptionTypes";
 import userTypeRequired from "middlewares/userTypeRequired";
 import chalk from "chalk";
 import { CLOUDINARY_USER_IMAGES_FOLDER } from "constants/index";
+import { deleteImage, uploadImage } from "utils/image";
 
 var upload = multer({ dest: "uploads/" });
 
@@ -59,13 +58,17 @@ router.post(
 
       let user = null;
 
-      const { public_id, url } = await cloudinary.uploader.upload(
-        req.file.path,
-        {
-          public_id: req.file.filename,
-          folder: "CLOUDINARY_USER_IMAGES_FOLDER",
-        }
-      );
+      const result = await uploadImage({
+        path: req.file.path,
+        filename: replaceString({
+          str: body.fullname,
+          replace: " ",
+          _with: "-",
+        }).toLowerCase(),
+        folder: CLOUDINARY_USER_IMAGES_FOLDER,
+      });
+
+      const { public_id, url } = result;
 
       if (body.user_type === "buyer") {
         let { fullname, email, password } = body;
@@ -254,18 +257,18 @@ router.post(
         // then a new image was selected
 
         // delete the previous image stored
-        await cloudinary.uploader.destroy(public_id, (error: any) => {
-          if (error) {
-            // then previous image was not deleted
-            console.log(
-              chalk.red("Previous image could not be deleted >> ", error)
-            );
-            // still continue the update process, even if image was not deleted
-          }
+        await deleteImage({
+          public_id,
+          errorMsg: "Previous image could not be deleted",
         });
 
-        const result = await cloudinary.uploader.upload(req.file.path, {
-          public_id: req.file.filename,
+        const result = await uploadImage({
+          path: req.file.path,
+          filename: replaceString({
+            str: body.fullname,
+            replace: " ",
+            _with: "-",
+          }).toLowerCase(),
           folder: CLOUDINARY_USER_IMAGES_FOLDER,
         });
 
@@ -941,18 +944,29 @@ router.delete("/", isAuthenticated, async (req: any, res: any) => {
         message: "User not found",
       });
 
-    // delete saved profile picture
-    cloudinary.uploader.destroy(user.img.public_id, (error: any) => {
-      if (error) {
-        console.log(chalk.red("Could not delete user image >> ", error));
-      }
+    await deleteImage({
+      public_id: user.img.public_id,
+      errorMsg: "Could not delete user image",
     });
 
     if (user.user_type === "seller") {
+      const sellerProducts = await Product.find({ seller_id: req.user._id });
+
+      // delete all seller's products from the db
       await Product.deleteMany({
-        seller_id: user._id,
-        store_id: req.store_id,
+        seller_id: req.user._id,
       });
+
+      if (sellerProducts && sellerProducts.length > 0) {
+        // delete all seller's products images
+        for (let i = 0; i < sellerProducts.length; i++) {
+          const product = sellerProducts[0];
+          await deleteImage({
+            public_id: product.img.public_id,
+            errorMsg: "Could not delete product image",
+          });
+        }
+      }
 
       await Seller.deleteOne({
         _id: user._id,

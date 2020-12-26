@@ -1,10 +1,5 @@
 import bcrypt from "bcryptjs";
 
-/**
- * Capitlize the first letter of a string containing one or more words
- * @param {string=} string to be capitalized
- * @returns {string} capitalized string
- */
 export const capitalize = (str: string) => {
   const strArr = str.split(" ");
   let captilized = "";
@@ -18,7 +13,7 @@ export const capitalize = (str: string) => {
   return captilized;
 };
 
-// bycrypt doesn't return a promise, so I configured mine
+// bycrypt doesn't return a promise, so here's a promisified type
 export function bcryptPromise(password: string): Promise<any> {
   return new Promise((resolve, reject) => {
     // Hash password using bcrypt
@@ -30,3 +25,17 @@ export function bcryptPromise(password: string): Promise<any> {
     });
   });
 }
+
+type ReplaceStringArgs = {
+  str: string;
+  replace: string;
+  _with: string;
+};
+export const replaceString = ({
+  str,
+  replace,
+  _with,
+}: ReplaceStringArgs): string => {
+  const reg = new RegExp(replace, "g");
+  return str.replace(reg, _with);
+};

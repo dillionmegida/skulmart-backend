@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-import { capitalize } from "utils/strings";
+import { capitalize, replaceString } from "utils/strings";
 import { shuffleArray } from "utils/arrays";
 
 import Product from "models/Product";
@@ -17,6 +17,8 @@ import {
   PRODUCTS_PER_PAGE,
 } from "constants/index";
 import { FREE_PLAN, SILVER_PLAN } from "constants/subscriptionTypes";
+import sharp from "sharp";
+import { deleteImage, uploadImage } from "utils/image";
 
 // ipInfo is gotten from express-ip middleware
 const userAgentIP = (req: any) => req.ipInfo.ip;
@@ -265,7 +267,7 @@ router.post(
       if (allProducts.length >= maxProducts)
         return res.status(400).json({
           message: `The plan you subscribed for (${subscriptionType.name} plan) only supports maximum of ${maxProducts} products.
-        You can delete one product to give room for another.`,
+            You can delete one product to give room for another.`,
         });
 
       name = capitalize(name.trim());
@@ -298,13 +300,19 @@ router.post(
         });
       }
 
-      const { public_id, url } = await cloudinary.uploader.upload(
-        req.file.path,
-        {
-          public_id: req.file.filename,
-          folder: CLOUDINARY_PRODUCT_IMAGES_FOLDER,
-        }
-      );
+      const imageDetails = await uploadImage({
+        path: req.file.path,
+        filename: replaceString({
+          str: name,
+          replace: " ",
+          _with: "-",
+        }).toLowerCase(),
+        folder: CLOUDINARY_PRODUCT_IMAGES_FOLDER,
+      });
+
+      const { public_id, url } = imageDetails;
+
+      res.status(400).json({ message: "Just error!" });
 
       const newProduct = new Product({
         img: { public_id, url },
@@ -345,13 +353,11 @@ router.delete("/:id", isAuthenticated, async (req: any, res: any) => {
       message: "No product with that id",
     });
 
-  cloudinary.uploader.destroy(product.img.public_id, (error) => {
-    if (error) {
-      console.log("Could not delete product image >> ", error);
-    }
+  await deleteImage({
+    public_id: product.img.public_id,
+    errorMsg: "Could not delete product image",
   });
-  // even if the image does not delete, our try block passed the first line
-  // which means it has been deleted from database
+
   res.json({
     message: "Product deleted successfully",
   });
@@ -411,16 +417,18 @@ router.post(
         // then a new image was selected
 
         // delete the previous image stored
-        await cloudinary.uploader.destroy(public_id, (error: any) => {
-          if (error) {
-            // then previous image was not deleted
-            console.log("Previous image could not be deleted >> ", error);
-            // still continue the update process, even if image was not deleted
-          }
+        await deleteImage({
+          public_id,
+          errorMsg: "Previous image could not be deleted",
         });
 
-        const result = await cloudinary.uploader.upload(req.file.path, {
-          public_id: req.file.filename,
+        const result = await uploadImage({
+          path: req.file.path,
+          filename: replaceString({
+            str: name,
+            replace: " ",
+            _with: "-",
+          }).toLowerCase(),
           folder: CLOUDINARY_PRODUCT_IMAGES_FOLDER,
         });
 
