@@ -2,3 +2,7 @@
 /uploads
 
 .env
+
+build/
+
+.DS_Store
