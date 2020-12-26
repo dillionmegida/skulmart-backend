@@ -8,4 +8,4 @@ export const CLOUDINARY_USER_IMAGES_FOLDER = process.env.IS_DEV
   : "market-hub/user_images";
 export const CLOUDINARY_PRODUCT_IMAGES_FOLDER = process.env.IS_DEV
   ? "market-hub/testing"
-  : "market-hub/user_images";
+  : "market-hub/product_images";
