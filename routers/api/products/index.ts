@@ -312,8 +312,6 @@ router.post(
 
       const { public_id, url } = imageDetails;
 
-      res.status(400).json({ message: "Just error!" });
-
       const newProduct = new Product({
         img: { public_id, url },
         name,
