@@ -204,6 +204,7 @@ router.post("/", upload.single("avatar"), async (req: any, res: any) => {
       name: fullname,
       store: store_name,
       type: "welcome",
+      user_type: "buyer",
     });
 
     if (!sendEmailResponse.error) {
@@ -275,6 +276,7 @@ router.post("/resend_confirmation_link", async (req: any, res: any) => {
       email: seller.email,
       name: seller.fullname,
       store: seller.store_name,
+      user_type: "buyer",
     });
 
     if (!sendEmailResponse.error) {
