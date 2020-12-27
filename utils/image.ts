@@ -23,7 +23,6 @@ function formatImage({
       .toFile(outputFile, (err: any) => {
         if (err) return reject(err);
 
-        console.log("resolved");
         resolve("success");
       });
   });
@@ -38,7 +37,7 @@ export async function uploadImage({
   path,
   filename,
   folder,
-}: UploadImageArgs): Promise<{ public_id?: string; url?: string; err?: any }> {
+}: UploadImageArgs): Promise<{ public_id?: string; url?: string; error?: any }> {
   try {
     const outputFile = path + "-formatted";
     const formatResponse = await formatImage({ path, outputFile });
@@ -51,9 +50,9 @@ export async function uploadImage({
     });
 
     return { public_id, url };
-  } catch (err) {
-    console.log(chalk.red("Could not format image because >>> ", err));
-    return { err };
+  } catch (error) {
+    console.log(chalk.red("Could not upload image because >>> "), error);
+    return { error };
   }
 }
 
@@ -68,6 +67,7 @@ export const deleteImage = async ({
   try {
     await cloudinary.uploader.destroy(public_id);
   } catch (error) {
-    console.log(errorMsg + " >> ", error);
+    console.log(chalk.red(errorMsg + " >> "), error);
+    return { error };
   }
 };

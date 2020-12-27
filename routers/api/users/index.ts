@@ -42,6 +42,8 @@ router.post(
   async (req: any, res: any) => {
     const body: SellerInterface | BuyerInterface = { ...req.body };
 
+    const { email } = body;
+
     try {
       const { store_name } = req;
 
@@ -56,6 +58,37 @@ router.post(
 
       const { _id: store_id, shortname } = store;
 
+      // check if user already exists
+      const buyer = await Buyer.findOne({ email });
+      if (buyer) {
+        // return if user exists
+        return res.status(400).json({
+          message: `User with email '${email}' already exists.`,
+        });
+      }
+
+      const seller = await Seller.findOne({ email });
+      if (seller) {
+        // return if user exists
+        return res.status(400).json({
+          message: `User with email '${email}' already exists.`,
+        });
+      }
+
+      if (body.user_type === "seller") {
+        const sellerWithSameUsername = await Seller.findOne({
+          username: body.username,
+        });
+
+        // check if user already exists by username and email address
+        if (sellerWithSameUsername) {
+          // return if user exists
+          return res.status(400).json({
+            message: `Seller with username '${body.username}' already exists.`,
+          });
+        }
+      }
+
       let user = null;
 
       const result = await uploadImage({
@@ -68,6 +101,11 @@ router.post(
         folder: CLOUDINARY_USER_IMAGES_FOLDER,
       });
 
+      if (result.error)
+        return res.status(400).json({
+          error: "Upload failed. Please try again",
+        });
+
       const { public_id, url } = result;
 
       if (body.user_type === "buyer") {
@@ -76,23 +114,6 @@ router.post(
         // confirm formats of inputs
         fullname = capitalize(fullname.trim());
         email = email.trim();
-
-        // check if user already exists
-        const buyer = await Buyer.findOne({ email });
-        if (buyer) {
-          // return if user exists
-          return res.status(400).json({
-            message: `User with email '${email}' already exists.`,
-          });
-        }
-
-        const seller = await Seller.findOne({ email });
-        if (seller) {
-          // return if user exists
-          return res.status(400).json({
-            message: `User with email '${email}' already exists.`,
-          });
-        }
 
         // create an object of the body entry
         const newBuyer = new Buyer({
@@ -126,31 +147,6 @@ router.post(
         // remove spaces - though this is handled in the client side already but just incase
         username = username.trim().replace(/\s/g, "").toLowerCase();
         email = email.trim();
-
-        const seller = await Seller.findOne({ $or: [{ username }, { email }] });
-
-        // check if user already exists by username and email address
-        if (seller) {
-          // return if user exists
-          if (seller.username === username) {
-            return res.status(400).json({
-              message: `Seller with username '${username}' already exists.`,
-            });
-          }
-          if (seller.email === email) {
-            return res.status(400).json({
-              message: `Seller with email '${email}' already exists.`,
-            });
-          }
-        }
-
-        const buyer = await Buyer.findOne({ email });
-        if (buyer) {
-          // return if user exists
-          return res.status(400).json({
-            message: `User with email '${email}' already exists.`,
-          });
-        }
 
         const newSeller = new Seller({
           img: { public_id, url },
@@ -271,6 +267,11 @@ router.post(
           }).toLowerCase(),
           folder: CLOUDINARY_USER_IMAGES_FOLDER,
         });
+
+        if (result.error)
+          return res.status(400).json({
+            error: "Upload failed. Please try again",
+          });
 
         // change image details to the new image
         public_id = result.public_id;
@@ -431,7 +432,7 @@ router.get("/confirm_email/:hash", async (req: any, res: any) => {
   } else {
     res.json(400).json({
       error: "Could not verify email",
-      message: "Seller's email address could not be verified",
+      message: "User's email address could not be verified",
     });
   }
 });
@@ -510,15 +511,13 @@ router.post("/resend_confirmation_link", async (req: any, res: any) => {
   let user: BuyerInterface | SellerInterface | null = null;
 
   if (user_type === "buyer") {
-    const buyer = await Buyer.findOne({ email });
-    user = buyer ? Object.create(buyer) : null;
+    user = await Buyer.findOne({ email });
   } else if (user_type === "seller") {
-    const seller = await Seller.findOne({ email });
-    user = seller ? Object.create(seller) : null;
+    user = await Seller.findOne({ email });
   }
 
   try {
-    if (user === null) {
+    if (!user) {
       // then email does not exist
       return res.status(400).json({
         error: "Unable to find email",
@@ -532,27 +531,27 @@ router.post("/resend_confirmation_link", async (req: any, res: any) => {
       });
     }
 
-    const existingEmailConfirmation = await EmailConfirmation.findOne({
+    let existingEmailConfirmation = await EmailConfirmation.findOne({
       user_id: user._id,
     });
 
-    // TODO just incase the emailConfirmation document was not saved
+    // incase the emailConfirmation document was not saved in the db during registration
 
-    // if (existingEmailConfirmation === null) {
-    //   // then an email confirmation document was not saved for this email, which is almost never possible
-    //   const generatedHash = randomNumber();
-    //   const newEmailToBeConfirmed = new EmailConfirmation({
-    //     generatedHash,
-    //     seller_id: seller._id,
-    //   });
+    if (existingEmailConfirmation === null) {
+      // then an email confirmation document was not saved for this email, which is almost never possible
+      const generatedHash = randomNumber();
+      const newEmailToBeConfirmed = new EmailConfirmation({
+        generatedHash,
+        user_id: user._id,
+        user_type,
+      });
+      await newEmailToBeConfirmed.save();
 
-    //   await newEmailToBeConfirmed.save();
-
-    if (!existingEmailConfirmation)
-      return res.status(400).json({ message: "Confirmation hash not found" });
+      existingEmailConfirmation = newEmailToBeConfirmed;
+    }
 
     const sendEmailResponse = await sendEmailConfirmation({
-      generatedHash: existingEmailConfirmation.generatedHash,
+      generatedHash: existingEmailConfirmation?.generatedHash,
       email: user.email,
       name: user.fullname,
       store: user.store_name,
@@ -596,15 +595,13 @@ router.post("/reset_password", async (req: any, res: any) => {
   let user: BuyerInterface | SellerInterface | null = null;
 
   if (user_type === "buyer") {
-    const buyer = await Buyer.findOne({ email });
-    user = Object.create(buyer);
+    user = await Buyer.findOne({ email });
   } else if (user_type === "seller") {
-    const seller = await Seller.findOne({ email });
-    user = Object.create(seller);
+    user = await Seller.findOne({ email });
   }
 
   try {
-    if (user === null) {
+    if (!user) {
       // then email does not exist
       return res.status(400).json({
         error: "Unable to find email",
@@ -769,24 +766,21 @@ router.post("/update/email", isAuthenticated, async (req: any, res: any) => {
     email: string;
     user_type: "seller" | "buyer";
   };
+
   email = email.trim();
 
-  let existingUserEmail: SellerInterface | BuyerInterface | null = null;
-
-  if (user_type === "seller") {
-    existingUserEmail = await Seller.findOne({
-      email,
-    });
-  } else if (user_type === "buyer") {
-    existingUserEmail = await Buyer.findOne({
-      email,
+  // check if user already exists
+  const buyerWithSameEmail = await Buyer.findOne({ email });
+  if (buyerWithSameEmail) {
+    return res.status(400).json({
+      message: `User with the email '${email}' already exists.`,
     });
   }
 
-  if (existingUserEmail !== null) {
-    // that means the new email used has been registered already
+  const sellerWithSameEmail = await Seller.findOne({ email });
+  if (sellerWithSameEmail) {
     return res.status(400).json({
-      message: `User with the email '${email}' already exists`,
+      message: `User with the email '${email}' already exists.`,
     });
   }
 
@@ -831,6 +825,7 @@ router.post("/update/email", isAuthenticated, async (req: any, res: any) => {
     const newEmailToBeConfirmed = new EmailConfirmation({
       generatedHash,
       user_id: userId,
+      user_type,
     });
 
     await newEmailToBeConfirmed.save();
