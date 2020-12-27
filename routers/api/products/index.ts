@@ -310,6 +310,11 @@ router.post(
         folder: CLOUDINARY_PRODUCT_IMAGES_FOLDER,
       });
 
+      if (imageDetails.error)
+        return res.status(400).json({
+          error: "Upload failed. Please try again",
+        });
+
       const { public_id, url } = imageDetails;
 
       const newProduct = new Product({
@@ -429,6 +434,11 @@ router.post(
           }).toLowerCase(),
           folder: CLOUDINARY_PRODUCT_IMAGES_FOLDER,
         });
+
+        if (result.error)
+          return res.status(400).json({
+            error: "Upload failed. Please try again",
+          });
 
         // change image details to the new image
         public_id = result.public_id;
