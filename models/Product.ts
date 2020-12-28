@@ -4,10 +4,6 @@ import ProductInterface from "interfaces/Product";
 
 const ProductSchema: Schema = new Schema(
   {
-    _id: {
-      type: String,
-      default: shortid.generate,
-    },
     img: {
       type: Object,
       required: true,

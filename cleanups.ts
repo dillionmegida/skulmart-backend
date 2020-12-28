@@ -3,6 +3,8 @@ import sendMail from "mails";
 import { FREE_PLAN } from "constants/subscriptionTypes";
 import { siteName } from "config/siteDetails";
 import SellerNotificationMessage from "models/SellerNotificationMessage";
+import Product from "models/Product";
+import { Schema } from "mongoose";
 
 // const changeSubToNullForUnverified = async () => {
 //   const unverified = await Seller.find({
@@ -102,6 +104,20 @@ const cleanups = async () => {
   // const notifications = await SellerNotificationMessage.find();
   // console.log({notifications})
   // await SellerNotificationMessage.deleteMany();
+
+  // const products = await Product.find({ _id: "7MWw9wo5h" });
+
+  // for (let i = 0; i < products.length; i++) {
+  //   await Product.updateOne(
+  //     { _id: "7MWw9wo5h" },
+  //     {
+  //       $set: {
+  //         _id: new Schema.Types.ObjectId("7MWw9wo5h"),
+  //       },
+  //     }
+  //   );
+  // }
+
   console.log("ended cleanup");
 };
 

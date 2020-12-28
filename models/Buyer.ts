@@ -23,6 +23,12 @@ const BuyerSchema: Schema = new Schema(
       type: Boolean,
       default: false,
     },
+    cart: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Cart",
+      },
+    ],
     store_id: {
       type: Schema.Types.ObjectId,
       ref: "Store",

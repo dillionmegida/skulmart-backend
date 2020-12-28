@@ -1,8 +1,8 @@
-import { Document } from "mongoose";
+import { Document, Schema } from "mongoose";
 
 export default interface SellerNotificationMessageInterface extends Document {
-  _id: string;
+  _id: Schema.Types.ObjectId;
   title: string;
   message: string;
-  viewedIds: string[];
+  viewedIds: Schema.Types.ObjectId[];
 }

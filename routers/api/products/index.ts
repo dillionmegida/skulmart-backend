@@ -17,7 +17,6 @@ import {
   PRODUCTS_PER_PAGE,
 } from "constants/index";
 import { FREE_PLAN, SILVER_PLAN } from "constants/subscriptionTypes";
-import sharp from "sharp";
 import { deleteImage, uploadImage } from "utils/image";
 
 // ipInfo is gotten from express-ip middleware
@@ -146,17 +145,21 @@ router.get("/query", async (req: any, res: any, next: any) => {
 
 // Get product by id
 router.get("/:id", async (req: any, res: any) => {
-  const product = await Product.findOne({
-    _id: req.params.id,
-    store_id: req.store_id,
-    visible: true,
-  });
-  if (product === null)
-    return res.status(404).json({
-      error: "Invalid id",
-      message: "No product with that id exists",
+  try {
+    const product = await Product.findOne({
+      _id: req.params.id,
+      store_id: req.store_id,
+      visible: true,
     });
-  return res.json({ product });
+    if (product === null)
+      return res.status(404).json({
+        error: "Invalid id",
+        message: "No product with that id exists",
+      });
+    return res.json({ product });
+  } catch (err) {
+    return res.status(400).json({ message: "Product with that id not found" });
+  }
 });
 
 // Get products by seller

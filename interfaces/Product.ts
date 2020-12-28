@@ -1,4 +1,4 @@
-import { Document } from "mongoose";
+import { Document, Schema } from "mongoose";
 import ImageInterface from "./Image";
 
 export default interface ProductInterface extends Document {
@@ -15,6 +15,6 @@ export default interface ProductInterface extends Document {
     devices: string[];
   };
   visible: boolean;
-  store_id: string;
-  seller_id: string;
+  store_id: Schema.Types.ObjectId;
+  seller_id: Schema.Types.ObjectId;
 }

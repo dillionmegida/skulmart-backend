@@ -55,6 +55,7 @@ app.get("/cleanups", async (req: any, res: any) => {
 
 import products from "routers/api/products";
 import sellers from "routers/api/sellers";
+import buyers from "routers/api/buyers";
 import users from "routers/api/users";
 import stores from "routers/api/stores";
 
@@ -64,6 +65,7 @@ import admin from "routers/api/admin";
 
 app.use("/api/products", products);
 app.use("/api/sellers", sellers);
+app.use("/api/buyers", buyers);
 app.use("/api/stores", stores);
 app.use("/api/users", users);
 

@@ -532,7 +532,7 @@ router.post("/resend_confirmation_link", async (req: any, res: any) => {
     }
 
     let existingEmailConfirmation = await EmailConfirmation.findOne({
-      user_id: user._id,
+      user_id: user._id as any,
     });
 
     // incase the emailConfirmation document was not saved in the db during registration
