@@ -23,6 +23,7 @@ router.get("/", async (req, res) => {
  *
  */
 
+// get cart content
 router.get("/cart", isAuthenticated, async (req: any, res) => {
   try {
     const buyer = req.user as BuyerInterface;
@@ -33,6 +34,7 @@ router.get("/cart", isAuthenticated, async (req: any, res) => {
   }
 });
 
+// add item to cart
 router.post("/cart/:product_id", isAuthenticated, async (req: any, res) => {
   const { product_id } = req.params;
 
@@ -83,6 +85,35 @@ router.post("/cart/:product_id", isAuthenticated, async (req: any, res) => {
     res.json({ message: "Product successfully added to cart" });
   } catch (err) {
     console.log(chalk.red("Could not add product to cart because >>> "), err);
+  }
+});
+
+// remove item from cart
+router.delete("/cart/:product_id", isAuthenticated, async (req: any, res) => {
+  const { product_id } = req.params;
+
+  try {
+    const buyer = req.user as BuyerInterface;
+
+    const criteria = { buyer: buyer._id, product: product_id };
+
+    const item = await Cart.find({ ...criteria });
+
+    if (!item)
+      return res.status(400).json({
+        message: "Product does not exist",
+      });
+
+    await Cart.findOneAndDelete({ ...criteria });
+
+    res.json({
+      message: "Item removed successfully from cart",
+    });
+  } catch (err) {
+    console.log(
+      chalk.red("Could not remove product from cart because >>> "),
+      err
+    );
   }
 });
 
