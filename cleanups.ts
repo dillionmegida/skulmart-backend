@@ -5,6 +5,7 @@ import { siteName } from "config/siteDetails";
 import SellerNotificationMessage from "models/SellerNotificationMessage";
 import Product from "models/Product";
 import { Schema } from "mongoose";
+import ProductInterface from "interfaces/Product";
 
 // const changeSubToNullForUnverified = async () => {
 //   const unverified = await Seller.find({
@@ -69,6 +70,17 @@ import { Schema } from "mongoose";
 
 const cleanups = async () => {
   console.log("started cleanup");
+  // const products: any = await Product.find();
+
+  // for (let i = 0; i < products.length; i++) {
+  //   // console.log(products[i], products[i]._id, products[i].seller_id);
+  //   // console.log(products[i].seller_id);
+  //   await Product.findByIdAndUpdate(products[i]._id, {
+  //     $set: {
+  //       seller: products[i].seller_id,
+  //     },
+  //   });
+  // }
   // const sellers = await Seller.find()
   // console.log({sellers})
   // await changeSubToNullForUnverified();

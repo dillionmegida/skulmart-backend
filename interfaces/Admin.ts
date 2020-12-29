@@ -1,7 +1,7 @@
-import { Document, Schema } from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 export default interface AdminInterface extends Document {
-  _id: Schema.Types.ObjectId;
+  _id: mongoose.Types.ObjectId;
   fullname: string;
   email: string;
   password: string;

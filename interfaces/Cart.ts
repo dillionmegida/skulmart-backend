@@ -1,9 +1,9 @@
-import { Document, Schema } from "mongoose";
-import ProductInterface from "./Product";
+import mongoose, { Document } from "mongoose";
 
 export default interface CartInterface extends Document {
-  _id: Schema.Types.ObjectId;
-  buyer: Schema.Types.ObjectId;
-  product: Schema.Types.ObjectId;
+  _id: mongoose.Types.ObjectId;
+  buyer: mongoose.Types.ObjectId;
+  seller: mongoose.Types.ObjectId;
+  product: mongoose.Types.ObjectId;
   quantity: number;
 }

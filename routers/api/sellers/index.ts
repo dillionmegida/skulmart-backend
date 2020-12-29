@@ -59,7 +59,7 @@ router.get("/:username", async (req: any, res: any) => {
   const totalProducts = await Product.countDocuments({
     store_id: req.store_id,
     visible: true,
-    seller_id: seller._id,
+    seller: seller._id,
   });
   return res.json({ seller, totalProducts });
 });
@@ -131,7 +131,7 @@ router.get("/products/all", isAuthenticated, async (req: any, res: any) => {
     const criteria = {
       store_id: req.store_id,
       visible: true,
-      seller_id: req.user._id,
+      seller: req.user._id,
     };
 
     const totalCount = await Product.countDocuments({ ...criteria });
@@ -263,7 +263,7 @@ router.get("/subscription/callback", async (req: any, res: any) => {
     });
 
     const idsOfProducts = await Product.find({
-      seller_id: sellerId,
+      seller: sellerId,
     })
       .limit(plan.max_products)
       .select("_id");

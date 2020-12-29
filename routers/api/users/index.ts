@@ -945,11 +945,11 @@ router.delete("/", isAuthenticated, async (req: any, res: any) => {
     });
 
     if (user.user_type === "seller") {
-      const sellerProducts = await Product.find({ seller_id: req.user._id });
+      const sellerProducts = await Product.find({ seller: req.user._id });
 
       // delete all seller's products from the db
       await Product.deleteMany({
-        seller_id: req.user._id,
+        seller: req.user._id,
       });
 
       if (sellerProducts && sellerProducts.length > 0) {

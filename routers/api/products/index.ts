@@ -150,7 +150,7 @@ router.get("/:id", async (req: any, res: any) => {
       _id: req.params.id,
       store_id: req.store_id,
       visible: true,
-    });
+    }).populate("seller");
     if (product === null)
       return res.status(404).json({
         error: "Invalid id",
@@ -171,7 +171,7 @@ router.get("/seller/:id", async (req: any, res: any) => {
     const criteria = {
       store_id: req.store_id,
       visible: true,
-      seller_id: req.params.id,
+      seller: req.params.id,
       quantity: {
         $gt: 0,
       },
@@ -264,7 +264,7 @@ router.post(
 
       const allProducts = await Product.find({
         store_id: req.store_id,
-        seller_id: loggedInSellerId,
+        seller: loggedInSellerId,
       });
 
       if (allProducts.length >= maxProducts)
@@ -281,7 +281,7 @@ router.post(
       // Check if the same name has been posted by the same seller
       const existingProduct = await Product.findOne({
         name,
-        seller_id: loggedInSellerId,
+        seller: loggedInSellerId,
       });
 
       if (existingProduct) {
@@ -327,7 +327,7 @@ router.post(
         category,
         price,
         store_id: store._id,
-        seller_id: loggedInSellerId,
+        seller: loggedInSellerId,
         visible: true,
         quantity,
       });
@@ -395,7 +395,7 @@ router.post(
     try {
       const existingProduct = await Product.findOne({
         name,
-        seller_id: authUser,
+        seller: authUser._id,
       });
       if (existingProduct && existingProduct._id !== req.params.id) {
         // then there is an existing product with the name
@@ -459,7 +459,7 @@ router.post(
           category,
           price,
           store_id: store._id,
-          seller_id: authUser,
+          seller: authUser._id,
           quantity,
         },
       });

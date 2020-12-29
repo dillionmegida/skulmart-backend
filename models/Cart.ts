@@ -5,7 +5,7 @@ const CartSchema: Schema = new Schema(
   {
     buyer: { type: Schema.Types.ObjectId, required: true, ref: "Buyer" },
     product: {
-      type: String,
+      type: Schema.Types.ObjectId,
       required: true,
       ref: "Product",
     },
@@ -13,6 +13,7 @@ const CartSchema: Schema = new Schema(
       type: Number,
       required: true,
     },
+    seller: { type: Schema.Types.ObjectId, required: true, ref: "Seller" },
   },
   {
     timestamps: true,

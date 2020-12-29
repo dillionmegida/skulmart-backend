@@ -1,7 +1,7 @@
-import { Document, Schema } from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 export default interface ResetPasswordInterface extends Document {
-  _id: Schema.Types.ObjectId;
+  _id: mongoose.Types.ObjectId;
   generatedHash: string;
-  user_id: Schema.Types.ObjectId;
+  user_id: mongoose.Types.ObjectId;
 }

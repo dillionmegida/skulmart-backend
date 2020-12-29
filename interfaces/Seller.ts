@@ -1,8 +1,8 @@
-import { Document, Schema } from "mongoose";
+import mongoose, { Document } from "mongoose";
 import ImageInterface from "./Image";
 
 export default interface SellerInterface extends Document {
-  _id: Schema.Types.ObjectId;
+  _id: mongoose.Types.ObjectId;
   img: ImageInterface;
   fullname: string;
   brand_name: string;
@@ -14,7 +14,7 @@ export default interface SellerInterface extends Document {
   subscription_type: string;
   subscription_reference: string;
   password: string;
-  store_id: Schema.Types.ObjectId;
+  store_id: mongoose.Types.ObjectId;
   store_name: string;
   user_type: "seller";
 }
