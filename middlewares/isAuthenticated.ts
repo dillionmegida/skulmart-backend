@@ -20,6 +20,14 @@ export default async function isAuthTokenValid(req: any, res: any, next: any) {
   try {
     let user: SellerInterface | BuyerInterface | null = null;
 
+    const { merchant = null } = req.headers;
+
+    if (decoded.user_type === "buyer" && merchant) {
+      // it means buyer has logged in before, but he's trying
+      // to access the merchant dashboard
+      return next();
+    }
+
     if (decoded.user_type === "buyer") {
       const buyer = await Buyer.findById(decoded._id)
         .select("-password")
