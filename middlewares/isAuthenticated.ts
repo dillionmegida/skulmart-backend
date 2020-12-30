@@ -41,9 +41,7 @@ export default async function isAuthTokenValid(req: any, res: any, next: any) {
           path: "cart",
           populate: {
             path: "product",
-            populate: {
-              path: "seller",
-            },
+            populate: [{ path: "seller" }, { path: "store" }],
           },
         })
         .populate("store");
