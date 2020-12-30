@@ -1,5 +1,4 @@
 import Store from "models/Store";
-import { domain } from "config/siteDetails";
 
 export default async function getStore(req: any, res: any, next: any) {
   const { store_name, main = null, merchant = null } = req.headers;
