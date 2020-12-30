@@ -21,7 +21,9 @@ const emailConfirmation = async ({
   const html = `
         <h2>Hi ${name} 👋</h2>
         <p>Please confirm your email address (${email})
-          which you used when registering as a ${user_type} for ${store} store on ${siteName}.</p>
+          which you used when registering as a 
+          ${user_type} ${user_type === 'seller' ? 'for ' + store  + ' store ': ''}
+          on ${siteName}.</p>
         <a
             style='
             margin: 5px 0;

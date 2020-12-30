@@ -5,7 +5,7 @@ import Store from "models/Store";
 
 router.get("/", async (req: any, res: any) => {
   const stores = await Store.find();
-  return res.json(stores);
+  return res.json({ stores });
 });
 
 router.get("/:id", async (req: any, res: any) => {

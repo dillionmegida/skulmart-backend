@@ -1,7 +1,7 @@
 {
-  "name": "market-hub-server",
+  "name": "skulmart-server",
   "version": "1.0.0",
-  "description": "The server for Market-Hub",
+  "description": "The server for SkulMart",
   "main": "build/index.js",
   "scripts": {
     "start": "node build/index.js",

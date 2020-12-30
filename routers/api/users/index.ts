@@ -24,7 +24,7 @@ import Product from "models/Product";
 import { FREE_PLAN } from "constants/subscriptionTypes";
 import userTypeRequired from "middlewares/userTypeRequired";
 import chalk from "chalk";
-import { CLOUDINARY_USER_IMAGES_FOLDER } from "constants/index";
+import { CLOUDINARY_USER_IMAGES_FOLDER, MERCHANT_SITE } from "constants/index";
 import { deleteImage, uploadImage } from "utils/image";
 import StoreInterface from "interfaces/Store";
 
@@ -43,13 +43,11 @@ router.post(
   async (req: any, res: any) => {
     const body: SellerInterface | BuyerInterface = { ...req.body };
 
-    const { email } = body;
+    const { email, store: store_id } = body;
 
     try {
-      const { store_name } = req;
-
       const store = await Store.findOne({
-        shortname: store_name.toLowerCase(),
+        _id: store_id,
       });
 
       if (!store)
@@ -57,7 +55,7 @@ router.post(
           message: "Store does not exist",
         });
 
-      const { _id: store_id, shortname } = store;
+      const { shortname } = store;
 
       // check if user already exists
       const buyer = await Buyer.findOne({ email });
@@ -186,7 +184,7 @@ router.post(
         generatedHash,
         email: user.email,
         name: user.fullname,
-        store: store_name,
+        store: shortname,
         user_type: body.user_type,
         type: "welcome",
       });
@@ -345,7 +343,6 @@ router.post(
 
 // Email confirmation
 router.get("/confirm_email/:hash", async (req: any, res: any) => {
-  console.log("yo");
   const { type: typeOfEmailConfirmation = "" } = req.query;
   const hash = await EmailConfirmation.findOne({
     generatedHash: req.params.hash,
@@ -411,6 +408,7 @@ router.get("/confirm_email/:hash", async (req: any, res: any) => {
         email: confirmedUser.email,
         name: confirmedUser.fullname,
         store: store.shortname,
+        user_type,
       });
 
       if (sendEmailResponse.error) {
@@ -419,10 +417,15 @@ router.get("/confirm_email/:hash", async (req: any, res: any) => {
       }
     }
 
+    const emailConfirmedLink =
+      user_type === "seller"
+        ? MERCHANT_SITE + "/email-confirmed?email=" + confirmedUser.email
+        : `http://${store.shortname}.skulmart.com/email-confirmed?email=${confirmedUser.email}`;
+
     // whether a welcome email is able to be sent or not, redirect to email_confirmed
     // because seller email has already been confirmed
     res.json({
-      redirectTo: `http://${store.shortname}.skulmart.com/email_confirmed?email=${confirmedUser.email}`,
+      redirectTo: emailConfirmedLink,
     });
   } else {
     res.json(400).json({
@@ -633,6 +636,7 @@ router.post("/reset_password", async (req: any, res: any) => {
       email,
       name: user.fullname,
       store: shortname,
+      user_type,
     });
 
     if (!sendEmailResponse.error) {

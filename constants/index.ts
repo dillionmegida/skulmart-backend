@@ -9,3 +9,5 @@ export const CLOUDINARY_USER_IMAGES_FOLDER = process.env.IS_DEV
 export const CLOUDINARY_PRODUCT_IMAGES_FOLDER = process.env.IS_DEV
   ? "market-hub/testing"
   : "market-hub/product_images";
+
+export const MERCHANT_SITE = "https://merchant.skulmart.com";
