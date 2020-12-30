@@ -10,12 +10,12 @@ export default async function isAuthTokenValid(req: any, res: any, next: any) {
   const tokenString = token ? token.split(" ")[1] : undefined;
 
   if (!token || !tokenString)
-    return res.status(401).json({ message: "auth token invalid" });
+    return res.status(401).json({ message: "Not logged in" });
 
   const decoded: { user_type: "buyer" | "seller"; _id: string } = isTokenValid(
     tokenString
   );
-  if (!decoded) return res.status(401).json({ message: "auth token invalid" });
+  if (!decoded) return res.status(401).json({ message: "Not logged in" });
 
   try {
     let user: SellerInterface | BuyerInterface | null = null;
@@ -31,19 +31,22 @@ export default async function isAuthTokenValid(req: any, res: any, next: any) {
               path: "seller",
             },
           },
-        });
+        })
+        .populate("store");
       user = buyer && Object.create(buyer);
     } else if (decoded.user_type === "seller") {
-      const seller = await Seller.findById(decoded._id).select("-password");
+      const seller = await Seller.findById(decoded._id)
+        .select("-password")
+        .populate("store");
       user = seller && Object.create(seller);
     }
 
     if (!user) {
-      return res.status(401).json({ message: "auth token invalid" });
+      return res.status(401).json({ message: "Not logged in" });
     }
     req.user = Object.create(user);
     next();
   } catch {
-    return res.status(401).json({ message: "auth token invalid" });
+    return res.status(401).json({ message: "Not logged in" });
   }
 }

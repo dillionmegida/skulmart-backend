@@ -14,6 +14,7 @@ import Product from "models/Product";
 import isAuthenticated from "middlewares/isAuthenticated";
 import SellerNotificationMessage from "models/SellerNotificationMessage";
 import { SELLERS_PER_PAGE, PRODUCTS_PER_PAGE } from "constants/index";
+import SellerInterface from "interfaces/Seller";
 
 /*
  *
@@ -25,7 +26,7 @@ import { SELLERS_PER_PAGE, PRODUCTS_PER_PAGE } from "constants/index";
 router.get("/", async (req: any, res: any) => {
   const { page: _page = 0 } = req.query;
   const criteria = {
-    store_id: req.store_id,
+    store: req.store_id,
     email_confirm: true,
   };
   const page = parseInt(_page);
@@ -46,7 +47,7 @@ router.get("/", async (req: any, res: any) => {
 router.get("/:username", async (req: any, res: any) => {
   const seller = await Seller.findOne({
     username: req.params.username,
-    store_id: req.store_id,
+    store: req.store_id,
     subscription_type: { $ne: undefined },
   }).select("-password");
   if (seller === null) {
@@ -57,7 +58,7 @@ router.get("/:username", async (req: any, res: any) => {
     });
   }
   const totalProducts = await Product.countDocuments({
-    store_id: req.store_id,
+    store: req.store_id,
     visible: true,
     seller: seller._id,
   });
@@ -70,7 +71,6 @@ router.get("/id/:id", async (req: any, res: any) => {
   try {
     const seller = await Seller.findOne({
       _id: id,
-      store_id: req.store_id,
       subscription_type: { $ne: undefined },
     }).select("-password");
     res.json({ seller });
@@ -88,7 +88,7 @@ router.get("/search/query", async (req: any, res: any) => {
   const { q = null, page: _page } = req.query;
   let searchRegex = new RegExp(`${q.replace("%20", "").toLowerCase()}`, "ig");
   const criteria = {
-    store_id: req.store_id,
+    store: req.store_id,
     email_confirm: true,
     $or: [
       {
@@ -128,10 +128,12 @@ router.get("/products/all", isAuthenticated, async (req: any, res: any) => {
     const { page: _page } = req.query;
     const page = parseInt(_page);
 
+    const loggedInSeller = req.user as SellerInterface;
+
     const criteria = {
-      store_id: req.store_id,
+      store: loggedInSeller.store,
       visible: true,
-      seller: req.user._id,
+      seller: loggedInSeller._id,
     };
 
     const totalCount = await Product.countDocuments({ ...criteria });
@@ -141,7 +143,8 @@ router.get("/products/all", isAuthenticated, async (req: any, res: any) => {
       ...criteria,
     })
       .limit(PRODUCTS_PER_PAGE)
-      .skip(page * PRODUCTS_PER_PAGE);
+      .skip(page * PRODUCTS_PER_PAGE)
+      .populate("store");
 
     res.json({ products, totalPages });
   } catch (err) {

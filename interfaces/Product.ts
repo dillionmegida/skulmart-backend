@@ -15,6 +15,6 @@ export default interface ProductInterface extends Document {
     devices: string[];
   };
   visible: boolean;
-  store_id: mongoose.Types.ObjectId;
+  store: mongoose.Types.ObjectId;
   seller: mongoose.Types.ObjectId;
 }

@@ -26,6 +26,7 @@ import userTypeRequired from "middlewares/userTypeRequired";
 import chalk from "chalk";
 import { CLOUDINARY_USER_IMAGES_FOLDER } from "constants/index";
 import { deleteImage, uploadImage } from "utils/image";
+import StoreInterface from "interfaces/Store";
 
 var upload = multer({ dest: "uploads/" });
 
@@ -121,7 +122,7 @@ router.post(
           fullname,
           email,
           password,
-          store_id,
+          store,
           store_name: shortname,
         });
 
@@ -157,7 +158,7 @@ router.post(
           whatsapp,
           email,
           password,
-          store_id,
+          store: store_id,
           store_name: shortname,
         });
 
@@ -233,11 +234,11 @@ router.post(
           img_url: string;
         });
 
-    try {
-      const { store_name } = req;
+    const authUser = req.user as SellerInterface | BuyerInterface;
 
+    try {
       const store = await Store.findOne({
-        shortname: store_name.toLowerCase(),
+        _id: authUser.store,
       });
 
       if (!store)
@@ -283,14 +284,14 @@ router.post(
 
         const existingUser = await Seller.findOne({
           username,
-          _id: req.user._id,
+          _id: authUser._id,
         });
 
         if (
           existingUser &&
-          existingUser._id.toString() !== req.user._id.toString()
+          existingUser._id.toString() !== authUser._id.toString()
         ) {
-          // then there is an seller with the name
+          // then there is a seller with the name
           return res.status(400).json({
             message: `Seller with the username '${username}' already exists`,
           });
@@ -301,39 +302,33 @@ router.post(
         // remove spaces - though this is handled in the client side already but just incase
         username = username.trim().replace(/\s/g, "").toLowerCase();
 
-        await Seller.findOneAndUpdate(
-          { _id: req.user._id, store_id: req.store_id },
-          {
-            $set: {
-              img: {
-                public_id,
-                url,
-              },
-              fullname,
-              brand_name,
-              username,
-              brand_desc,
-              whatsapp,
+        await Seller.findByIdAndUpdate(authUser._id, {
+          $set: {
+            img: {
+              public_id,
+              url,
             },
-          }
-        );
+            fullname,
+            brand_name,
+            username,
+            brand_desc,
+            whatsapp,
+          },
+        });
       } else if (body.user_type === "buyer") {
         let { fullname } = body;
 
         fullname = capitalize(fullname.trim());
 
-        await Buyer.findOneAndUpdate(
-          { _id: req.user._id, store_id: req.store_id },
-          {
-            $set: {
-              img: {
-                public_id,
-                url,
-              },
-              fullname,
+        await Buyer.findByIdAndUpdate(req.user._id, {
+          $set: {
+            img: {
+              public_id,
+              url,
             },
-          }
-        );
+            fullname,
+          },
+        });
       }
       return res.json({
         message: "Updated account successfully",
@@ -342,7 +337,7 @@ router.post(
       console.log(chalk.red("Error updating user info >> ", err));
       res.status(400).json({
         error: err,
-        message: "No user with that id",
+        message: "Error occured. Please try again",
       });
     }
   }
@@ -406,7 +401,7 @@ router.get("/confirm_email/:hash", async (req: any, res: any) => {
     if (!confirmedUser)
       return res.status(404).json({ message: "User not found" });
 
-    const store = await Store.findById(confirmedUser.store_id);
+    const store = await Store.findById(confirmedUser.store);
 
     if (!store)
       return res.status(404).json({ message: "Store of user not found" });
@@ -550,11 +545,13 @@ router.post("/resend_confirmation_link", async (req: any, res: any) => {
       existingEmailConfirmation = newEmailToBeConfirmed;
     }
 
+    const { shortname } = (await Store.findById(user.store)) as StoreInterface;
+
     const sendEmailResponse = await sendEmailConfirmation({
       generatedHash: existingEmailConfirmation?.generatedHash,
       email: user.email,
       name: user.fullname,
-      store: user.store_name,
+      store: shortname,
       user_type,
     });
 
@@ -629,11 +626,13 @@ router.post("/reset_password", async (req: any, res: any) => {
     // then a password reset document was saved already
     else hash = existingResetPassword.generatedHash;
 
+    const { shortname } = (await Store.findById(user.store)) as StoreInterface;
+
     const sendEmailResponse = await resetPasswordEmail({
       generatedHash: hash,
       email,
       name: user.fullname,
-      store: user.store_name,
+      store: shortname,
     });
 
     if (!sendEmailResponse.error) {

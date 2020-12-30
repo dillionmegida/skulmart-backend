@@ -48,7 +48,7 @@ const ProductSchema: Schema = new Schema(
       type: Boolean,
       default: false,
     },
-    store_id: {
+    store: {
       type: Schema.Types.ObjectId,
       ref: "Store",
       required: true,

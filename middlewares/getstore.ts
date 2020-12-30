@@ -2,10 +2,14 @@ import Store from "models/Store";
 import { domain } from "config/siteDetails";
 
 export default async function getStore(req: any, res: any, next: any) {
-  const { store_name, main = null } = req.headers;
+  const { store_name, main = null, merchant = null } = req.headers;
 
   if (main !== null)
     // then API requests are coming from the main app
+    return next();
+
+  if (merchant !== null)
+    // then API requests are coming from the merchant app
     return next();
 
   // if (subdomain === "admin") {
@@ -16,7 +20,10 @@ export default async function getStore(req: any, res: any, next: any) {
   const store = await Store.findOne({ shortname: store_name });
 
   // then store does not exist
-  if (!store) return res.redirect(domain + "/no-store?store=" + store_name);
+  if (!store)
+    return res
+      .status(400)
+      .json({ message: "This request is not coming from a store" });
 
   req.store_id = store._id;
 

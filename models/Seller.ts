@@ -59,13 +59,9 @@ const SellerSchema: Schema = new Schema(
       type: String,
       required: true,
     },
-    store_id: {
+    store: {
       type: Schema.Types.ObjectId,
       ref: "Store",
-      required: true,
-    },
-    store_name: {
-      type: String,
       required: true,
     },
   },

@@ -14,7 +14,6 @@ export default interface SellerInterface extends Document {
   subscription_type: string;
   subscription_reference: string;
   password: string;
-  store_id: mongoose.Types.ObjectId;
-  store_name: string;
+  store: mongoose.Types.ObjectId;
   user_type: "seller";
 }

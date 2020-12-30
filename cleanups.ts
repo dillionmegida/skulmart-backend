@@ -6,6 +6,7 @@ import SellerNotificationMessage from "models/SellerNotificationMessage";
 import Product from "models/Product";
 import { Schema } from "mongoose";
 import ProductInterface from "interfaces/Product";
+import Buyer from "models/Buyer";
 
 // const changeSubToNullForUnverified = async () => {
 //   const unverified = await Seller.find({
@@ -73,11 +74,9 @@ const cleanups = async () => {
   // const products: any = await Product.find();
 
   // for (let i = 0; i < products.length; i++) {
-  //   // console.log(products[i], products[i]._id, products[i].seller_id);
-  //   // console.log(products[i].seller_id);
   //   await Product.findByIdAndUpdate(products[i]._id, {
   //     $set: {
-  //       seller: products[i].seller_id,
+  //       store: products[i].store_id,
   //     },
   //   });
   // }

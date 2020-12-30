@@ -18,6 +18,9 @@ import {
 } from "constants/index";
 import { FREE_PLAN, SILVER_PLAN } from "constants/subscriptionTypes";
 import { deleteImage, uploadImage } from "utils/image";
+import SellerInterface from "interfaces/Seller";
+import chalk from "chalk";
+import ProductInterface from "interfaces/Product";
 
 // ipInfo is gotten from express-ip middleware
 const userAgentIP = (req: any) => req.ipInfo.ip;
@@ -32,7 +35,7 @@ const userAgentIP = (req: any) => req.ipInfo.ip;
 router.get("/", async (req: any, res: any) => {
   const { page: _page = 0 } = req.query;
   const criteria = {
-    store_id: req.store_id,
+    store: req.store_id,
     visible: true,
     quantity: {
       $gt: 0,
@@ -60,7 +63,7 @@ router.get("/categories", async (req: any, res: any) => {
   const page = parseInt(_page);
 
   const criteria = {
-    store_id: req.store_id,
+    store: req.store_id,
     visible: true,
     quantity: {
       $gt: 0,
@@ -92,7 +95,7 @@ router.get("/categories/:category", async (req: any, res: any) => {
   const { category } = req.params;
 
   const criteria = {
-    store_id: req.store_id,
+    store: req.store_id,
     visible: true,
     category,
     quantity: {
@@ -122,7 +125,7 @@ router.get("/query", async (req: any, res: any, next: any) => {
     let searchRegex = new RegExp(`${qLowerCase}`, "ig");
 
     const criteria = {
-      store_id: req.store_id,
+      store: req.store_id,
       visible: true,
       name: { $regex: searchRegex },
       quantity: {
@@ -148,7 +151,6 @@ router.get("/:id", async (req: any, res: any) => {
   try {
     const product = await Product.findOne({
       _id: req.params.id,
-      store_id: req.store_id,
       visible: true,
     }).populate("seller");
     if (product === null)
@@ -169,7 +171,7 @@ router.get("/seller/:id", async (req: any, res: any) => {
     const page = parseInt(_page);
 
     const criteria = {
-      store_id: req.store_id,
+      store: req.store_id,
       visible: true,
       seller: req.params.id,
       quantity: {
@@ -201,7 +203,6 @@ router.get("/views/:id", async (req: any, res: any) => {
   try {
     const product = await Product.findOne({
       _id: id,
-      store_id: req.store_id,
       visible: true,
     });
     if (product !== null) {
@@ -244,10 +245,10 @@ router.post(
     try {
       let { name, desc, category, price, quantity } = req.body;
 
-      const loggedInSellerId = req.user._id;
+      const loggedInSeller: SellerInterface = req.user;
 
       const response = await Seller.findOne({
-        _id: loggedInSellerId,
+        _id: loggedInSeller._id,
       });
 
       if (!response)
@@ -263,11 +264,11 @@ router.post(
       let maxProducts = subscriptionType.max_products;
 
       const allProducts = await Product.find({
-        store_id: req.store_id,
-        seller: loggedInSellerId,
+        store: loggedInSeller.store,
+        seller: loggedInSeller._id,
       });
 
-      if (allProducts.length >= maxProducts)
+      if (allProducts.length === maxProducts)
         return res.status(400).json({
           message: `The plan you subscribed for (${subscriptionType.name} plan) only supports maximum of ${maxProducts} products.
             You can delete one product to give room for another.`,
@@ -281,7 +282,7 @@ router.post(
       // Check if the same name has been posted by the same seller
       const existingProduct = await Product.findOne({
         name,
-        seller: loggedInSellerId,
+        seller: loggedInSeller._id,
       });
 
       if (existingProduct) {
@@ -291,7 +292,7 @@ router.post(
       }
 
       const store = await Store.findOne({
-        shortname: req.store_name.toLowerCase(),
+        _id: loggedInSeller.store,
       });
 
       if (store === null) {
@@ -326,8 +327,8 @@ router.post(
         desc,
         category,
         price,
-        store_id: store._id,
-        seller: loggedInSellerId,
+        store: store._id,
+        seller: loggedInSeller._id,
         visible: true,
         quantity,
       });
@@ -349,24 +350,26 @@ router.post(
 
 // Delete a product
 router.delete("/:id", isAuthenticated, async (req: any, res: any) => {
-  const product = await Product.findOneAndDelete({
-    _id: req.params.id,
-    store_id: req.store_id,
-  });
+  try {
+    const product = (await Product.findById(req.params.id)) as ProductInterface;
 
-  if (!product)
-    return res.status(400).json({
-      message: "No product with that id",
+    await Product.findByIdAndDelete(product._id);
+
+    await deleteImage({
+      public_id: product.img.public_id,
+      errorMsg: "Could not delete product image",
     });
 
-  await deleteImage({
-    public_id: product.img.public_id,
-    errorMsg: "Could not delete product image",
-  });
-
-  res.json({
-    message: "Product deleted successfully",
-  });
+    res.json({
+      message: "Product deleted successfully",
+    });
+  } catch (err) {
+    console.log("An error occured during product delete >> ", err);
+    res.status(500).json({
+      error: err,
+      message: "No product with that id",
+    });
+  }
 });
 
 // Update a product
@@ -390,7 +393,7 @@ router.post(
     desc = desc.trim();
     quantity = parseInt(quantity);
 
-    const authUser = req.user;
+    const authUser = req.user as SellerInterface;
 
     try {
       const existingProduct = await Product.findOne({
@@ -404,7 +407,7 @@ router.post(
         });
       }
 
-      const store = await Store.findOne({ shortname: req.store_name });
+      const store = await Store.findOne({ _id: authUser.store });
 
       if (store === null) {
         // then the store does not exist
@@ -458,7 +461,7 @@ router.post(
           desc,
           category,
           price,
-          store_id: store._id,
+          store: store._id,
           seller: authUser._id,
           quantity,
         },
@@ -468,7 +471,7 @@ router.post(
         message: `Product updated successfully`,
       });
     } catch (err) {
-      console.log("Could not update product >> ", err);
+      console.log(chalk.red("Could not update product >> "), err);
       res.status(500).json({
         error: err,
         message: "Error occured. Please try again",
