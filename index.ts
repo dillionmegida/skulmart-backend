@@ -53,13 +53,13 @@ app.get("/cleanups", async (req: any, res: any) => {
 // @desc Here are my routes for market-hub
 // @access Public
 
-import products from "routers/api/products";
-import sellers from "routers/api/sellers";
-import buyers from "routers/api/buyers";
-import users from "routers/api/users";
-import stores from "routers/api/stores";
+import products from "api/routers/products";
+import sellers from "api/routers/sellers";
+import buyers from "api/routers/buyers";
+import users from "api/routers/users";
+import stores from "api/routers/stores";
 
-import admin from "routers/api/admin";
+import admin from "api/routers/admin";
 
 // api routes
 

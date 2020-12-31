@@ -11,3 +11,5 @@ router.get("/", getAllStores);
 router.get("/:id", getStoreById);
 
 router.get("/name/:shortname", getStoreByName);
+
+export default router;

@@ -50,3 +50,5 @@ router.delete("/:id", isAuthenticated, deleteProduct);
 
 // Update a product
 router.post("/update/:id", isAuthenticated, updateProduct);
+
+export default router;

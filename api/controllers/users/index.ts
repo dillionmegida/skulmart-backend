@@ -6,3 +6,5 @@ export { default as resendEmailConfirmationLink } from "./resendEmailConfirmatio
 export { default as resetPasswordRequest } from "./resetPasswordRequest";
 export { default as resetPassword } from "./resetPassword";
 export { default as updateUserEmail } from "./updateUserEmail";
+export { default as updateUserPassword } from "./updateUserPassword";
+export { default as deleteUser } from "./deleteUser";

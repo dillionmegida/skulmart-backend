@@ -47,8 +47,6 @@ export default async function removeFromCart(req: any, res: any) {
       if (cartId !== 1) {
         const newSetOfIds = _buyer.cart.splice(cartId, 1);
 
-        console.log({ newSetOfIds });
-
         await Buyer.findByIdAndUpdate(buyer._id, {
           $set: {
             cart: newSetOfIds,

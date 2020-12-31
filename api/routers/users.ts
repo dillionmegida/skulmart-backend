@@ -1,11 +1,14 @@
 import {
   confirmEmail,
   createUser,
+  deleteUser,
   loginUser,
   resendEmailConfirmationLink,
   resetPassword,
   resetPasswordRequest,
   updateUser,
+  updateUserEmail,
+  updateUserPassword,
 } from "api/controllers/users";
 import express from "express";
 import isAuthenticated from "middlewares/isAuthenticated";
@@ -47,4 +50,16 @@ router.post("/resend_confirmation_link", resendEmailConfirmationLink);
 // Reset password request
 router.post("/reset_password", resetPasswordRequest);
 
+// Reset password
 router.post("/reset_password/:hash", resetPassword);
+
+// Update seller email
+router.post("/update/email", isAuthenticated, updateUserEmail);
+
+// Update user password
+router.post("/update/password", isAuthenticated, updateUserPassword);
+
+// Delete user
+router.delete("/", isAuthenticated, deleteUser);
+
+export default router;

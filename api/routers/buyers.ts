@@ -9,10 +9,12 @@ import isAuthenticated from "middlewares/isAuthenticated";
  *
  */
 
-router.get('/cart', isAuthenticated, getCart)
+router.get("/cart", isAuthenticated, getCart);
 
 // add item to cart
 router.post("/cart/:product_id", isAuthenticated, addToCart);
 
 // remove item from cart
 router.delete("/cart/:product_id", isAuthenticated, removeFromCart);
+
+export default router;
