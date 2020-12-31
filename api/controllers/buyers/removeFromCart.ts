@@ -35,25 +35,30 @@ export default async function removeFromCart(req: any, res: any) {
     // delete cart document
     await Cart.findOneAndDelete({ ...criteria });
 
-    const _buyer = await Buyer.findById(buyer._id);
+    // // delete the id from the buyer cart
+    // // the id allows .populate when getting the buyer
 
-    // delete the id from the buyer cart
-    // the id allows .populate when getting the buyer
-    if (_buyer) {
-      const cartId = _buyer.cart.findIndex(
-        (a) => a.toString() === cart._id.toString()
-      );
+    // getting buyer again because the buyer from req.user
+    // has cart populated from isAuthenticated with products
+    // but only the ids are needed
+    const _buyer = (await Buyer.findById(buyer._id)) as BuyerInterface;
 
-      if (cartId !== 1) {
-        const newSetOfIds = _buyer.cart.splice(cartId, 1);
+    const cartId = _buyer.cart.findIndex(
+      (a) => a.toString() === cart._id.toString()
+    );
 
-        await Buyer.findByIdAndUpdate(buyer._id, {
-          $set: {
-            cart: newSetOfIds,
-          },
-        });
-      }
-    }
+    if (cartId !== -1) {
+      const newIds = [..._buyer.cart];
+      newIds.splice(cartId, 1);
+      await Buyer.findByIdAndUpdate(buyer._id, {
+        $set: {
+          cart: newIds,
+        },
+      });
+    } else
+      return res.json({
+        message: "This cart does not exist",
+      });
 
     res.json({
       message: "Item removed successfully from cart",

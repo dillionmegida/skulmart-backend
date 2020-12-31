@@ -1,10 +1,10 @@
-import chalk from 'chalk';
-import BuyerInterface from 'interfaces/Buyer';
-import Buyer from 'models/Buyer';
-import Cart from 'models/Cart';
-import Product from 'models/Product';
-import Seller from 'models/Seller';
-import mongoose from 'mongoose'
+import chalk from "chalk";
+import BuyerInterface from "interfaces/Buyer";
+import Buyer from "models/Buyer";
+import Cart from "models/Cart";
+import Product from "models/Product";
+import Seller from "models/Seller";
+import mongoose from "mongoose";
 
 export default async function addToCart(req: any, res: any) {
   const { product_id } = req.params;
@@ -52,11 +52,10 @@ export default async function addToCart(req: any, res: any) {
       seller: seller._id,
     });
 
-    const _buyer = await Buyer.findById(buyer._id);
-
-    // impossible to have this error, but let it be here
-    if (!_buyer)
-      return res.status(400).json({ message: "Buyer account not found" });
+    // getting buyer again because the buyer from req.user
+    // has cart populated from isAuthenticated with products
+    // but only the ids are needed
+    const _buyer = (await Buyer.findById(buyer._id)) as BuyerInterface;
 
     await newCart.save();
 
