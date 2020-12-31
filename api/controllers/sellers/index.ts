@@ -5,3 +5,5 @@ export { default as getSellerBySearch } from "./getSellerBySearch";
 export { default as getAuthSellerProducts } from "./getAuthSellerProducts";
 export { default as initializeSubscription } from "./initializeSubscription";
 export { default as subscriptionCallback } from "./subscriptionCallback";
+export { default as getNotifications } from "./getNotifications";
+export { default as getNotification } from "./getNotification";

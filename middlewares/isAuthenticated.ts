@@ -4,7 +4,7 @@ import SellerInterface from "interfaces/Seller";
 import BuyerInterface from "interfaces/Buyer";
 import Buyer from "models/Buyer";
 
-export default async function isAuthTokenValid(req: any, res: any, next: any) {
+export default async function isAuthenticated(req: any, res: any, next: any) {
   const token = getTokenFromCookie(req);
 
   const tokenString = token ? token.split(" ")[1] : undefined;
