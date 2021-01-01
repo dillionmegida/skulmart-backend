@@ -1,6 +1,7 @@
 import sendMail from ".";
 import { siteName } from "config/siteDetails";
 import { FREE_PLAN } from "constants/subscriptionTypes";
+import { links } from "constants/index";
 
 type WelcomeEmailArgs = {
   email: string;
@@ -35,7 +36,10 @@ const welcomeEmail = async ({
             Using your default store, sign in on <a href='https://${store}.skulmart.com/signin'>${store.toUpperCase()} Skulmart</a>
             so you can access your dashboard 🎉.`
               : `You have automatically received a free plan. This plan supports uploading a maximum of ${FREE_PLAN.max_products} products.
-            So, head over to <a href='https://merchant.skulmart.com'>your dashboard</a> and start managing your products on ${siteName} 🎉.`
+            So, head over to <a href=${links.MERCHANT_SITE}>your dashboard</a> and start managing your products on ${siteName} 🎉.
+            <br/><br/>
+            You can also join the <a href=${links.SELLER_WHATSAPP_GROUP}>SkulMart Sellers WhatsApp Group</a> to get quick access to updates,
+            suggest features, seek help, and also report issues.`
           }</p>
         </div>
             `;
