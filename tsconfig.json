@@ -12,6 +12,7 @@
     "baseUrl": ".",
     "paths": {
       "config/*": ["config/*"],
+      "api/*": ["api/*"],
       "constants/*": ["constants/*"],
       "helpers/*": ["helpers/*"],
       "interfaces/*": ["interfaces/*"],
