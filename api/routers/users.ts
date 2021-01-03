@@ -1,4 +1,5 @@
 import {
+  addAtmCard,
   confirmEmail,
   createUser,
   deleteUser,
@@ -61,5 +62,7 @@ router.post("/update/password", isAuthenticated, updateUserPassword);
 
 // Delete user
 router.delete("/", isAuthenticated, deleteUser);
+
+router.post("/card", isAuthenticated, addAtmCard);
 
 export default router;
