@@ -1,5 +1,5 @@
 import sendMail from ".";
-import { siteName } from "config/siteDetails";
+import { siteName, twitter } from "config/siteDetails";
 import { FREE_PLAN } from "constants/subscriptionTypes";
 import { links } from "constants/index";
 import { shareTwitter, shareWhatsApp } from "utils/socialMediaSharing";
@@ -18,11 +18,11 @@ type SellerShareMessageArgs = {
   store: string;
 };
 const sellerShareMessage = ({ store, username }: SellerShareMessageArgs) =>
-  "I now manage my business on " +
+  "I am now managing my orders with " +
   store.toUpperCase() +
   " " +
   siteName +
-  ". Check out my profile here: " +
+  " (@" + twitter + ") !. Check out my profile here: " +
   getSellerProfileLink({ store, username: username });
 
 type WelcomeEmailArgs = {
