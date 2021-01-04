@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { MERCHANT_SITE } from "constants/index";
+import { links } from "constants/index";
 import { FREE_PLAN } from "constants/subscriptionTypes";
 import welcomeEmail from "mails/welcomeEmail";
 import Buyer from "models/Buyer";
@@ -71,9 +71,8 @@ export default async function confirmEmail(req: any, res: any) {
     if (typeOfEmailConfirmation === "welcome") {
       const sendEmailResponse = await welcomeEmail({
         email: confirmedUser.email,
-        name: confirmedUser.fullname,
+        profile: confirmedUser,
         store: store.shortname,
-        user_type,
       });
 
       if (sendEmailResponse.error) {
@@ -84,7 +83,7 @@ export default async function confirmEmail(req: any, res: any) {
 
     const emailConfirmedLink =
       user_type === "seller"
-        ? MERCHANT_SITE + "/email-confirmed?email=" + confirmedUser.email
+        ? links.MERCHANT_SITE + "/email-confirmed?email=" + confirmedUser.email
         : `http://${store.shortname}.skulmart.com/email-confirmed?email=${confirmedUser.email}`;
 
     // whether a welcome email is able to be sent or not, redirect to email_confirmed

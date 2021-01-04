@@ -1,6 +1,6 @@
 import sendMail from ".";
 import { siteName } from "config/siteDetails";
-import { MERCHANT_SITE } from "constants/index";
+import { links } from "constants/index";
 
 type ResetPasswordEmailArgs = {
   generatedHash: string;
@@ -19,7 +19,7 @@ const resetPasswordEmail = async ({
   const subject = `Reset your password on ${siteName}`;
   const resetLink =
     user_type === "seller"
-      ? MERCHANT_SITE + "/reset-password?hash=" + generatedHash
+      ? links.MERCHANT_SITE + "/reset-password?hash=" + generatedHash
       : `https://${store}.skulmart.com/reset-password?hash=${generatedHash}`;
   const html = `
         <h2>Hi ${name} 👋</h2>

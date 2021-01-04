@@ -25,14 +25,15 @@ router.get("/id/:id", getSellerById);
 // Get sellers by query
 router.get("/search/query", getSellerBySearch);
 
-// Get all products of logged in seller
-router.get("/products/all", isAuthenticated, getAuthSellerProducts);
 
 /*
- *
- * PRIVATE ROUTES
- *
- */
+*
+* PRIVATE ROUTES
+*
+*/
+
+// Get all products of logged in seller
+router.get("/products/all", isAuthenticated, getAuthSellerProducts);
 
 // Initialize seller subscription
 router.get("/subscription/initialize", isAuthenticated, initializeSubscription);

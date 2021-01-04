@@ -10,4 +10,7 @@ export const CLOUDINARY_PRODUCT_IMAGES_FOLDER = process.env.IS_DEV
   ? "market-hub/testing"
   : "market-hub/product_images";
 
-export const MERCHANT_SITE = "https://merchant.skulmart.com";
+export const links = {
+  MERCHANT_SITE: "https://merchant.skulmart.com",
+  SELLER_WHATSAPP_GROUP: "‎https://chat.whatsapp.com/G3tJXGTuY2hC5gar4J6L8V",
+};
