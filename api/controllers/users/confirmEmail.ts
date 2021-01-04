@@ -71,9 +71,8 @@ export default async function confirmEmail(req: any, res: any) {
     if (typeOfEmailConfirmation === "welcome") {
       const sendEmailResponse = await welcomeEmail({
         email: confirmedUser.email,
-        name: confirmedUser.fullname,
+        profile: confirmedUser,
         store: store.shortname,
-        user_type,
       });
 
       if (sendEmailResponse.error) {
