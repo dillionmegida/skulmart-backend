@@ -62,9 +62,9 @@ const welcomeEmail = async ({
               links.MERCHANT_SITE
             }>your dashboard</a> and start managing your products on ${siteName} 🎉.
             <br/><br/>
-            You can also join the <a href=${
+            You can also join the <a href="${
               links.SELLER_WHATSAPP_GROUP
-            }>SkulMart Sellers WhatsApp Group</a> to get quick access to updates,
+            }">SkulMart Sellers WhatsApp Group</a> to get quick access to updates,
             suggest features, seek help, and also report issues.<br/><br/>
             Inform your contacts/followers on Twitter and Whatsapp that you now manage
             your products on ${siteName} by clicking the following links: 
