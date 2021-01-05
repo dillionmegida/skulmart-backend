@@ -11,4 +11,5 @@ type Product = {
 export default interface TransactionInterface extends Document {
   _id: mongoose.Types.ObjectId;
   products: Product[];
+  buyer: mongoose.Types.ObjectId;
 }
