@@ -5,13 +5,7 @@ import { links } from "constants/index";
 import { shareTwitter, shareWhatsApp } from "utils/socialMediaSharing";
 import BuyerInterface from "interfaces/Buyer";
 import SellerInterface from "interfaces/Seller";
-
-type GetSellerProfileLinkArgs = {
-  username: string;
-  store: string;
-};
-const getSellerProfileLink = ({ username, store }: GetSellerProfileLinkArgs) =>
-  `https://${store}.skulmart.com/sellers/${username}`;
+import { getSellerProfileLink } from "utils/getLinks";
 
 type SellerShareMessageArgs = {
   username: string;
@@ -22,7 +16,9 @@ const sellerShareMessage = ({ store, username }: SellerShareMessageArgs) =>
   store.toUpperCase() +
   " " +
   siteName +
-  " (@" + twitter + ") !. Check out my profile here: " +
+  " (@" +
+  twitter +
+  ") !. Check out my profile here: " +
   getSellerProfileLink({ store, username: username });
 
 type WelcomeEmailArgs = {
