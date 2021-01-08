@@ -1,3 +1,4 @@
+import { json } from "body-parser";
 import chalk from "chalk";
 import { CLOUDINARY_USER_IMAGES_FOLDER } from "constants/index";
 import BuyerInterface from "interfaces/Buyer";
@@ -74,13 +75,13 @@ export default async function createUser(req: any, res: any) {
 
     if (result.error)
       return res.status(400).json({
-        error: "Upload failed. Please try again",
+        error: "Saving image failed. Please try again",
       });
 
     const { public_id, url } = result;
 
     if (body.user_type === "buyer") {
-      let { fullname, email, password } = body;
+      let { fullname, email, password, phone } = body;
 
       // confirm formats of inputs
       fullname = capitalize(fullname.trim());
@@ -94,6 +95,7 @@ export default async function createUser(req: any, res: any) {
         password,
         store,
         store_name: shortname,
+        phone,
       });
 
       newBuyer.password = await bcryptPromise(newBuyer.password);

@@ -9,6 +9,7 @@ export default interface BuyerInterface extends Document {
   fullname: string;
   email: string;
   email_confirm: boolean;
+  phone: string;
   store: mongoose.Types.ObjectId;
   user_type: "buyer";
 }

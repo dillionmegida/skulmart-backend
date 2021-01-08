@@ -23,6 +23,10 @@ const BuyerSchema: Schema = new Schema(
       type: Boolean,
       default: false,
     },
+    phone: {
+      type: String,
+      required: true,
+    },
     cart: [
       {
         type: Schema.Types.ObjectId,

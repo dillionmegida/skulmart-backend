@@ -105,7 +105,7 @@ export default async function updateUser(req: any, res: any) {
         },
       });
     } else if (body.user_type === "buyer") {
-      let { fullname } = body;
+      let { fullname, phone } = body;
 
       fullname = capitalize(fullname.trim());
 
@@ -116,6 +116,7 @@ export default async function updateUser(req: any, res: any) {
             url,
           },
           fullname,
+          phone,
         },
       });
     }
