@@ -74,6 +74,9 @@ export default async function makeTransaction(req: any, res: any) {
     }
   }
 
+  // TODO: delete all cart items
+  // but watch out if they checked out on all cart items or just checked out on a product
+
   const sellerUsernames = Object.keys(groupItemsPurchasedBySeller);
 
   for (let i = 0; i < sellerUsernames.length; i++) {
