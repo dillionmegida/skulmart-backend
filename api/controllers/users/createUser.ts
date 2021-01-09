@@ -180,7 +180,7 @@ export default async function createUser(req: any, res: any) {
       );
     }
   } catch (err) {
-    console.log(chalk.red("An error occured during user creation >> ", err));
+    console.log(chalk.red("An error occured during user creation >> "), err);
     res.status(500).json({
       error: err,
       message: "Error occured. Please try again",

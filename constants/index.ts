@@ -14,3 +14,5 @@ export const links = {
   MERCHANT_SITE: "https://merchant.skulmart.com",
   SELLER_WHATSAPP_GROUP: "‎https://chat.whatsapp.com/G3tJXGTuY2hC5gar4J6L8V",
 };
+
+export const PAYSTACK_HOSTNAME = "https://api.paystack.co";

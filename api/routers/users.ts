@@ -1,8 +1,10 @@
 import {
   addAtmCard,
+  addBankAccount,
   confirmEmail,
   createUser,
   deleteUser,
+  getBanks,
   loginUser,
   resendEmailConfirmationLink,
   resetPassword,
@@ -54,15 +56,23 @@ router.post("/reset_password", resetPasswordRequest);
 // Reset password
 router.post("/reset_password/:hash", resetPassword);
 
+router.use(isAuthenticated);
+
 // Update seller email
-router.post("/update/email", isAuthenticated, updateUserEmail);
+router.post("/update/email", updateUserEmail);
 
 // Update user password
-router.post("/update/password", isAuthenticated, updateUserPassword);
+router.post("/update/password", updateUserPassword);
 
 // Delete user
-router.delete("/", isAuthenticated, deleteUser);
+router.delete("/", deleteUser);
 
-router.post("/card", isAuthenticated, addAtmCard);
+// router.post("/card", addAtmCard);
+
+// Add a user's bank account
+router.post("/bank", addBankAccount);
+
+// Get all available banks
+router.get("/bank", getBanks);
 
 export default router;

@@ -34,6 +34,22 @@ const BuyerSchema: Schema = new Schema(
         ref: "Cart",
       },
     ],
+    banks: [
+      {
+        bank_name: {
+          type: String,
+        },
+        bank_code: {
+          type: String,
+        },
+        account_name: {
+          type: String,
+        },
+        account_number: {
+          type: String,
+        },
+      },
+    ],
     store: {
       type: Schema.Types.ObjectId,
       ref: "Store",

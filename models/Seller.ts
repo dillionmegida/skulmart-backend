@@ -64,6 +64,22 @@ const SellerSchema: Schema = new Schema(
       ref: "Store",
       required: true,
     },
+    banks: [
+      {
+        bank_name: {
+          type: String,
+        },
+        bank_code: {
+          type: String,
+        },
+        account_name: {
+          type: String,
+        },
+        account_number: {
+          type: String,
+        },
+      },
+    ],
   },
   {
     timestamps: true,

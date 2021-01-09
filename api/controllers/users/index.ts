@@ -9,3 +9,5 @@ export { default as updateUserEmail } from "./updateUserEmail";
 export { default as updateUserPassword } from "./updateUserPassword";
 export { default as deleteUser } from "./deleteUser";
 export { default as addAtmCard } from "./addAtmCard";
+export { default as addBankAccount } from "./addBankAccount";
+export { default as getBanks } from "./getBanks";
