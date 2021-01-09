@@ -6,6 +6,7 @@ import {
   deleteUser,
   getBanks,
   loginUser,
+  removeBankAccount,
   resendEmailConfirmationLink,
   resetPassword,
   resetPasswordRequest,
@@ -67,12 +68,15 @@ router.post("/update/password", updateUserPassword);
 // Delete user
 router.delete("/", deleteUser);
 
+// Get all available banks
+router.get("/bank", getBanks);
+
 // router.post("/card", addAtmCard);
 
 // Add a user's bank account
 router.post("/bank", addBankAccount);
 
-// Get all available banks
-router.get("/bank", getBanks);
+// Add a user's bank account
+router.delete("/bank", removeBankAccount);
 
 export default router;
