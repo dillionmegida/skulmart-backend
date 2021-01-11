@@ -1,6 +1,8 @@
 export const PRODUCTS_PER_PAGE = 20;
 export const SELLERS_PER_PAGE = 20;
 
+export const SERVER_URL = "http://skulmart-backend.herokuapp.com";
+
 export const MAILGUN_EMAIL = "support@mg.skulmart.com";
 
 export const CLOUDINARY_USER_IMAGES_FOLDER = process.env.IS_DEV
@@ -16,3 +18,6 @@ export const links = {
 };
 
 export const PAYSTACK_HOSTNAME = "https://api.paystack.co";
+
+export const CALLBACK_URL_AFTER_INITIALIZING_TRANSACTION =
+  SERVER_URL + "/api/buyers/transaction/complete";

@@ -11,6 +11,14 @@ const TransactionSchema: Schema = new Schema({
       has_buyer_received: Boolean,
     },
   ],
+  status: {
+    type: String,
+    default: "none",
+  },
+  payment_link: {
+    type: String,
+    default: null,
+  },
 });
 
 export default mongoose.model<TransactionInterface>(

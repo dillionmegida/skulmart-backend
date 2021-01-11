@@ -1,5 +1,6 @@
 import mongoose, { Document } from "mongoose";
 import Bank from "./Bank";
+import Card from "./Card";
 import ImageInterface from "./Image";
 
 export default interface SellerInterface extends Document {
@@ -16,6 +17,7 @@ export default interface SellerInterface extends Document {
   subscription_reference: string;
   password: string;
   banks: Bank[];
+  cards: Card[];
   store: mongoose.Types.ObjectId;
   user_type: "seller";
 }

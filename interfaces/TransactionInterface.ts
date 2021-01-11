@@ -18,6 +18,9 @@ export default interface TransactionInterfaTce extends Document {
   buyer: mongoose.Types.ObjectId;
   buyer_phone: string;
   price_paid: number;
+  status: "pending" | "success" | "failed" | "none";
+  payment_link: string | null; // should be string if 1. status is pending
+  // and 2. it is the first_charge. The rest should be recurring
 }
 
 export type GroupedItemsPurchasedBySeller = {

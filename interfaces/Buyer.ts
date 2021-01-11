@@ -1,5 +1,6 @@
 import mongoose, { Document } from "mongoose";
 import Bank from "./Bank";
+import Card from "./Card";
 import ImageInterface from "./Image";
 
 export default interface BuyerInterface extends Document {
@@ -7,6 +8,7 @@ export default interface BuyerInterface extends Document {
   img: ImageInterface;
   cart: mongoose.Types.ObjectId[];
   banks: Bank[];
+  cards: Card[];
   password: string;
   fullname: string;
   email: string;

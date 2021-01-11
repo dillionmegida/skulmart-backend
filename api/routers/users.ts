@@ -6,6 +6,7 @@ import {
   deleteUser,
   getBanks,
   loginUser,
+  removeAtmCard,
   removeBankAccount,
   resendEmailConfirmationLink,
   resetPassword,
@@ -73,8 +74,13 @@ router.get("/bank", getBanks);
 
 // router.post("/card", addAtmCard);
 
+// Remove a saved card
+router.delete("/card", removeAtmCard);
+
 // Add a user's bank account
 router.post("/bank", addBankAccount);
+
+// Add a user's bank account
 
 // Add a user's bank account
 router.delete("/bank", removeBankAccount);

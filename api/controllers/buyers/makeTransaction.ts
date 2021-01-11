@@ -9,6 +9,10 @@ import addPaystackAuth from "utils/addPaystackAuth";
 export default async function makeTransaction(req: any, res: any) {
   const user = req.user as BuyerInterface | SellerInterface;
 
+  const { first_charge = false } = req.query as {
+    first_charge: boolean;
+  };
+
   const { account_number, transaction, message } = req.body as {
     account_number: string;
     message: string;
