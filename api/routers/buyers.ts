@@ -28,8 +28,7 @@ router.post("/cart/:cart_id/update", updateItemInCart);
 // remove item from cart
 router.delete("/cart/:product_id", removeFromCart);
 
+// make transaction - buy everything in cart
 router.post("/transaction", makeTransaction);
-
-router.get("/transaction/complete", makeTransaction);
 
 export default router;

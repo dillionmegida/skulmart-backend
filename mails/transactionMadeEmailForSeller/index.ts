@@ -12,13 +12,11 @@ type Args = {
     quantity: number;
     price_when_bought: number;
   }[];
-  buyer_phone: string;
   message: string;
 };
 
 export default async function transactionMadeEmailForSeller({
   seller,
-  buyer_phone,
   buyer,
   items,
   message,
@@ -27,7 +25,7 @@ export default async function transactionMadeEmailForSeller({
   const html = transactionMadeForSeller({
     buyer: {
       name: buyer.fullname,
-      phone: buyer_phone,
+      phone: buyer.phone,
     },
     products: items.map((i) => ({
       name: i.product.name,

@@ -44,7 +44,9 @@ export default async function addAtmCardComplete(req: any, res: any) {
       ) !== -1;
 
     if (doesCardExist)
-      return res.status(400).json({ message: "This card has been saved alread" });
+      return res
+        .status(400)
+        .json({ message: "This card has been saved alread" });
 
     if (user.user_type === "buyer") {
       await Buyer.findByIdAndUpdate(user._id, {
@@ -60,7 +62,16 @@ export default async function addAtmCardComplete(req: any, res: any) {
       });
     }
 
-    // TODO trigger refund
+    await axios({
+      method: "post",
+      url: PAYSTACK_HOSTNAME + "/refund",
+      headers: {
+        ...addPaystackAuth(),
+      },
+      data: {
+        transaction: reference,
+      },
+    });
 
     res.json({
       authorization,

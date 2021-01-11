@@ -12,15 +12,10 @@ type Product = {
   has_buyer_received: boolean;
 };
 
-export default interface TransactionInterfaTce extends Document {
+export default interface TransactionInterface extends Document {
   _id: mongoose.Types.ObjectId;
   products: Product[];
   buyer: mongoose.Types.ObjectId;
-  buyer_phone: string;
-  price_paid: number;
-  status: "pending" | "success" | "failed" | "none";
-  payment_link: string | null; // should be string if 1. status is pending
-  // and 2. it is the first_charge. The rest should be recurring
 }
 
 export type GroupedItemsPurchasedBySeller = {

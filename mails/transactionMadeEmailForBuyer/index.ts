@@ -7,12 +7,10 @@ type Args = {
   buyer: BuyerInterface;
   items: GroupedItemsPurchasedBySeller;
   price_paid: number;
-  buyer_phone: string;
   message: string;
 };
 
 export default async function transactionMadeEmailForBuyer({
-  buyer_phone,
   price_paid,
   items,
   message,
@@ -20,7 +18,7 @@ export default async function transactionMadeEmailForBuyer({
 }: Args) {
   const subject = `Order Receipt`;
   const html = transactionMadeForBuyer({
-    buyerPhone: buyer_phone,
+    buyerPhone: buyer.phone,
     items,
     pricePaid: price_paid,
     message,
