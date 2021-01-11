@@ -36,6 +36,7 @@ export default async function removeAtmCard(req: any, res: any) {
         },
       });
     }
+    res.json({ message: "Card removed successfully" });
   } catch (err) {
     console.log(chalk.red("An error occured during ATM card removal"), err);
   }

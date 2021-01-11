@@ -19,5 +19,5 @@ export const links = {
 
 export const PAYSTACK_HOSTNAME = "https://api.paystack.co";
 
-export const CALLBACK_URL_AFTER_INITIALIZING_TRANSACTION =
-  SERVER_URL + "/api/buyers/transaction/complete";
+export const CALLBACK_URL_AFTER_ADDING_CARD =
+  SERVER_URL + "/api/buyers/card/complete";

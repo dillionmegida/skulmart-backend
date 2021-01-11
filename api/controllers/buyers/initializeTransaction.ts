@@ -1,6 +1,6 @@
 import axios from "axios";
 import {
-  CALLBACK_URL_AFTER_INITIALIZING_TRANSACTION,
+  CALLBACK_URL_AFTER_ADDING_CARD,
   PAYSTACK_HOSTNAME,
 } from "constants/index";
 import BuyerInterface from "interfaces/Buyer";
@@ -18,7 +18,7 @@ export default async function initializeTransaction(req: any, res: any) {
       data: {
         amount,
         email: user.email,
-        callback_url: CALLBACK_URL_AFTER_INITIALIZING_TRANSACTION,
+        callback_url: CALLBACK_URL_AFTER_ADDING_CARD,
       },
       headers: {
         ...addPaystackAuth(),

@@ -1,5 +1,6 @@
 import {
-  addAtmCard,
+  addAtmCardComplete,
+  addAtmCardInitialize,
   addBankAccount,
   confirmEmail,
   createUser,
@@ -72,7 +73,22 @@ router.delete("/", deleteUser);
 // Get all available banks
 router.get("/bank", getBanks);
 
-// router.post("/card", addAtmCard);
+/**
+ * Adding new card is based on how paystack works
+ * The first one initializes the transaction, giving the user a ui form to pay through
+ * then the second is a callback, which is called after the form
+ * to add the card details to the user's document, also, refunding the user
+ */
+
+// adding card start
+
+// Add new card (initialize)
+router.post("/card/initialize", addAtmCardInitialize);
+
+// Add new card (complete)
+router.post("/card/complete", addAtmCardComplete);
+
+// adding card complete
 
 // Remove a saved card
 router.delete("/card", removeAtmCard);
