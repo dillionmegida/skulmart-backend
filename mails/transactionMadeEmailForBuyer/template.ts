@@ -70,7 +70,7 @@ export default function transactionMadeForBuyer({
     </div>
     <p>
       The seller(s) of the product(s) you've purchased will contact you on
-      the number your provided <b>(${buyerPhone})</b>
+     your number <b>(${buyerPhone})</b>
       to discuss the delivery process.
       <br/>
       <br/>

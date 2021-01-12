@@ -13,6 +13,7 @@ type Args = {
     price_when_bought: number;
   }[];
   message: string;
+  first_purchase?: boolean;
 };
 
 export default async function transactionMadeEmailForSeller({
@@ -20,8 +21,11 @@ export default async function transactionMadeEmailForSeller({
   buyer,
   items,
   message,
+  first_purchase,
 }: Args) {
-  const subject = `Someone purchased from your store (${seller.brand_name}) 🎉`;
+  const subject = first_purchase
+    ? `Congratulations on your first sales 🎉`
+    : `Someone purchased from your store (${seller.brand_name}) 🎉`;
   const html = transactionMadeForSeller({
     buyer: {
       name: buyer.fullname,

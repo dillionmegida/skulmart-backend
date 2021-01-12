@@ -23,9 +23,11 @@ export default async function makeTransaction(req: any, res: any) {
     card_signature: string;
   };
 
-  let totalAmount = 5000;
-
+  let totalAmount = 50;
+  
   // transaction.products.forEach((p) => (totalAmount += p.price_when_bought));
+
+  const  totalAmountInKobo = totalAmount * 100;
 
   const cardToPayWith = buyer.cards.find(
     ({ signature }) => signature === card_signature
@@ -92,7 +94,7 @@ export default async function makeTransaction(req: any, res: any) {
       },
       data: {
         email: buyer.email,
-        amount: totalAmount,
+        amount: totalAmountInKobo,
         authorization_code: cardToPayWith.authorization_code,
       },
     });
@@ -119,7 +121,7 @@ export default async function makeTransaction(req: any, res: any) {
         const newTransaction = new Transaction({
           ref: transactionRef,
           buyer: buyer._id,
-          product: orders[i],
+          product: item.product_populated._id,
           seller: seller_info._id,
           quantity: item.quantity,
           price_when_bought: item.price_when_bought,
@@ -136,6 +138,7 @@ export default async function makeTransaction(req: any, res: any) {
           price_when_bought: i.price_when_bought,
           quantity: i.quantity,
         })),
+        // first_purchase
         message,
       });
     }

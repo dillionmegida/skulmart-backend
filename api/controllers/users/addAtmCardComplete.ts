@@ -22,6 +22,7 @@ export default async function addAtmCardComplete(req: any, res: any) {
         ...addPaystackAuth(),
       },
     });
+
     if (!verifyRes.data.status)
       return res
         .status(400)
@@ -29,6 +30,7 @@ export default async function addAtmCardComplete(req: any, res: any) {
           "Verification failed. If you have been debited, please send us an email @" +
             email
         );
+
 
     if (verifyRes.data.data.customer.email !== user.email)
       // just incase it's another user trying to verify charge
@@ -62,6 +64,14 @@ export default async function addAtmCardComplete(req: any, res: any) {
       });
     }
 
+    res.json({
+      authorization,
+      message:
+        "Card saved. Please contact @" +
+        email +
+        " if you do not see a refund in the next 48 hours",
+    });
+
     await axios({
       method: "post",
       url: PAYSTACK_HOSTNAME + "/refund",
@@ -71,14 +81,6 @@ export default async function addAtmCardComplete(req: any, res: any) {
       data: {
         transaction: reference,
       },
-    });
-
-    res.json({
-      authorization,
-      message:
-        "Card saved. Please contact @" +
-        email +
-        " if you do not see a refund in the next 48 hours",
     });
   } catch (err) {
     console.log(
