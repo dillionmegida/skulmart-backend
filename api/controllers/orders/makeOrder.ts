@@ -4,30 +4,30 @@ import { PAYSTACK_HOSTNAME } from "constants/index";
 import BuyerInterface from "interfaces/Buyer";
 import SellerInterface from "interfaces/Seller";
 import StoreInterface from "interfaces/Store";
-import TransactionInterface, {
+import OrderInterface, {
   GroupedItemsPurchasedBySeller,
-} from "interfaces/TransactionInterface";
-import transactionMadeEmailForBuyer from "mails/transactionMadeEmailForBuyer";
-import transactionMadeEmailForSeller from "mails/transactionMadeEmailForSeller";
+} from "interfaces/OrderInterface";
+import orderMadeEmailForBuyer from "mails/orderMadeEmailForBuyer";
+import orderMadeEmailForSeller from "mails/orderMadeEmailForSeller";
 import Seller from "models/Seller";
-import Transaction from "models/Transaction";
+import Order from "models/Order";
 import addPaystackAuth from "utils/addPaystackAuth";
 import shortId from "shortid";
 
-export default async function makeTransaction(req: any, res: any) {
+export default async function makeOrder(req: any, res: any) {
   const buyer = req.user as BuyerInterface;
 
   const { orders, message, card_signature } = req.body as {
     message: string;
-    orders: TransactionInterface[];
+    orders: OrderInterface[];
     card_signature: string;
   };
 
   let totalAmount = 50;
-  
-  // transaction.products.forEach((p) => (totalAmount += p.price_when_bought));
 
-  const  totalAmountInKobo = totalAmount * 100;
+  // orders.forEach((p) => (totalAmount += p.price_when_bought));
+
+  const totalAmountInKobo = totalAmount * 100;
 
   const cardToPayWith = buyer.cards.find(
     ({ signature }) => signature === card_signature
@@ -39,15 +39,15 @@ export default async function makeTransaction(req: any, res: any) {
   const groupItemsPurchasedBySeller: GroupedItemsPurchasedBySeller = {};
 
   for (let i = 0; i < orders.length; i++) {
-    const itemInTransaction = orders[i];
-    const sellerUsername = itemInTransaction.seller_username;
+    const order = orders[i];
+    const sellerUsername = order.seller_username;
 
     // const sellerItems = groupItemsPurchasedBySeller[sellerUsername] || null;
     const sellerItems = groupItemsPurchasedBySeller.deeesignsstudios;
 
     if (sellerItems) {
       // seller already has item in the group
-      sellerItems.items.push(itemInTransaction);
+      sellerItems.items.push(order);
     } else {
       const seller = (await Seller.findOne({
         username: sellerUsername,
@@ -63,10 +63,10 @@ export default async function makeTransaction(req: any, res: any) {
 
       const items = [
         {
-          price_when_bought: itemInTransaction.price_when_bought,
-          has_buyer_received: itemInTransaction.has_buyer_received,
-          product_populated: itemInTransaction.product_populated,
-          quantity: itemInTransaction.quantity,
+          price_when_bought: order.price_when_bought,
+          has_buyer_received: order.has_buyer_received,
+          product_populated: order.product_populated,
+          quantity: order.quantity,
         },
       ];
       // groupItemsPurchasedBySeller[sellerUsername] = {
@@ -86,23 +86,23 @@ export default async function makeTransaction(req: any, res: any) {
   }
 
   try {
-    const payRes = await axios({
-      url: PAYSTACK_HOSTNAME + "/transaction/charge_authorization",
-      method: "post",
-      headers: {
-        ...addPaystackAuth(),
-      },
-      data: {
-        email: buyer.email,
-        amount: totalAmountInKobo,
-        authorization_code: cardToPayWith.authorization_code,
-      },
-    });
+    // const payRes = await axios({
+    //   url: PAYSTACK_HOSTNAME + "/transaction/charge_authorization",
+    //   method: "post",
+    //   headers: {
+    //     ...addPaystackAuth(),
+    //   },
+    //   data: {
+    //     email: buyer.email,
+    //     amount: totalAmountInKobo,
+    //     authorization_code: cardToPayWith.authorization_code,
+    //   },
+    // });
 
-    if (!payRes.data.status)
-      return res
-        .status(400)
-        .json({ message: "Transaction failed. Please try again" });
+    // if (!payRes.data.status)
+    //   return res
+    //     .status(400)
+    //     .json({ message: "Making order failed. Please try again" });
 
     // TODO: delete all cart items
 
@@ -114,12 +114,12 @@ export default async function makeTransaction(req: any, res: any) {
         sellerUsername
       ];
 
-      const transactionRef = shortId.generate();
+      const orderRef = shortId.generate();
 
       for (let j = 0; j < items.length; j++) {
         const item = items[j];
-        const newTransaction = new Transaction({
-          ref: transactionRef,
+        const newOrder = new Order({
+          ref: orderRef,
           buyer: buyer._id,
           product: item.product_populated._id,
           seller: seller_info._id,
@@ -127,35 +127,32 @@ export default async function makeTransaction(req: any, res: any) {
           price_when_bought: item.price_when_bought,
         });
 
-        await newTransaction.save();
+        await newOrder.save();
       }
 
-      await transactionMadeEmailForSeller({
-        seller: seller_info,
-        buyer,
-        items: groupItemsPurchasedBySeller[sellerUsername].items.map((i) => ({
-          product: i.product_populated,
-          price_when_bought: i.price_when_bought,
-          quantity: i.quantity,
-        })),
-        // first_purchase
-        message,
-      });
+      // await orderMadeEmailForSeller({
+      //   seller: seller_info,
+      //   buyer,
+      //   items: groupItemsPurchasedBySeller[sellerUsername].items.map((i) => ({
+      //     product: i.product_populated,
+      //     price_when_bought: i.price_when_bought,
+      //     quantity: i.quantity,
+      //   })),
+      //   // first_purchase
+      //   message,
+      // });
     }
 
-    await transactionMadeEmailForBuyer({
-      items: groupItemsPurchasedBySeller,
-      price_paid: totalAmount,
-      message,
-      buyer,
-    });
+    // await orderMadeEmailForBuyer({
+    //   items: groupItemsPurchasedBySeller,
+    //   price_paid: totalAmount,
+    //   message,
+    //   buyer,
+    // });
 
-    res.json({ message: "Transaction completed" });
+    res.json({ message: "Order completed" });
   } catch (err) {
-    console.log(
-      chalk.red("An error occured during making transaction >>> "),
-      err
-    );
+    console.log(chalk.red("An error occured during making order >>> "), err);
     res.status(500).json({
       message:
         "An error occured. Please try again after few hours to avoid multiple deductions",

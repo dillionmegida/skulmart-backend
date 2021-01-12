@@ -1,7 +1,7 @@
-import TransactionInterface from "interfaces/TransactionInterface";
+import OrderInterface from "interfaces/OrderInterface";
 import mongoose, { Schema } from "mongoose";
 
-const TransactionSchema: Schema = new Schema({
+const OrderSchema: Schema = new Schema({
   ref: { type: String, required: true },
   product: { type: Schema.Types.ObjectId, required: true },
   buyer: { type: Schema.Types.ObjectId, required: true },
@@ -11,8 +11,8 @@ const TransactionSchema: Schema = new Schema({
   has_buyer_received: { type: Boolean, default: false },
 });
 
-export default mongoose.model<TransactionInterface>(
-  "Transaction",
-  TransactionSchema,
-  "transactions"
+export default mongoose.model<OrderInterface>(
+  "Order",
+  OrderSchema,
+  "orders"
 );

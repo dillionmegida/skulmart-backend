@@ -48,7 +48,7 @@ const welcomeEmail = async ({
           <p>
           ${
             profile.user_type === "buyer"
-              ? `You can log into your account on any store to manage your transactions.
+              ? `You can log into your account on any store to manage your orders.
             Using your default store, sign in on <a href='https://${store}.skulmart.com/signin'>${store.toUpperCase()} Skulmart</a>
             so you can access your dashboard 🎉.`
               : `You have automatically received a free plan. This plan supports uploading a maximum of ${

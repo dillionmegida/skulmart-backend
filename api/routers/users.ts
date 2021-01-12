@@ -75,7 +75,7 @@ router.get("/bank", getBanks);
 
 /**
  * Adding new card is based on how paystack works
- * The first one initializes the transaction, giving the user a ui form to pay through
+ * The first one initializes a transaction, giving the user a ui form to pay through
  * then the second is a callback, which is called after the form
  * to add the card details to the user's document, also, refunding the user
  */

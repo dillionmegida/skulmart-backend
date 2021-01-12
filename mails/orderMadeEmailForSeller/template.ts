@@ -6,7 +6,7 @@ type Args = {
   buyer: { name: string; phone: string };
 };
 
-export default function transactionMadeForSeller({
+export default function orderMadeForSeller({
   buyer,
   products,
   message,

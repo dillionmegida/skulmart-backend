@@ -1,8 +1,8 @@
 import BuyerInterface from "interfaces/Buyer";
 import ProductInterface from "interfaces/Product";
 import SellerInterface from "interfaces/Seller";
-import sendMail from "../";
-import transactionMadeForSeller from "./template";
+import sendMail from "..";
+import orderMadeForSeller from "./template";
 
 type Args = {
   seller: SellerInterface;
@@ -16,7 +16,7 @@ type Args = {
   first_purchase?: boolean;
 };
 
-export default async function transactionMadeEmailForSeller({
+export default async function orderMadeEmailForSeller({
   seller,
   buyer,
   items,
@@ -26,7 +26,7 @@ export default async function transactionMadeEmailForSeller({
   const subject = first_purchase
     ? `Congratulations on your first sales 🎉`
     : `Someone purchased from your store (${seller.brand_name}) 🎉`;
-  const html = transactionMadeForSeller({
+  const html = orderMadeForSeller({
     buyer: {
       name: buyer.fullname,
       phone: buyer.phone,

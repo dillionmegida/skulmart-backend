@@ -1,4 +1,4 @@
-import { GroupedItemsPurchasedBySeller } from "interfaces/TransactionInterface";
+import { GroupedItemsPurchasedBySeller } from "interfaces/OrderInterface";
 import { formatCurrency } from "utils/currency";
 import { getSellerProfileLink } from "utils/getLinks";
 
@@ -10,7 +10,7 @@ type Args = {
   emailSubject: string;
 };
 
-export default function transactionMadeForBuyer({
+export default function orderMadeForBuyer({
   items,
   pricePaid,
   buyerPhone,

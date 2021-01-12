@@ -1,7 +1,7 @@
 import BuyerInterface from "interfaces/Buyer";
-import { GroupedItemsPurchasedBySeller } from "interfaces/TransactionInterface";
-import sendMail from "../";
-import transactionMadeForBuyer from "./template";
+import { GroupedItemsPurchasedBySeller } from "interfaces/OrderInterface";
+import sendMail from "..";
+import orderMadeForBuyer from "./template";
 
 type Args = {
   buyer: BuyerInterface;
@@ -10,14 +10,14 @@ type Args = {
   message: string;
 };
 
-export default async function transactionMadeEmailForBuyer({
+export default async function orderMadeEmailForBuyer({
   price_paid,
   items,
   message,
   buyer,
 }: Args) {
   const subject = `Order Receipt`;
-  const html = transactionMadeForBuyer({
+  const html = orderMadeForBuyer({
     buyerPhone: buyer.phone,
     items,
     pricePaid: price_paid,

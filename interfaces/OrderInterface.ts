@@ -3,16 +3,7 @@ import ProductInterface from "./Product";
 import SellerInterface from "./Seller";
 import StoreInterface from "./Store";
 
-type Product = {
-  product: ProductInterface;
-  seller: SellerInterface;
-  quantity: number;
-  price_when_bought: number;
-  has_buyer_paid: boolean;
-  has_buyer_received: boolean;
-};
-
-export default interface TransactionInterface extends Document {
+export default interface OrderInterface extends Document {
   _id: mongoose.Types.ObjectId;
   ref: string;
   product: mongoose.Types.ObjectId;
