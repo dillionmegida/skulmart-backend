@@ -8,18 +8,18 @@ import TransactionInterface, {
   GroupedItemsPurchasedBySeller,
 } from "interfaces/TransactionInterface";
 import transactionMadeEmailForBuyer from "mails/transactionMadeEmailForBuyer";
-import transactionMadeForBuyer from "mails/transactionMadeEmailForBuyer/template";
 import transactionMadeEmailForSeller from "mails/transactionMadeEmailForSeller";
 import Seller from "models/Seller";
 import Transaction from "models/Transaction";
 import addPaystackAuth from "utils/addPaystackAuth";
+import shortId from "shortid";
 
 export default async function makeTransaction(req: any, res: any) {
   const buyer = req.user as BuyerInterface;
 
-  const { transaction, message, card_signature } = req.body as {
+  const { orders, message, card_signature } = req.body as {
     message: string;
-    transaction: TransactionInterface;
+    orders: TransactionInterface[];
     card_signature: string;
   };
 
@@ -36,9 +36,9 @@ export default async function makeTransaction(req: any, res: any) {
 
   const groupItemsPurchasedBySeller: GroupedItemsPurchasedBySeller = {};
 
-  for (let i = 0; i < transaction.products.length; i++) {
-    const itemInTransaction = transaction.products[i];
-    const sellerUsername = itemInTransaction.seller.username;
+  for (let i = 0; i < orders.length; i++) {
+    const itemInTransaction = orders[i];
+    const sellerUsername = itemInTransaction.seller_username;
 
     // const sellerItems = groupItemsPurchasedBySeller[sellerUsername] || null;
     const sellerItems = groupItemsPurchasedBySeller.deeesignsstudios;
@@ -62,9 +62,8 @@ export default async function makeTransaction(req: any, res: any) {
       const items = [
         {
           price_when_bought: itemInTransaction.price_when_bought,
-          has_buyer_paid: itemInTransaction.has_buyer_paid,
           has_buyer_received: itemInTransaction.has_buyer_received,
-          product: itemInTransaction.product,
+          product_populated: itemInTransaction.product_populated,
           quantity: itemInTransaction.quantity,
         },
       ];
@@ -105,23 +104,35 @@ export default async function makeTransaction(req: any, res: any) {
 
     // TODO: delete all cart items
 
-    const newTransaction = new Transaction({
-      buyer: buyer._id,
-      products: transaction.products,
-    });
-
-    await newTransaction.save();
-
     const sellerUsernames = Object.keys(groupItemsPurchasedBySeller);
 
     for (let i = 0; i < sellerUsernames.length; i++) {
       const sellerUsername = sellerUsernames[i];
-      const items = groupItemsPurchasedBySeller[sellerUsername];
+      const { items, seller_info } = groupItemsPurchasedBySeller[
+        sellerUsername
+      ];
+
+      const transactionRef = shortId.generate();
+
+      for (let j = 0; j < items.length; j++) {
+        const item = items[j];
+        const newTransaction = new Transaction({
+          ref: transactionRef,
+          buyer: buyer._id,
+          product: orders[i],
+          seller: seller_info._id,
+          quantity: item.quantity,
+          price_when_bought: item.price_when_bought,
+        });
+
+        await newTransaction.save();
+      }
+
       await transactionMadeEmailForSeller({
-        seller: items.seller_info as SellerInterface,
+        seller: seller_info,
         buyer,
         items: groupItemsPurchasedBySeller[sellerUsername].items.map((i) => ({
-          product: i.product,
+          product: i.product_populated,
           price_when_bought: i.price_when_bought,
           quantity: i.quantity,
         })),

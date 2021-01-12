@@ -14,18 +14,23 @@ type Product = {
 
 export default interface TransactionInterface extends Document {
   _id: mongoose.Types.ObjectId;
-  products: Product[];
+  ref: string;
+  product: mongoose.Types.ObjectId;
+  product_populated: ProductInterface;
   buyer: mongoose.Types.ObjectId;
+  seller: mongoose.Types.ObjectId;
+  seller_username: string;
+  quantity: number;
+  price_when_bought: number;
+  has_buyer_received: boolean;
 }
 
 export type GroupedItemsPurchasedBySeller = {
   [username: string]: {
     items: {
-      product: ProductInterface;
+      product_populated: ProductInterface;
       quantity: number;
       price_when_bought: number;
-      has_buyer_paid: boolean;
-      has_buyer_received: boolean;
     }[];
     seller_info: SellerInterface & { store: StoreInterface };
   };

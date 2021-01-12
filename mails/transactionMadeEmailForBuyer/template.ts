@@ -40,7 +40,7 @@ export default function transactionMadeForBuyer({
                 return `
                 <li>
                   <b>
-                    ${i.product.name.toUpperCase()}
+                    ${i.product_populated.name.toUpperCase()}
                   </b>
                   ---
                   <b>${i.quantity}</b> qty(s)
