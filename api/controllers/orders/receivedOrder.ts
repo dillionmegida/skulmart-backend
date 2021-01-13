@@ -42,6 +42,7 @@ export default async function receivedOrder(req: any, res: any) {
       buyer: buyer,
       product,
       seller_rating: rating,
+      seller_review: review,
     });
 
     // TODO - send money to seller if seller has saved bank

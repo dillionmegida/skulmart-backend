@@ -8,6 +8,7 @@ type Args = {
   product: ProductInterface;
   emailSubject: string;
   seller_rating: number;
+  seller_review: string;
 };
 
 export default function ({
@@ -15,8 +16,9 @@ export default function ({
   emailSubject,
   product,
   seller_rating,
+  seller_review,
 }: Args) {
-  const { seller_review, quantity, price_when_bought } = order;
+  const { quantity, price_when_bought } = order;
   const totalPaid = price_when_bought * quantity;
   return `
 <div>

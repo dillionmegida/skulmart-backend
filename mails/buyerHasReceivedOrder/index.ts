@@ -11,6 +11,7 @@ type Args = {
   buyer: BuyerInterface;
   seller: SellerInterface;
   seller_rating: number;
+  seller_review: string;
 };
 
 export default async function buyerHasReceivedOrder({
@@ -19,6 +20,7 @@ export default async function buyerHasReceivedOrder({
   buyer,
   seller,
   seller_rating,
+  seller_review,
 }: Args) {
   const { fullname: buyerFullname } = buyer;
   const { email } = seller;
@@ -27,7 +29,8 @@ export default async function buyerHasReceivedOrder({
     order,
     emailSubject: subject,
     product,
-    seller_rating
+    seller_rating,
+    seller_review,
   });
 
   const mailResponse = await sendMail({
