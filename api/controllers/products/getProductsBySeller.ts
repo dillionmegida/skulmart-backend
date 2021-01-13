@@ -1,15 +1,25 @@
 import { PRODUCTS_PER_PAGE } from "constants/index";
 import Product from "models/Product";
+import Seller from "models/Seller";
 
 export default async function getProductsBySeller(req: any, res: any) {
   try {
     const { page: _page } = req.query;
     const page = parseInt(_page);
 
+    const { username } = req.params;
+
+    const seller = await Seller.findOne({ username });
+
+    if (!seller)
+      return res.status(400).json({
+        message: "No seller with that username",
+      });
+
     const criteria = {
       store: req.store_id,
       visible: true,
-      seller: req.params.id,
+      seller: seller._id,
       quantity: {
         $gt: 0,
       },
@@ -23,7 +33,7 @@ export default async function getProductsBySeller(req: any, res: any) {
     })
       .limit(PRODUCTS_PER_PAGE)
       .skip(page * PRODUCTS_PER_PAGE);
-    res.json({ products, totalPages });
+    res.json({ products, totalPages, seller });
   } catch (err) {
     res.status(404).json({
       error: err,

@@ -31,7 +31,7 @@ router.get("/query", getProductsBySearch);
 router.get("/:id", getProductsById);
 
 // Get products by seller
-router.get("/seller/:id", getProductsBySeller);
+router.get("/seller/:username", getProductsBySeller);
 
 // Update the number of views of a product
 router.get("/views/:id", updateProductViews);
