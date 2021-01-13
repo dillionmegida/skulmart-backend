@@ -1,4 +1,10 @@
-import { getOrders, getOrdersByRef, makeOrder } from "api/controllers/orders";
+import {
+  getOrders,
+  getOrdersByRef,
+  makeOrder,
+  getOrder,
+  receivedOrder,
+} from "api/controllers/orders";
 import express from "express";
 import isAuthenticated from "middlewares/isAuthenticated";
 const router = express.Router();
@@ -11,7 +17,13 @@ router.post("/", makeOrder);
 // get all buyer's orders
 router.get("/", getOrders);
 
-/// get all buyer's orders by ref
+// get an order
+router.get("/id/:id", getOrder);
+
+// get all buyer's orders by ref
 router.get("/ref/:ref", getOrdersByRef);
+
+// post request after confirms receiving order
+router.post("/received/:id", receivedOrder);
 
 export default router;

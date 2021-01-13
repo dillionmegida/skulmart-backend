@@ -4,7 +4,10 @@ import mongoose, { Schema } from "mongoose";
 const SellerSchema: Schema = new Schema(
   {
     img: {
-      type: Object,
+      type: {
+        public_id: String,
+        url: String,
+      },
       required: true,
     },
     fullname: {
@@ -88,6 +91,7 @@ const SellerSchema: Schema = new Schema(
         account_name: String,
       },
     ],
+    ratings: [Number],
   },
   {
     timestamps: true,

@@ -20,4 +20,5 @@ export default interface SellerInterface extends Document {
   cards: Card[];
   store: mongoose.Types.ObjectId;
   user_type: "seller";
+  ratings: number[];
 }
