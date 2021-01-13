@@ -1,7 +1,11 @@
 import chalk from "chalk";
 import BuyerInterface from "interfaces/Buyer";
 import OrderInterface from "interfaces/OrderInterface";
+import ProductInterface from "interfaces/Product";
+import SellerInterface from "interfaces/Seller";
+import buyerHasReceivedOrder from "mails/buyerHasReceivedOrder";
 import Order from "models/Order";
+import Product from "models/Product";
 import Seller from "models/Seller";
 
 export default async function receivedOrder(req: any, res: any) {
@@ -14,7 +18,8 @@ export default async function receivedOrder(req: any, res: any) {
 
   try {
     const order = (await Order.findById(id)) as OrderInterface;
-    const seller = await Seller.findById(order.seller);
+    const seller = (await Seller.findById(order.seller)) as SellerInterface;
+    const product = (await Product.findById(order.product)) as ProductInterface;
 
     await Order.findByIdAndUpdate(order._id, {
       $set: {
@@ -29,6 +34,14 @@ export default async function receivedOrder(req: any, res: any) {
       $set: {
         ratings: seller?.ratings.concat(rating),
       },
+    });
+
+    await buyerHasReceivedOrder({
+      order,
+      seller: seller,
+      buyer: buyer,
+      product,
+      seller_rating: rating,
     });
 
     // TODO - send money to seller if seller has saved bank
