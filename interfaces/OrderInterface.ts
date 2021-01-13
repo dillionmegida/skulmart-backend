@@ -14,6 +14,7 @@ export default interface OrderInterface extends Document {
   quantity: number;
   price_when_bought: number;
   has_buyer_received: boolean;
+  buyer_received_date?: Date | null;
 }
 
 export type GroupedItemsPurchasedBySeller = {
