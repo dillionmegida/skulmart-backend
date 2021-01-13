@@ -27,13 +27,13 @@ export default function ({
     Order info:
     <br/>
     <ul>
-      <li>Name: ${product.name}</li>
-      <li>Qty: ${quantity}</li>
-      <li>Price (when bought): ${formatCurrency(price_when_bought)}</li>
+      <li>Name: <b>${product.name}</b></li>
+      <li>Qty: <b>${quantity}</b></li>
+      <li>Price (when bought): <b>${formatCurrency(price_when_bought)}</b></li>
     </ul>
   </div>
   <p>
-    The buyer rated you <b>${seller_rating} out of 5</b>.
+    The buyer rated you <b>${seller_rating}</b> out of <b>5</b>.
     <br/>
   </p>
   ${
@@ -51,10 +51,10 @@ export default function ({
     Keep up the good work!
   </p>
   <p>
-    The money paid for this order is ${formatCurrency(totalPaid)}. This will
+    The money paid for this order is <b>${formatCurrency(totalPaid)}</b>. This will
     be refunded into the default bank account you provided in your
     dashboard. If you do not get the refund in the next 48 hours, please send
-    us a mail @<a href="mailto:${email}">${email}</a>.
+    us a mail at <a href="mailto:${email}">${email}</a>.
   </p>
 </div>
   `;

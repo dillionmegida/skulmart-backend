@@ -77,6 +77,7 @@ const welcomeEmail = async ({
               })
             )}">Share on WhatsApp</a>`
           }</p>
+          <p>Always keep an eye on your emails for notifications on transactions, updates or anything : )</p>
         </div>
             `;
 
