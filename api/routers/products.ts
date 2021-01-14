@@ -9,7 +9,7 @@ import {
   postProduct,
   updateProduct,
   updateProductViews,
-  getProductRatings,
+  getProductReviews,
 } from "api/controllers/products";
 import express from "express";
 const router = express.Router();
@@ -31,8 +31,8 @@ router.get("/query", getProductsBySearch);
 // Get product by id
 router.get("/:id", getProductById);
 
-// Get product ratings
-router.get("/ratings/:id", getProductRatings);
+// Get product reviews
+router.get("/reviews/:id", getProductReviews);
 
 // Get products by seller
 router.get("/seller/:username", getProductsBySeller);
