@@ -19,6 +19,7 @@ export default interface OrderInterface extends Document {
   buyer_received_date?: Date | null;
   seller_review?: string;
   seller_rating?: number;
+  has_buyer_reviewed_order?: boolean;
 }
 
 export type GroupedItemsPurchasedBySeller = {

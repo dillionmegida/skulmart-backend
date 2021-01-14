@@ -53,8 +53,7 @@ export default async function receivedOrder(req: any, res: any) {
   } catch (err) {
     console.log(chalk.red("An error occured during receiving order >>> "), err);
     res.status(500).json({
-      message:
-        "An error occured. Please try again after few hours to avoid multiple deductions",
+      message: "An error occured. Please try again",
     });
   }
 }

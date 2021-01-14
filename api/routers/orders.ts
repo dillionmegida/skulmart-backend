@@ -4,6 +4,7 @@ import {
   makeOrder,
   getOrder,
   receivedOrder,
+  reviewOrder
 } from "api/controllers/orders";
 import express from "express";
 import isAuthenticated from "middlewares/isAuthenticated";
@@ -25,5 +26,8 @@ router.get("/ref/:ref", getOrdersByRef);
 
 // post request after confirms receiving order
 router.post("/received/:id", receivedOrder);
+
+// buyer reviews order purchased
+router.post("/review/:id", reviewOrder);
 
 export default router;
