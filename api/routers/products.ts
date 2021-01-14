@@ -3,12 +3,13 @@ import {
   getCategories,
   getProducts,
   getProductsByCategory,
-  getProductsById,
+  getProductById,
   getProductsBySearch,
   getProductsBySeller,
   postProduct,
   updateProduct,
   updateProductViews,
+  getProductRatings,
 } from "api/controllers/products";
 import express from "express";
 const router = express.Router();
@@ -28,7 +29,10 @@ router.get("/categories/:category", getProductsByCategory);
 router.get("/query", getProductsBySearch);
 
 // Get product by id
-router.get("/:id", getProductsById);
+router.get("/:id", getProductById);
+
+// Get product ratings
+router.get("/ratings/:id", getProductRatings);
 
 // Get products by seller
 router.get("/seller/:username", getProductsBySeller);

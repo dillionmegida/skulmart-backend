@@ -3,7 +3,7 @@ import ImageInterface from "./Image";
 
 export default interface ProductInterface extends Document {
   img: ImageInterface;
-  _id: string;
+  _id: mongoose.Types.ObjectId;
   name: string;
   desc: string;
   category: string;
@@ -17,4 +17,5 @@ export default interface ProductInterface extends Document {
   visible: boolean;
   store: mongoose.Types.ObjectId;
   seller: mongoose.Types.ObjectId;
+  ratings: number[];
 }
