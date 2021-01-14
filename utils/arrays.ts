@@ -8,3 +8,8 @@ export const shuffleArray = (arr: any[]) => {
   }
   return arr;
 };
+
+export function getRandom(arr: any[]) {
+  const randomNumber = Math.floor(Math.random() * arr.length);
+  return arr[randomNumber];
+}

@@ -1,8 +1,10 @@
 import chalk from "chalk";
 import BuyerInterface from "interfaces/Buyer";
+import SellerInterface from "interfaces/Seller";
+import buyerReviewedOrder from "mails/buyerReviewedOrder";
 import Order from "models/Order";
-import Product from "models/Product";
 import ProductReview from "models/ProductReview";
+import Seller from "models/Seller";
 
 export default async function reviewOrder(req: any, res: any) {
   const buyer = req.user as BuyerInterface;
@@ -25,21 +27,18 @@ export default async function reviewOrder(req: any, res: any) {
     // the seller may have deleted it, and that should not cause
     // a bad experience for the buyer
 
-    // this part may not be neccessary, and may increase
-    // response time, but let it be here for now
-    const existingProductReview = await ProductReview.findOne({
-      order: order._id,
-    });
-    if (existingProductReview)
-      return res
-        .status(400)
-        .json({ message: "You have reviewed this order already" });
+    const seller = await Seller.findOne({ _id: order.seller });
+
+    if (seller === null) {
+      // we shouldn't stop the buyer from still reviewing
+    }
 
     const newProductReview = new ProductReview({
       rating,
       review,
       buyer: buyer._id,
       product: order.product,
+      order: order._id,
     });
 
     await newProductReview.save();
@@ -51,6 +50,13 @@ export default async function reviewOrder(req: any, res: any) {
     });
 
     res.json({ message: "Review submitted successfully" });
+
+    await buyerReviewedOrder({
+      seller: seller as SellerInterface,
+      rating,
+      review,
+      buyer,
+    });
   } catch (err) {
     console.log(chalk.red("An error occured during reviewing order >>> "), err);
     res.status(500).json({
