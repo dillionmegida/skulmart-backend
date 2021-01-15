@@ -1,10 +1,9 @@
-// const paystackKey = process.env.PAYSTACK_TEST_SECRET_KEY;
-const paystackKey = process.env.PAYSTACK_SECRET_KEY;
+import { PAYSTACK_KEY } from "constants/index";
 
 export default function addPaystackAuth(): {
   authorization: string;
 } {
   return {
-    authorization: `Bearer ${paystackKey}`,
+    authorization: `Bearer ${PAYSTACK_KEY}`,
   };
 }

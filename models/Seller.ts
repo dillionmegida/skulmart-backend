@@ -73,6 +73,7 @@ const SellerSchema: Schema = new Schema(
         bank_code: String,
         account_name: String,
         account_number: String,
+        default: Boolean,
       },
     ],
     cards: [

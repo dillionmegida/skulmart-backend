@@ -17,7 +17,12 @@ export const links = {
   SELLER_WHATSAPP_GROUP: "‎https://chat.whatsapp.com/G3tJXGTuY2hC5gar4J6L8V",
 };
 
+export const PAYSTACK_KEY = process.env.PAYSTACK_SECRET_KEY;
+// export const PAYSTACK_KEY = process.env.PAYSTACK_TEST_SECRET_KEY;
+
 export const PAYSTACK_HOSTNAME = "https://api.paystack.co";
 
 export const CALLBACK_URL_AFTER_ADDING_CARD =
   SERVER_URL + "/api/buyers/card/complete";
+
+export const PAYSTACK_WEBHOOK = "/paystack-webhook";

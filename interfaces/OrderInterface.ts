@@ -20,6 +20,7 @@ export default interface OrderInterface extends Document {
   seller_review?: string;
   seller_rating?: number;
   has_buyer_reviewed_order?: boolean;
+  seller_receipt_code?: string; // to initiate transfer
 }
 
 export type GroupedItemsPurchasedBySeller = {

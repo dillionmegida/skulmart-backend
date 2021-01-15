@@ -3,4 +3,5 @@ export default interface Bank {
   bank_code: string;
   account_name: string;
   account_number: string;
+  default: boolean;
 }

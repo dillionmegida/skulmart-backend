@@ -15,6 +15,7 @@ const OrderSchema: Schema = new Schema(
     seller_review: { type: String, default: null },
     seller_rating: { type: Number, default: null },
     has_buyer_reviewed_order: { type: Boolean, default: false },
+    seller_receipt_code: { type: String, default: null },
   },
   {
     timestamps: true,

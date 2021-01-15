@@ -1,3 +1,4 @@
+import verifyAccountNumber from "api/helpers/verifyAccountNumber";
 import axios from "axios";
 import bodyParser from "body-parser";
 import chalk from "chalk";
@@ -17,26 +18,20 @@ export default async function addBankAccount(req: any, res: any) {
   };
 
   try {
-    const resolveResponse = await axios({
-      method: "GET",
-      url:
-        PAYSTACK_HOSTNAME +
-        "/bank/resolve?account_number=" +
-        account_number +
-        "&bank_code=" +
-        bank_code,
-      headers: {
-        ...addPaystackAuth(),
-      },
+    const resolveResponse = await verifyAccountNumber({
+      account_number,
+      bank_code,
     });
 
-    const { data } = resolveResponse;
-
-    if (data.status === false)
+    if (resolveResponse.status === false)
       return res.status(400).json({
         message:
           "Bank account provided is not yours. Please provide valid credentials",
       });
+
+    const {
+      data: { account_number: acctNumber, account_name: acctName },
+    } = resolveResponse;
 
     const existingBanks = [...user.banks];
     const doesNewBankExist =
@@ -53,10 +48,12 @@ export default async function addBankAccount(req: any, res: any) {
       await Buyer.findByIdAndUpdate(user._id, {
         $set: {
           banks: existingBanks.concat({
-            account_name: data.data.account_name,
-            account_number: data.data.account_number,
+            account_name: acctName,
+            account_number: acctNumber,
             bank_code,
             bank_name,
+            default: user.banks.length === 0,
+            // default if there was no bank before
           }),
         },
       });

@@ -59,8 +59,10 @@ import buyers from "api/routers/buyers";
 import users from "api/routers/users";
 import stores from "api/routers/stores";
 import orders from "api/routers/orders";
+import paystackWebhook from "api/routers/paystackWebhook";
 
 import admin from "api/routers/admin";
+import { PAYSTACK_WEBHOOK } from "./constants";
 
 // api routes
 
@@ -70,6 +72,7 @@ app.use("/api/buyers", buyers);
 app.use("/api/stores", stores);
 app.use("/api/users", users);
 app.use("/api/orders", orders);
+app.use(PAYSTACK_WEBHOOK, paystackWebhook);
 
 app.use("/api/admin", admin);
 
