@@ -1,6 +1,6 @@
 import Product from "models/Product";
 
-export default async function getProductsById(req: any, res: any) {
+export default async function getProductById(req: any, res: any) {
   try {
     const product = await Product.findOne({
       _id: req.params.id,

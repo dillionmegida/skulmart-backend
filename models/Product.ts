@@ -58,6 +58,7 @@ const ProductSchema: Schema = new Schema(
       ref: "Seller",
       required: true,
     },
+    ratings: [Number],
   },
   {
     timestamps: true,

@@ -4,7 +4,10 @@ import mongoose, { Schema } from "mongoose";
 const SellerSchema: Schema = new Schema(
   {
     img: {
-      type: Object,
+      type: {
+        public_id: String,
+        url: String,
+      },
       required: true,
     },
     fullname: {
@@ -64,6 +67,32 @@ const SellerSchema: Schema = new Schema(
       ref: "Store",
       required: true,
     },
+    banks: [
+      {
+        bank_name: String,
+        bank_code: String,
+        account_name: String,
+        account_number: String,
+        _default: Boolean,
+      },
+    ],
+    cards: [
+      {
+        authorization_code: String,
+        card_type: String,
+        last4: String,
+        exp_month: String,
+        exp_year: String,
+        bin: String,
+        bank_name: String,
+        channel: String,
+        signature: String,
+        reusable: Boolean,
+        country_code: String,
+        account_name: String,
+      },
+    ],
+    ratings: [Number],
   },
   {
     timestamps: true,

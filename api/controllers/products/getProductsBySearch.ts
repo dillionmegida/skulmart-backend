@@ -27,6 +27,6 @@ export default async function getProductsBySearch(req: any, res: any) {
       .limit(PRODUCTS_PER_PAGE)
       .skip(page * PRODUCTS_PER_PAGE);
 
-    res.json({ products, totalPages });
+    res.json({ products, totalPages, totalProducts: totalCount });
   }
 }

@@ -44,6 +44,7 @@ const emailConfirmation = async ({
             Confirm Email Address
         </a>
         <p style="margin-top: 30px; font-size: 14px">This email was sent to you because your email address was entered during a registration process @ ${siteName}. Ignore this email if it wasn't you.</p>
+        <p>Also, remember to always keep an eye on your emails for notifications on transactions, updates or anything : )</p>
     `;
 
   const mailResponse = await sendMail({

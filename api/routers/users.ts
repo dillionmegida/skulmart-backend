@@ -1,8 +1,14 @@
 import {
+  addAtmCardComplete,
+  addAtmCardInitialize,
+  addBankAccount,
   confirmEmail,
   createUser,
   deleteUser,
+  getBanks,
   loginUser,
+  removeAtmCard,
+  removeBankAccount,
   resendEmailConfirmationLink,
   resetPassword,
   resetPasswordRequest,
@@ -53,13 +59,46 @@ router.post("/reset_password", resetPasswordRequest);
 // Reset password
 router.post("/reset_password/:hash", resetPassword);
 
+router.use(isAuthenticated);
+
 // Update seller email
-router.post("/update/email", isAuthenticated, updateUserEmail);
+router.post("/update/email", updateUserEmail);
 
 // Update user password
-router.post("/update/password", isAuthenticated, updateUserPassword);
+router.post("/update/password", updateUserPassword);
 
 // Delete user
-router.delete("/", isAuthenticated, deleteUser);
+router.delete("/", deleteUser);
+
+// Get all available banks
+router.get("/bank", getBanks);
+
+/**
+ * Adding new card is based on how paystack works
+ * The first one initializes a transaction, giving the user a ui form to pay through
+ * then the second is a callback, which is called after the form
+ * to add the card details to the user's document, also, refunding the user
+ */
+
+// adding card start
+
+// Add new card (initialize)
+router.post("/card/initialize", addAtmCardInitialize);
+
+// Add new card (complete)
+router.post("/card/complete", addAtmCardComplete);
+
+// adding card complete
+
+// Remove a saved card
+router.delete("/card", removeAtmCard);
+
+// Add a user's bank account
+router.post("/bank", addBankAccount);
+
+// Add a user's bank account
+
+// Add a user's bank account
+router.delete("/bank", removeBankAccount);
 
 export default router;
