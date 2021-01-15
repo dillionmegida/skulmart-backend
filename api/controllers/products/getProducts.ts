@@ -22,5 +22,6 @@ export default async function getProducts(req: any, res: any) {
   return res.json({
     products: shuffleArray(products),
     totalPages,
+    totalProducts: totalCount
   });
 }

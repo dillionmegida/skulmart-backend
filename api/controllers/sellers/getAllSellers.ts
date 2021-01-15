@@ -18,5 +18,5 @@ export default async function getAllSellers(req: any, res: any) {
 
   const totalPages = Math.ceil(totalCount / SELLERS_PER_PAGE) - 1; // since pages start from 0;
 
-  return res.json({ sellers, totalPages });
+  return res.json({ sellers, totalPages, totalSellers: totalCount });
 }

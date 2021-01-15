@@ -24,7 +24,7 @@ export default async function getSellerBySearch(req: any, res: any) {
       .limit(SELLERS_PER_PAGE)
       .skip(page * SELLERS_PER_PAGE);
     const totalPages = Math.ceil(totalCount / SELLERS_PER_PAGE) - 1; // since pages start from 0;;
-    res.json({ sellers, totalPages });
+    res.json({ sellers, totalPages, totalSellers: totalCount });
   } catch (err) {
     res.status(400).json({
       error: err,

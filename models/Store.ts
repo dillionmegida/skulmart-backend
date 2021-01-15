@@ -3,6 +3,13 @@ import mongoose, { Schema } from "mongoose";
 
 const StoreSchema: Schema = new Schema(
   {
+    img: {
+      type: {
+        public_id: String,
+        url: String,
+      },
+      required: true,
+    },
     shortname: {
       type: String,
       required: true,
