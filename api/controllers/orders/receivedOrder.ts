@@ -56,7 +56,7 @@ export default async function receivedOrder(req: any, res: any) {
     });
 
     // verify seller account number
-    const sellerBank = seller.banks.find((a) => a.default === true);
+    const sellerBank = seller.banks.find((a) => a._default === true);
 
     if (!sellerBank)
       throw new Error(

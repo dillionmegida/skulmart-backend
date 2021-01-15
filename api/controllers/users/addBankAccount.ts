@@ -1,12 +1,9 @@
 import verifyAccountNumber from "api/helpers/verifyAccountNumber";
-import axios from "axios";
-import bodyParser from "body-parser";
 import chalk from "chalk";
-import { PAYSTACK_HOSTNAME } from "constants/index";
 import BuyerInterface from "interfaces/Buyer";
 import SellerInterface from "interfaces/Seller";
 import Buyer from "models/Buyer";
-import addPaystackAuth from "utils/addPaystackAuth";
+import Seller from "models/Seller";
 
 export default async function addBankAccount(req: any, res: any) {
   const user = req.user as BuyerInterface | SellerInterface;
@@ -52,12 +49,24 @@ export default async function addBankAccount(req: any, res: any) {
             account_number: acctNumber,
             bank_code,
             bank_name,
-            default: user.banks.length === 0,
+            _default: user.banks.length === 0,
             // default if there was no bank before
           }),
         },
       });
     } else {
+      await Seller.findByIdAndUpdate(user._id, {
+        $set: {
+          banks: existingBanks.concat({
+            account_name: acctName,
+            account_number: acctNumber,
+            bank_code,
+            bank_name,
+            _default: user.banks.length === 0,
+            // default if there was no bank before
+          }),
+        },
+      });
     }
 
     res.json({
