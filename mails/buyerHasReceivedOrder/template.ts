@@ -18,7 +18,7 @@ export default function ({
   seller_rating,
   seller_review,
 }: Args) {
-  const { quantity, price_when_bought } = order;
+  const { quantity, price_when_bought, _id } = order;
   const totalPaid = price_when_bought * quantity;
   return `
 <div>
@@ -48,13 +48,25 @@ export default function ({
       : ""
   }
   <p>
+    ----------
+  </p>
+  <p>
     Keep up the good work!
   </p>
   <p>
-    The money paid for this order is <b>${formatCurrency(totalPaid)}</b>. This will
+    The money paid for this order is <b>${formatCurrency(
+      totalPaid
+    )}</b>. This will
     be refunded into the default bank account you provided in your
-    dashboard. If you do not get the refund in the next 48 hours, please send
-    us a mail at <a href="mailto:${email}">${email}</a>.
+    dashboard.
+    <br/>
+    <br/>
+    If you haven't provided one yet, please send us an email at <a href="mailto:${email}">${email}</a>
+    with the subject <b>"No bank account to receive the refund for this order - ${_id}"</b> so that we can resolve it
+    immediately.
+    <br/>
+    <br/>
+    If you have an account, but do not get the refund in the next 24 hours, please email us.
   </p>
 </div>
   `;
