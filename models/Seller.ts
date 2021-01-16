@@ -7,6 +7,10 @@ const SellerSchema: Schema = new Schema(
       public_id: { type: String, required: true },
       url: { type: String, required: true },
     },
+    wallet: {
+      type: Number,
+      default: 0,
+    },
     fullname: {
       type: String,
       required: true,

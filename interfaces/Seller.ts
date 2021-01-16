@@ -7,6 +7,7 @@ import Views from "./Views";
 export default interface SellerInterface extends Document {
   _id: mongoose.Types.ObjectId;
   img: ImageInterface;
+  wallet: number;
   fullname: string;
   brand_name: string;
   username: string;
