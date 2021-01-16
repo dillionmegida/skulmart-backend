@@ -1,10 +1,11 @@
 import {
-  getOrders,
+  getOrdersByBuyer,
   getOrdersByRef,
   makeOrder,
   getOrder,
   receivedOrder,
-  reviewOrder
+  reviewOrder,
+  getOrdersFromSeller,
 } from "api/controllers/orders";
 import express from "express";
 import isAuthenticated from "middlewares/isAuthenticated";
@@ -16,7 +17,10 @@ router.use(isAuthenticated);
 router.post("/", makeOrder);
 
 // get all buyer's orders
-router.get("/", getOrders);
+router.get("/buyer", getOrdersByBuyer);
+
+// get all orders buyers made from seller
+router.get("/seller", getOrdersFromSeller);
 
 // get an order
 router.get("/id/:id", getOrder);

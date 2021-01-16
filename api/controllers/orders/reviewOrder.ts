@@ -56,6 +56,7 @@ export default async function reviewOrder(req: any, res: any) {
     await Order.findByIdAndUpdate(order._id, {
       $set: {
         has_buyer_reviewed_order: true,
+        review: newProductReview._id,
       },
     });
 

@@ -1,15 +1,16 @@
 import chalk from "chalk";
-import BuyerInterface from "interfaces/Buyer";
+import SellerInterface from "interfaces/Seller";
 import Order from "models/Order";
 
 export default async function getOrders(req: any, res: any) {
-  const buyer = req.user as BuyerInterface;
+  const seller = req.user as SellerInterface;
 
   try {
-    const allBuyersOrders = await Order.find({ buyer: buyer._id }).populate(
-      "product"
-    );
-    res.json({ orders: allBuyersOrders });
+    const allSellerOrders = await Order.find({ seller: seller._id })
+      .populate("product")
+      .populate("buyer")
+      .populate("review");
+    res.json({ orders: allSellerOrders });
   } catch (err) {
     console.log(
       chalk.red("An error occured during getting buyer's orders >> "),
