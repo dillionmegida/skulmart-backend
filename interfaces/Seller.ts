@@ -12,6 +12,8 @@ export default interface SellerInterface extends Document {
   username: string;
   brand_desc: string;
   whatsapp: string;
+  twitter: string;
+  instagram: string;
   email: string;
   views: Views;
   email_confirm: boolean;

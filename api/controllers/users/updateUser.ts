@@ -2,15 +2,11 @@ import chalk from "chalk";
 import { CLOUDINARY_USER_IMAGES_FOLDER } from "constants/index";
 import BuyerInterface from "interfaces/Buyer";
 import SellerInterface from "interfaces/Seller";
-import emailConfirmation from "mails/emailConfirmation";
 import Buyer from "models/Buyer";
-import EmailConfirmation from "models/EmailConfirmation";
 import Seller from "models/Seller";
 import Store from "models/Store";
 import { deleteImage, uploadImage } from "utils/image";
-import { randomNumber } from "utils/numbers";
-import { bcryptPromise, capitalize, replaceString } from "utils/strings";
-import { getToken } from "utils/token";
+import { capitalize, replaceString } from "utils/strings";
 
 export default async function updateUser(req: any, res: any) {
   const body = { ...req.body } as
@@ -69,7 +65,15 @@ export default async function updateUser(req: any, res: any) {
     }
 
     if (body.user_type === "seller") {
-      let { fullname, brand_name, username, brand_desc, whatsapp } = body;
+      let {
+        fullname,
+        brand_name,
+        username,
+        brand_desc,
+        whatsapp,
+        instagram = "",
+        twitter = "",
+      } = body;
 
       const existingUser = await Seller.findOne({
         username,
@@ -102,6 +106,8 @@ export default async function updateUser(req: any, res: any) {
           username,
           brand_desc,
           whatsapp,
+          instagram,
+          twitter,
         },
       });
     } else if (body.user_type === "buyer") {

@@ -31,6 +31,8 @@ const SellerSchema: Schema = new Schema(
       type: String,
       required: true,
     },
+    twitter: String,
+    instagram: String,
     email: {
       type: String,
       required: true,
