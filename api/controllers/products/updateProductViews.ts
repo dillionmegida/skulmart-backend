@@ -26,8 +26,8 @@ export default async function updateProductViews(req: any, res: any) {
           },
         });
       }
-      res.json({});
     }
+    res.json({});
   } catch (err) {
     res.status(404).json({
       error: err,

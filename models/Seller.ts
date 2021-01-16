@@ -4,11 +4,8 @@ import mongoose, { Schema } from "mongoose";
 const SellerSchema: Schema = new Schema(
   {
     img: {
-      type: {
-        public_id: String,
-        url: String,
-      },
-      required: true,
+      public_id: { type: String, required: true },
+      url: { type: String, required: true },
     },
     fullname: {
       type: String,
@@ -61,6 +58,16 @@ const SellerSchema: Schema = new Schema(
     password: {
       type: String,
       required: true,
+    },
+    views: {
+      type: {
+        count: Number,
+        devices: [String],
+      },
+      default: {
+        count: 0,
+        devices: [],
+      },
     },
     store: {
       type: Schema.Types.ObjectId,

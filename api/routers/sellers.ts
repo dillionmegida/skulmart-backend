@@ -8,6 +8,7 @@ import {
   getSellerByUsername,
   initializeSubscription,
   subscriptionCallback,
+  updateSellerViews,
 } from "api/controllers/sellers";
 import express from "express";
 const router = express.Router();
@@ -15,6 +16,9 @@ import isAuthenticated from "middlewares/isAuthenticated";
 
 // Get all sellers in a store
 router.get("/", getAllSellers);
+
+// Update the number of views of a seller
+router.get("/views/:id", updateSellerViews);
 
 // Get seller by username
 router.get("/:username", getSellerByUsername);
@@ -25,12 +29,11 @@ router.get("/id/:id", getSellerById);
 // Get sellers by query
 router.get("/search/query", getSellerBySearch);
 
-
 /*
-*
-* PRIVATE ROUTES
-*
-*/
+ *
+ * PRIVATE ROUTES
+ *
+ */
 
 // Get all products of logged in seller
 router.get("/products/all", isAuthenticated, getAuthSellerProducts);

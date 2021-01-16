@@ -7,3 +7,4 @@ export { default as initializeSubscription } from "./initializeSubscription";
 export { default as subscriptionCallback } from "./subscriptionCallback";
 export { default as getNotifications } from "./getNotifications";
 export { default as getNotification } from "./getNotification";
+export { default as updateSellerViews } from "./updateSellerViews";

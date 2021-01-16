@@ -5,12 +5,8 @@ import ProductInterface from "interfaces/Product";
 const ProductSchema: Schema = new Schema(
   {
     img: {
-      type: Object,
-      required: true,
-      default: {
-        public_id: null,
-        url: null,
-      },
+      public_id: { type: String, required: true },
+      url: { type: String, required: true },
     },
     name: {
       type: String,
@@ -38,7 +34,10 @@ const ProductSchema: Schema = new Schema(
       default: 0,
     },
     views: {
-      type: Object,
+      type: {
+        count: Number,
+        devices: [String],
+      },
       default: {
         count: 0,
         devices: [],
