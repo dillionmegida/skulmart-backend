@@ -5,7 +5,7 @@
   "main": "build/index.js",
   "scripts": {
     "start": "node build/index.js",
-    "server": "nodemon",
+    "server": "export NODE_ENV=development && nodemon",
     "build": "tsc --project tsconfig.json && tscpaths -p tsconfig.json -s ./ -o ./build",
     "postinstall": "npm run build",
     "deploy": "git add . && git commit -m 'Heroku deploy' && git push heroku master"

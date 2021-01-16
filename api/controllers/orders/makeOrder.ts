@@ -1,17 +1,12 @@
-import axios from "axios";
 import chalk from "chalk";
-import { PAYSTACK_HOSTNAME } from "constants/index";
 import BuyerInterface from "interfaces/Buyer";
 import SellerInterface from "interfaces/Seller";
 import StoreInterface from "interfaces/Store";
 import OrderInterface, {
   GroupedItemsPurchasedBySeller,
 } from "interfaces/OrderInterface";
-import orderMadeEmailForBuyer from "mails/orderMadeEmailForBuyer";
-import orderMadeEmailForSeller from "mails/orderMadeEmailForSeller";
 import Seller from "models/Seller";
 import Order from "models/Order";
-import addPaystackAuth from "utils/addPaystackAuth";
 import shortId from "shortid";
 
 export default async function makeOrder(req: any, res: any) {
@@ -42,8 +37,10 @@ export default async function makeOrder(req: any, res: any) {
     const order = orders[i];
     const sellerUsername = order.seller_username;
 
-    // const sellerItems = groupItemsPurchasedBySeller[sellerUsername] || null;
-    const sellerItems = groupItemsPurchasedBySeller.deeesignsstudios;
+    const sellerItems =
+      process.env.NODE_ENV === "development"
+        ? groupItemsPurchasedBySeller.deeesignsstudios // in development, I want to use this user for testing
+        : groupItemsPurchasedBySeller[sellerUsername] || null;
 
     if (sellerItems) {
       // seller already has item in the group
@@ -69,19 +66,23 @@ export default async function makeOrder(req: any, res: any) {
           quantity: order.quantity,
         },
       ];
-      // groupItemsPurchasedBySeller[sellerUsername] = {
-      //   items,
-      //   seller_info: seller,
-      // };
 
-      groupItemsPurchasedBySeller.deeesignsstudios = {
-        items,
-        seller_info: ((await Seller.findOne({
-          username: "deeesignsstudios",
-        })) as SellerInterface).populate("store") as SellerInterface & {
-          store: StoreInterface;
-        },
-      };
+      if (process.env.NODE_ENV === "development") {
+        // use this user for testing
+        groupItemsPurchasedBySeller.deeesignsstudios = {
+          items,
+          seller_info: ((await Seller.findOne({
+            username: "deeesignsstudios",
+          })) as SellerInterface).populate("store") as SellerInterface & {
+            store: StoreInterface;
+          },
+        };
+      } else {
+        groupItemsPurchasedBySeller[sellerUsername] = {
+          items,
+          seller_info: seller,
+        };
+      }
     }
   }
 
