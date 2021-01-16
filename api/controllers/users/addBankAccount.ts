@@ -73,6 +73,7 @@ export default async function addBankAccount(req: any, res: any) {
       message: "Bank account verified successfully",
       data: {
         bank_name,
+        account_name: acctName,
       },
     });
   } catch (err) {
