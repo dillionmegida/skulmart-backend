@@ -33,7 +33,6 @@ const BuyerSchema: Schema = new Schema(
     cart: [
       {
         type: Schema.Types.ObjectId,
-        required: true,
         ref: "Cart",
       },
     ],

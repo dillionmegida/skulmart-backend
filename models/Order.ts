@@ -17,7 +17,6 @@ const OrderSchema: Schema = new Schema(
     has_buyer_reviewed_order: { type: Boolean, default: false },
     review: {
       type: Schema.Types.ObjectId,
-      required: true,
       ref: "ProductReview",
     },
     seller_receipt_code: { type: String, default: null },

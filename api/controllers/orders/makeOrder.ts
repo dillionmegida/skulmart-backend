@@ -8,6 +8,13 @@ import OrderInterface, {
 import Seller from "models/Seller";
 import Order from "models/Order";
 import shortId from "shortid";
+import axios from "axios";
+import addPaystackAuth from "utils/addPaystackAuth";
+import { PAYSTACK_HOSTNAME } from "constants/index";
+import Cart from "models/Cart";
+import orderMadeEmailForSeller from "mails/orderMadeEmailForSeller";
+import orderMadeEmailForBuyer from "mails/orderMadeEmailForBuyer";
+import Buyer from "models/Buyer";
 
 export default async function makeOrder(req: any, res: any) {
   const buyer = req.user as BuyerInterface;
@@ -18,9 +25,9 @@ export default async function makeOrder(req: any, res: any) {
     card_signature: string;
   };
 
-  let totalAmount = 50;
+  let totalAmount = 0;
 
-  // orders.forEach((p) => (totalAmount += p.price_when_bought));
+  orders.forEach((p) => (totalAmount += p.price_when_bought * p.quantity));
 
   const totalAmountInKobo = totalAmount * 100;
 
@@ -35,12 +42,12 @@ export default async function makeOrder(req: any, res: any) {
 
   for (let i = 0; i < orders.length; i++) {
     const order = orders[i];
-    const sellerUsername = order.seller_username;
+    const sellerUsername =
+      process.env.NODE_ENV === "dev"
+        ? "deeesignsstudios" // in development, I want to use this user for testing
+        : order.seller_username;
 
-    const sellerItems =
-      process.env.NODE_ENV === "development"
-        ? groupItemsPurchasedBySeller.deeesignsstudios // in development, I want to use this user for testing
-        : groupItemsPurchasedBySeller[sellerUsername] || null;
+    const sellerItems = groupItemsPurchasedBySeller[sellerUsername] || null;
 
     if (sellerItems) {
       // seller already has item in the group
@@ -67,45 +74,39 @@ export default async function makeOrder(req: any, res: any) {
         },
       ];
 
-      if (process.env.NODE_ENV === "development") {
-        // use this user for testing
-        groupItemsPurchasedBySeller.deeesignsstudios = {
-          items,
-          seller_info: ((await Seller.findOne({
-            username: "deeesignsstudios",
-          })) as SellerInterface).populate("store") as SellerInterface & {
-            store: StoreInterface;
-          },
-        };
-      } else {
-        groupItemsPurchasedBySeller[sellerUsername] = {
-          items,
-          seller_info: seller,
-        };
-      }
+      groupItemsPurchasedBySeller[sellerUsername] = {
+        items,
+        seller_info: seller,
+      };
     }
   }
 
   try {
-    // const payRes = await axios({
-    //   url: PAYSTACK_HOSTNAME + "/transaction/charge_authorization",
-    //   method: "post",
-    //   headers: {
-    //     ...addPaystackAuth(),
-    //   },
-    //   data: {
-    //     email: buyer.email,
-    //     amount: totalAmountInKobo,
-    //     authorization_code: cardToPayWith.authorization_code,
-    //   },
-    // });
+    const payRes = await axios({
+      url: PAYSTACK_HOSTNAME + "/transaction/charge_authorization",
+      method: "post",
+      headers: {
+        ...addPaystackAuth(),
+      },
+      data: {
+        email: buyer.email,
+        amount: totalAmountInKobo,
+        authorization_code: cardToPayWith.authorization_code,
+      },
+    });
 
-    // if (!payRes.data.status)
-    //   return res
-    //     .status(400)
-    //     .json({ message: "Making order failed. Please try again" });
+    if (!payRes.data.status)
+      return res
+        .status(400)
+        .json({ message: "Making order failed. Please try again" });
 
-    // TODO: delete all cart items
+    await Buyer.findByIdAndUpdate(buyer._id, {
+      $set: {
+        cart: [],
+      },
+    });
+
+    await Cart.deleteMany({ buyer: buyer._id });
 
     const sellerUsernames = Object.keys(groupItemsPurchasedBySeller);
 
@@ -114,8 +115,12 @@ export default async function makeOrder(req: any, res: any) {
       const { items, seller_info } = groupItemsPurchasedBySeller[
         sellerUsername
       ];
-
       const orderRef = shortId.generate();
+
+      // TODO: find a better way to know if this is the seller's first order
+      const currentCountOfSellerOrders = await Order.countDocuments({
+        seller: seller_info._id,
+      });
 
       for (let j = 0; j < items.length; j++) {
         const item = items[j];
@@ -127,29 +132,28 @@ export default async function makeOrder(req: any, res: any) {
           quantity: item.quantity,
           price_when_bought: item.price_when_bought,
         });
-
         await newOrder.save();
       }
 
-      // await orderMadeEmailForSeller({
-      //   seller: seller_info,
-      //   buyer,
-      //   items: groupItemsPurchasedBySeller[sellerUsername].items.map((i) => ({
-      //     product: i.product_populated,
-      //     price_when_bought: i.price_when_bought,
-      //     quantity: i.quantity,
-      //   })),
-      //   // first_purchase
-      //   message,
-      // });
+      await orderMadeEmailForSeller({
+        seller: seller_info,
+        buyer,
+        items: groupItemsPurchasedBySeller[sellerUsername].items.map((i) => ({
+          product: i.product_populated,
+          price_when_bought: i.price_when_bought,
+          quantity: i.quantity,
+        })),
+        first_purchase: currentCountOfSellerOrders < 1,
+        message,
+      });
     }
 
-    // await orderMadeEmailForBuyer({
-    //   items: groupItemsPurchasedBySeller,
-    //   price_paid: totalAmount,
-    //   message,
-    //   buyer,
-    // });
+    await orderMadeEmailForBuyer({
+      items: groupItemsPurchasedBySeller,
+      price_paid: totalAmount,
+      message,
+      buyer,
+    });
 
     res.json({ message: "Order completed" });
   } catch (err) {

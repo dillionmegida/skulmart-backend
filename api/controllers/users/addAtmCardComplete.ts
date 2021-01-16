@@ -67,7 +67,7 @@ export default async function addAtmCardComplete(req: any, res: any) {
     res.json({
       authorization,
       message:
-        "Card saved. Please contact @" +
+        "Card saved. Please contact " +
         email +
         " if you do not see a refund in the next 48 hours",
     });

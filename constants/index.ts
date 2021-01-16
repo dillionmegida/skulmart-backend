@@ -17,8 +17,10 @@ export const links = {
   SELLER_WHATSAPP_GROUP: "‎https://chat.whatsapp.com/G3tJXGTuY2hC5gar4J6L8V",
 };
 
-export const PAYSTACK_KEY = process.env.PAYSTACK_SECRET_KEY;
-// export const PAYSTACK_KEY = process.env.PAYSTACK_TEST_SECRET_KEY;
+export const PAYSTACK_KEY =
+  process.env.NODE_ENV === "dev"
+    ? process.env.PAYSTACK_TEST_SECRET_KEY
+    : process.env.PAYSTACK_SECRET_KEY;
 
 export const PAYSTACK_HOSTNAME = "https://api.paystack.co";
 
