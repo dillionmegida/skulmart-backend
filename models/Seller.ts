@@ -8,8 +8,7 @@ const SellerSchema: Schema = new Schema(
       url: { type: String, required: true },
     },
     wallet: {
-      type: Number,
-      default: 0,
+      balance: { type: Number, default: 0 },
     },
     fullname: {
       type: String,
