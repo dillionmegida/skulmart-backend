@@ -29,7 +29,7 @@ export default async function updateProduct(req: any, res: any) {
       name,
       seller: authUser._id,
     });
-    if (existingProduct && existingProduct._id !== req.params.id) {
+    if (existingProduct && existingProduct._id.toString() !== req.params.id) {
       // then there is an existing product with the name
       return res.status(400).json({
         message: `Product with the name '${name}' already exists`,

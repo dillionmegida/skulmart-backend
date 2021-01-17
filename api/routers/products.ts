@@ -53,6 +53,11 @@ router.post("/", isAuthenticated, upload.single("prodImage"), postProduct);
 router.delete("/:id", isAuthenticated, deleteProduct);
 
 // Update a product
-router.post("/update/:id", isAuthenticated, updateProduct);
+router.post(
+  "/update/:id",
+  upload.single("prodImage"),
+  isAuthenticated,
+  updateProduct
+);
 
 export default router;
