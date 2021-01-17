@@ -1,6 +1,7 @@
 import { email } from "config/siteDetails";
 import OrderInterface from "interfaces/OrderInterface";
 import ProductInterface from "interfaces/Product";
+import chargeFee from "utils/chargeFee";
 import { formatCurrency } from "utils/currency";
 
 type Args = {
@@ -30,6 +31,9 @@ export default function ({
       <li>Name: <b>${product.name}</b></li>
       <li>Qty: <b>${quantity}</b></li>
       <li>Price (when bought): <b>${formatCurrency(price_when_bought)}</b></li>
+      <li>Total price: <b>${formatCurrency(
+        price_when_bought * quantity
+      )}</b></li>
     </ul>
   </div>
   <p>
@@ -37,7 +41,7 @@ export default function ({
     <br/>
   </p>
   ${
-    seller_review && seller_review.length > 0
+    seller_review.length > 0
       ? `
     <p>
       They also sent a review:
@@ -54,19 +58,9 @@ export default function ({
     Keep up the good work!
   </p>
   <p>
-    The money paid for this order is <b>${formatCurrency(
-      totalPaid
-    )}</b>. This will
-    be refunded into the default bank account you provided in your
-    dashboard.
-    <br/>
-    <br/>
-    If you haven't provided one yet, please send us an email at <a href="mailto:${email}">${email}</a>
-    with the subject <b>"No bank account to receive the refund for this order - ${_id}"</b> so that we can resolve it
-    immediately.
-    <br/>
-    <br/>
-    If you have an account, but do not get the refund in the next 24 hours, please email us.
+    <b>${formatCurrency(
+      chargeFee(totalPaid).minusFee
+    )}</b> has been added to your wallet 🚀.
   </p>
 </div>
   `;

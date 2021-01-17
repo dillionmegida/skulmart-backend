@@ -57,13 +57,13 @@ export default async function addToCart(req: any, res: any) {
     // but only the ids are needed
     const _buyer = (await Buyer.findById(buyer._id)) as BuyerInterface;
 
-    await newCart.save();
-
     await Buyer.findByIdAndUpdate(buyer._id, {
       $set: {
         cart: _buyer.cart.concat(newCart._id),
       },
     });
+
+    await newCart.save();
 
     res.json({ message: "Product successfully added to cart" });
   } catch (err) {

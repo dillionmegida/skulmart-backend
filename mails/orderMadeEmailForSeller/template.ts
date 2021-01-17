@@ -1,3 +1,4 @@
+import chargeFee from "utils/chargeFee";
 import { formatCurrency } from "utils/currency";
 
 type Args = {
@@ -6,11 +7,7 @@ type Args = {
   buyer: { name: string; phone: string };
 };
 
-export default function orderMadeForSeller({
-  buyer,
-  products,
-  message,
-}: Args) {
+export default function orderMadeForSeller({ buyer, products, message }: Args) {
   let totalPrice = 0;
   products.forEach((p) => (totalPrice += p.quantity * p.price));
   return `
@@ -43,10 +40,14 @@ export default function orderMadeForSeller({
   </div>
   <p>
     Kindly contact ${buyer.name} on <b>${buyer.phone}</b> to discuss
-    on how to deliver and recieve the orders.
+    the delivery process of the order.
+    <br/>
+    Remember that the earlier you call the buyer, the higher they rate you.
   </p>
   <p>
-    Remember that the earlier you call the buyer, the higher they rate you.
+    When the buyer receives the order, you'll get <b>${formatCurrency(
+      chargeFee(totalPrice).minusFee
+    )}</b>
   </p>
 </div>
   `;

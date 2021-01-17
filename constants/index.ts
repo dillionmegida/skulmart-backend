@@ -23,6 +23,7 @@ export const PAYSTACK_KEY =
     : process.env.PAYSTACK_SECRET_KEY;
 
 export const PAYSTACK_HOSTNAME = "https://api.paystack.co";
+export const MONIFY_HOSTNAME = "https://sandbox.monnify.com/api/v1/";
 
 export const CALLBACK_URL_AFTER_ADDING_CARD =
   SERVER_URL + "/api/buyers/card/complete";

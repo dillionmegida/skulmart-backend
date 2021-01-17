@@ -82,31 +82,31 @@ export default async function makeOrder(req: any, res: any) {
   }
 
   try {
-    const payRes = await axios({
-      url: PAYSTACK_HOSTNAME + "/transaction/charge_authorization",
-      method: "post",
-      headers: {
-        ...addPaystackAuth(),
-      },
-      data: {
-        email: buyer.email,
-        amount: totalAmountInKobo,
-        authorization_code: cardToPayWith.authorization_code,
-      },
-    });
+    // const payRes = await axios({
+    //   url: PAYSTACK_HOSTNAME + "/transaction/charge_authorization",
+    //   method: "post",
+    //   headers: {
+    //     ...addPaystackAuth(),
+    //   },
+    //   data: {
+    //     email: buyer.email,
+    //     amount: totalAmountInKobo,
+    //     authorization_code: cardToPayWith.authorization_code,
+    //   },
+    // });
 
-    if (!payRes.data.status)
-      return res
-        .status(400)
-        .json({ message: "Making order failed. Please try again" });
+    // if (!payRes.data.status)
+    //   return res
+    //     .status(400)
+    //     .json({ message: "Making order failed. Please try again" });
 
-    await Buyer.findByIdAndUpdate(buyer._id, {
-      $set: {
-        cart: [],
-      },
-    });
+    // await Buyer.findByIdAndUpdate(buyer._id, {
+    //   $set: {
+    //     cart: [],
+    //   },
+    // });
 
-    await Cart.deleteMany({ buyer: buyer._id });
+    // await Cart.deleteMany({ buyer: buyer._id });
 
     const sellerUsernames = Object.keys(groupItemsPurchasedBySeller);
 

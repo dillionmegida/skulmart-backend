@@ -1,6 +1,5 @@
 import axios from "axios";
 import chalk from "chalk";
-import { CALLBACK_URL_AFTER_ADDING_CARD } from "constants/index";
 import { PAYSTACK_HOSTNAME } from "constants/index";
 import BuyerInterface from "interfaces/Buyer";
 import SellerInterface from "interfaces/Seller";
