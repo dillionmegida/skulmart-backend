@@ -4,6 +4,7 @@ import SellerInterface from "interfaces/Seller";
 import confirmChangedEmail from "mails/confirmChangedEmail";
 import Buyer from "models/Buyer";
 import EmailConfirmation from "models/EmailConfirmation";
+import Product from "models/Product";
 import Seller from "models/Seller";
 import { randomNumber } from "utils/numbers";
 
@@ -56,6 +57,16 @@ export default async function updateUserEmail(req: any, res: any) {
         email_confirm: false,
       },
     });
+
+    // make all seller's product hidden
+    await Product.updateMany(
+      { seller: existingUser._id },
+      {
+        $set: {
+          visible: false,
+        },
+      }
+    );
   } else if (user_type === "buyer") {
     await Buyer.findByIdAndUpdate(userId, {
       $set: {

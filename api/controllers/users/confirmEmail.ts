@@ -4,6 +4,7 @@ import { FREE_PLAN } from "constants/subscriptionTypes";
 import welcomeEmail from "mails/welcomeEmail";
 import Buyer from "models/Buyer";
 import EmailConfirmation from "models/EmailConfirmation";
+import Product from "models/Product";
 import Seller from "models/Seller";
 import Store from "models/Store";
 
@@ -38,6 +39,16 @@ export default async function confirmEmail(req: any, res: any) {
         subscription_type: FREE_PLAN.name,
       },
     });
+
+    // after verification, all seller's views should be visible
+    await Product.updateMany(
+      { seller: updateEmailStatus?._id },
+      {
+        $set: {
+          visible: true,
+        },
+      }
+    );
   }
 
   if (updateEmailStatus) {
