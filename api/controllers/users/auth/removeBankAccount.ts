@@ -22,6 +22,9 @@ export default async function removeBankAccount(req: any, res: any) {
 
     existingBanks.splice(bankToBeRemoved, 1);
 
+    if (user.banks[bankToBeRemoved]._default === true)
+      existingBanks[0]._default = true; // make the next account true
+
     if (user.user_type === "buyer") {
       await Buyer.findByIdAndUpdate(user._id, {
         $set: {

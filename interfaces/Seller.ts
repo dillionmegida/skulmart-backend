@@ -2,7 +2,6 @@ import mongoose, { Document } from "mongoose";
 import Bank from "./Bank";
 import Card from "./Card";
 import ImageInterface from "./Image";
-import Views from "./Views";
 import Wallet from "./Wallet";
 
 export default interface SellerInterface extends Document {
