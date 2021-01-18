@@ -1,24 +1,16 @@
-import axios from "axios";
 import chalk from "chalk";
-import { PAYSTACK_HOSTNAME } from "constants/index";
-import addPaystackAuth from "utils/addPaystackAuth";
+import getBanksApi from "api/helpers/getBanks";
 
 export default async function getBanks(req: any, res: any) {
   try {
-    const allBanksResponse = await axios({
-      method: "get",
-      url: PAYSTACK_HOSTNAME + "/bank" + "?pay_with_bank=true",
-      headers: {
-        ...addPaystackAuth(),
-      },
-    });
+    const response = await getBanksApi();
 
-    if (!allBanksResponse.data.status)
-      return res.status(500).json({
-        message: "Error occured. Please try again",
+    if (response.requestSuccessful === false)
+      return res.status(400).json({
+        message: "Banks could not be fetched",
       });
 
-    res.json({ banks: allBanksResponse.data.data });
+    res.json({ banks: response.responseBody });
   } catch (err) {
     console.log(
       chalk.red("An error occured during fetching of banks >> "),

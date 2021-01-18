@@ -9,6 +9,7 @@ import {
   initializeSubscription,
   subscriptionCallback,
   updateSellerViews,
+  withdrawFromWallet,
 } from "api/controllers/sellers";
 import express from "express";
 const router = express.Router();
@@ -35,20 +36,25 @@ router.get("/search/query", getSellerBySearch);
  *
  */
 
+router.use(isAuthenticated);
+
 // Get all products of logged in seller
-router.get("/products/all", isAuthenticated, getAuthSellerProducts);
+router.get("/products/all", getAuthSellerProducts);
+
+// Withdraw from wallet
+router.post("/withdraw", withdrawFromWallet);
 
 // Initialize seller subscription
-router.get("/subscription/initialize", isAuthenticated, initializeSubscription);
+router.get("/subscription/initialize", initializeSubscription);
 
 // Subscription callback
 router.get("/subscription/callback", subscriptionCallback);
 
 // Get all notifications for seller
-router.get("/notifications/all", isAuthenticated, getNotifications);
+router.get("/notifications/all", getNotifications);
 
 // Get notification
-router.get("/notifications/:id", isAuthenticated, getNotification);
+router.get("/notifications/:id", getNotification);
 
 // paystack hits the path when a seller pays
 router.post("/subscription/activate", async (req: any, res: any) => {
