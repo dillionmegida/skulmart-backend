@@ -6,7 +6,7 @@ export default async function getProductReviews(req: any, res: any) {
   const { id } = req.params;
   try {
     const product = await Product.findOne({ _id: id })
-      .populate("seller")
+      .populate({ path: "seller", select: "-views_devices" })
       .select("-views_devices");
 
     if (!product)

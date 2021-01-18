@@ -10,7 +10,7 @@ export default async function getOrdersByRef(req: any, res: any) {
     const allBuyersOrders = await Order.find({
       buyer: buyer._id,
       ref,
-    }).populate("product");
+    }).populate({ path: "product", select: "-views_devices" });
     res.json({ orders: allBuyersOrders });
   } catch (err) {
     console.log(

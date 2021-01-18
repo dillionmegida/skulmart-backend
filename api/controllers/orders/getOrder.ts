@@ -5,7 +5,7 @@ export default async function getOrder(req: any, res: any) {
 
   try {
     const order = await Order.findById(id)
-      .populate("product")
+      .populate({ path: "product", select: "-views_devices" })
       .populate("review")
       .populate("buyer");
     res.json({

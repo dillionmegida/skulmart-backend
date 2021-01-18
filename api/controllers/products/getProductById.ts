@@ -6,7 +6,7 @@ export default async function getProductById(req: any, res: any) {
       _id: req.params.id,
       visible: true,
     })
-      .populate("seller")
+      .populate({ path: "seller", select: "-views_devices" })
       .select("-views_devices");
     if (product === null)
       return res.status(404).json({

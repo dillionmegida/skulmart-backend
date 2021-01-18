@@ -5,7 +5,10 @@ import Cart from "models/Cart";
 export default async function getCart(req: any, res: any) {
   try {
     const buyer = req.user as BuyerInterface;
-    const carts = await Cart.find({ buyer: buyer._id }).populate("product");
+    const carts = await Cart.find({ buyer: buyer._id }).populate({
+      path: "product",
+      select: "-views_devices",
+    });
     res.json({ carts });
   } catch (err) {
     console.log(chalk.red("Could not fetch cart because >>> "), err);

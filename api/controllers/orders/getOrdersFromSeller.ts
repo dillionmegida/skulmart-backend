@@ -7,7 +7,7 @@ export default async function getOrders(req: any, res: any) {
 
   try {
     const allSellerOrders = await Order.find({ seller: seller._id })
-      .populate("product")
+      .populate({ path: "product", select: "-views_devices" })
       .populate("buyer")
       .populate("review");
     res.json({ orders: allSellerOrders });
