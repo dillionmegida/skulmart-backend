@@ -31,6 +31,7 @@ export default async function getProductsBySeller(req: any, res: any) {
     const products = await Product.find({
       ...criteria,
     })
+      .select("-views_devices")
       .limit(PRODUCTS_PER_PAGE)
       .skip(page * PRODUCTS_PER_PAGE);
     res.json({ products, totalPages, seller });

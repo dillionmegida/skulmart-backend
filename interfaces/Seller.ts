@@ -17,7 +17,8 @@ export default interface SellerInterface extends Document {
   twitter: string;
   instagram: string;
   email: string;
-  views: Views;
+  views_count: number;
+  views_devices: string[];
   email_confirm: boolean;
   subscription_type: string;
   subscription_reference: string;

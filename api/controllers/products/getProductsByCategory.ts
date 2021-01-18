@@ -22,6 +22,7 @@ export default async function getProductsByCategory(req: any, res: any) {
   const products = await Product.find({
     ...criteria,
   })
+    .select("-views_devices")
     .limit(PRODUCTS_PER_PAGE)
     .skip(page * PRODUCTS_PER_PAGE);
 

@@ -24,6 +24,7 @@ export default async function getProductsBySearch(req: any, res: any) {
     const products = await Product.find({
       ...criteria,
     })
+      .select("-views-devices")
       .limit(PRODUCTS_PER_PAGE)
       .skip(page * PRODUCTS_PER_PAGE);
 

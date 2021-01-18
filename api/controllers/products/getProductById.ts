@@ -5,7 +5,9 @@ export default async function getProductById(req: any, res: any) {
     const product = await Product.findOne({
       _id: req.params.id,
       visible: true,
-    }).populate("seller");
+    })
+      .populate("seller")
+      .select("-views_devices");
     if (product === null)
       return res.status(404).json({
         error: "Invalid id",

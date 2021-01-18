@@ -33,15 +33,13 @@ const ProductSchema: Schema = new Schema(
       type: Number,
       default: 0,
     },
-    views: {
-      type: {
-        count: Number,
-        devices: [String],
-      },
-      default: {
-        count: 0,
-        devices: [],
-      },
+    views_count: {
+      type: Number,
+      default: 0,
+    },
+    views_devices: {
+      type: [String],
+      default: [],
     },
     visible: {
       type: Boolean,

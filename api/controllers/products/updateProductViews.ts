@@ -13,15 +13,15 @@ export default async function updateProductViews(req: any, res: any) {
     });
     if (product !== null) {
       // then product exists
-      if (!product.views.devices.includes(ip)) {
+      if (!product.views_devices.includes(ip)) {
         // then this device has not viewed the product before
-        product.views.count++;
-        product.views.devices.push(ip);
+        product.views_count++;
+        product.views_devices.push(ip);
         await Product.findByIdAndUpdate(id, {
           $set: {
             views: {
-              count: product.views.count,
-              devices: [...product.views.devices],
+              count: product.views_count,
+              devices: [...product.views_devices],
             },
           },
         });

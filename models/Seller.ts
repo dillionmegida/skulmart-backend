@@ -64,15 +64,13 @@ const SellerSchema: Schema = new Schema(
       type: String,
       required: true,
     },
-    views: {
-      type: {
-        count: Number,
-        devices: [String],
-      },
-      default: {
-        count: 0,
-        devices: [],
-      },
+    views_count: {
+      type: Number,
+      default: 0,
+    },
+    views_devices: {
+      type: [String],
+      default: [],
     },
     store: {
       type: Schema.Types.ObjectId,

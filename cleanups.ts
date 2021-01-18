@@ -71,17 +71,24 @@ import Buyer from "models/Buyer";
 
 const cleanups = async () => {
   console.log("started cleanup");
-  // const products: any = await Product.find();
 
-  // for (let i = 0; i < products.length; i++) {
-  //   await Product.findByIdAndUpdate(products[i]._id, {
-  //     $set: {
-  //       store: products[i].store_id,
-  //     },
-  //   });
+  // const sellers = await Seller.find();
+
+  // for (let i = 0; i < sellers.length; i++) {
+  //   const seller = sellers[i];
+
+  //   await Seller.updateMany(
+  //     { _id: seller._id },
+  //     {
+  //       $set: {
+  //         views_count: seller.views.count,
+  //         views_devices: seller.views.devices,
+  //         views: { devices: [], count: 0 },
+  //       },
+  //     }
+  //   );
   // }
-  // const sellers = await Seller.find()
-  // console.log({sellers})
+
   // await changeSubToNullForUnverified();
   // await tellSubscribedItIsFree();
   // await tellUnsubscribedItIsFree();

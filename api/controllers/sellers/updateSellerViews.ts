@@ -11,15 +11,15 @@ export default async function updateSellerViews(req: any, res: any) {
       _id: id,
     });
     if (seller !== null) {
-      if (!seller.views.devices.includes(ip)) {
+      if (!seller.views_devices.includes(ip)) {
         // then this device has not viewed the seller before
-        seller.views.count++;
-        seller.views.devices.push(ip);
+        seller.views_count++;
+        seller.views_devices.push(ip);
         await Seller.findByIdAndUpdate(id, {
           $set: {
             views: {
-              count: seller.views.count,
-              devices: [...seller.views.devices],
+              count: seller.views_count,
+              devices: [...seller.views_devices],
             },
           },
         });

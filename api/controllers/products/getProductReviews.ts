@@ -5,7 +5,9 @@ import ProductReview from "models/ProductReview";
 export default async function getProductReviews(req: any, res: any) {
   const { id } = req.params;
   try {
-    const product = await Product.findOne({ _id: id }).populate("seller");
+    const product = await Product.findOne({ _id: id })
+      .populate("seller")
+      .select("-views_devices");
 
     if (!product)
       return res.status(400).json({
