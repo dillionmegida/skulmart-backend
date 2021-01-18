@@ -79,7 +79,7 @@ export default async function postProduct(req: any, res: any) {
       folder: CLOUDINARY_PRODUCT_IMAGES_FOLDER,
     });
 
-    if (imageDetails.error)
+    if (!imageDetails.success)
       return res.status(400).json({
         error: "Upload failed. Please try again",
       });

@@ -37,7 +37,10 @@ export async function uploadImage({
   path,
   filename,
   folder,
-}: UploadImageArgs): Promise<{ public_id?: string; url?: string; error?: any }> {
+}: UploadImageArgs): Promise<
+  | { public_id: string; url: string; success: true }
+  | { error: any; success: false }
+> {
   try {
     const outputFile = path + "-formatted";
     const formatResponse = await formatImage({ path, outputFile });
@@ -49,10 +52,10 @@ export async function uploadImage({
       folder,
     });
 
-    return { public_id, url };
+    return { public_id, url, success: true };
   } catch (error) {
     console.log(chalk.red("Could not upload image because >>> "), error);
-    return { error };
+    return { error, success: false };
   }
 }
 

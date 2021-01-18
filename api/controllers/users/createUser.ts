@@ -1,4 +1,3 @@
-import { json } from "body-parser";
 import chalk from "chalk";
 import { CLOUDINARY_USER_IMAGES_FOLDER } from "constants/index";
 import BuyerInterface from "interfaces/Buyer";
@@ -63,22 +62,32 @@ export default async function createUser(req: any, res: any) {
 
     let user = null;
 
-    const result = await uploadImage({
-      path: req.file.path,
-      filename: replaceString({
-        str: body.fullname,
-        replace: " ",
-        _with: "-",
-      }).toLowerCase(),
-      folder: CLOUDINARY_USER_IMAGES_FOLDER,
-    });
+    let uploadImageResult: { public_id: null | string; url: null | string } = {
+      public_id: null,
+      url: null,
+    };
 
-    if (result.error)
-      return res.status(400).json({
-        error: "Saving image failed. Please try again",
+    if (req.file !== undefined && body.user_type !== "buyer") {
+      // only buyers can skip image upload
+
+      const uploadResponse = await uploadImage({
+        path: req.file.path,
+        filename: replaceString({
+          str: body.fullname,
+          replace: " ",
+          _with: "-",
+        }).toLowerCase(),
+        folder: CLOUDINARY_USER_IMAGES_FOLDER,
       });
 
-    const { public_id, url } = result;
+      if (!uploadResponse.success)
+        return res.status(400).json({
+          error: "Saving image failed. Please try again",
+        });
+
+      uploadImageResult.public_id = uploadResponse.public_id;
+      uploadImageResult.url = uploadResponse.url;
+    }
 
     if (body.user_type === "buyer") {
       let { fullname, email, password, phone } = body;
@@ -89,7 +98,10 @@ export default async function createUser(req: any, res: any) {
 
       // create an object of the body entry
       const newBuyer = new Buyer({
-        img: { public_id, url },
+        img: {
+          public_id: uploadImageResult.public_id,
+          url: uploadImageResult.url,
+        },
         fullname,
         email,
         password,
@@ -122,7 +134,10 @@ export default async function createUser(req: any, res: any) {
       email = email.trim();
 
       const newSeller = new Seller({
-        img: { public_id, url },
+        img: {
+          public_id: uploadImageResult.public_id,
+          url: uploadImageResult.url,
+        },
         fullname,
         brand_name,
         username,

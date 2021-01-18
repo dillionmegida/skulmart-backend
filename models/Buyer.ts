@@ -4,8 +4,8 @@ import mongoose, { Schema } from "mongoose";
 const BuyerSchema: Schema = new Schema(
   {
     img: {
-      public_id: { type: String, required: true },
-      url: { type: String, required: true },
+      public_id: { type: String, default: null },
+      url: { type: String, default: null },
     },
     user_type: {
       type: String,

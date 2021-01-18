@@ -54,7 +54,7 @@ export default async function updateUser(req: any, res: any) {
         folder: CLOUDINARY_USER_IMAGES_FOLDER,
       });
 
-      if (result.error)
+      if (!result.success)
         return res.status(400).json({
           error: "Upload failed. Please try again",
         });
