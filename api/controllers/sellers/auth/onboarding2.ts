@@ -30,6 +30,7 @@ export default async function onboarding2(req: any, res: any) {
         twitter,
         facebook,
         instagram,
+        visible: true,
       },
     });
 

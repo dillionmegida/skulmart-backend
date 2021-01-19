@@ -3,23 +3,21 @@ import { CLOUDINARY_USER_IMAGES_FOLDER } from "constants/index";
 import SellerInterface from "interfaces/Seller";
 import Seller from "models/Seller";
 import { uploadImage } from "utils/image";
-import { capitalize } from "utils/strings";
+import { capitalize, replaceString } from "utils/strings";
 
 export default async function onboarding1(req: any, res: any) {
   const user = req.user as SellerInterface;
 
   const body: SellerInterface = { ...req.body };
 
-  const {
-    fullname: _fullname,
-    brand_name: _brand_name,
-    username: _username,
-    brand_desc,
-  } = body;
+  const { brand_name: _brand_name, brand_desc } = body;
 
   const brand_name = capitalize(_brand_name.trim());
-  const fullname = capitalize(_fullname.trim());
-  const username = _username.trim().replace(/\s/g, "").toLowerCase();
+  const username = replaceString({
+    str: brand_name,
+    replace: " ",
+    _with: "-",
+  }).toLowerCase();
 
   try {
     const sellerWithSameUsername = await Seller.findOne({
@@ -30,7 +28,7 @@ export default async function onboarding1(req: any, res: any) {
     if (sellerWithSameUsername)
       // return if user exists
       return res.status(400).json({
-        message: `Seller with username '${body.username}' already exists.`,
+        message: `${brand_name}' has been taken.`,
       });
 
     const uploadImageResult = await uploadImage({
@@ -52,7 +50,6 @@ export default async function onboarding1(req: any, res: any) {
           public_id,
           url,
         },
-        fullname,
         username,
         brand_name,
         brand_desc,
