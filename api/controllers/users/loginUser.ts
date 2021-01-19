@@ -4,25 +4,24 @@ import bcrypt from "bcryptjs";
 import { getToken } from "utils/token";
 
 export default async function loginUser(req: any, res: any) {
-  let { usernameOrEmail, password, user_type } = req.body as {
-    usernameOrEmail: string;
+  let { email, password, user_type } = req.body as {
+    email: string;
     password: string;
     user_type: "buyer" | "seller";
   };
 
-  // this applies to seller online, as they can provide a username or an email
-  usernameOrEmail = usernameOrEmail.trim();
+  email = email.trim();
 
   let user = null;
 
   if (user_type === "seller") {
     const seller = await Seller.findOne({
-      $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
+      email,
     });
     user = seller && Object.create(seller);
   } else {
     const buyer = await Buyer.findOne({
-      email: usernameOrEmail,
+      email,
     });
     user = buyer && Object.create(buyer);
   }
@@ -30,7 +29,7 @@ export default async function loginUser(req: any, res: any) {
   if (!user) {
     // then no user exists with those credentials
     return res.status(400).json({
-      message: "Username or password is incorrect",
+      message: "Email or password is incorrect",
     });
   }
 
@@ -40,7 +39,7 @@ export default async function loginUser(req: any, res: any) {
     // then they don't match
     return res.status(400).json({
       error: "Wrong credentials",
-      message: "Username or password is incorrect",
+      message: "Email or password is incorrect",
     });
   }
 
