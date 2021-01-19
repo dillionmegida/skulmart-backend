@@ -9,3 +9,5 @@ export { default as getNotifications } from "./auth/getNotifications";
 export { default as getNotification } from "./auth/getNotification";
 export { default as updateSellerViews } from "./updateSellerViews";
 export { default as withdrawFromWallet } from "./auth/withdrawFromWallet";
+export { default as onboarding1 } from "./auth/onboarding1";
+export { default as onboarding2 } from "./auth/onboarding2";

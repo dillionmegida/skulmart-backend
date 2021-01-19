@@ -15,6 +15,7 @@ export default interface SellerInterface extends Document {
   whatsapp: string;
   twitter: string;
   instagram: string;
+  facebook: string;
   email: string;
   views_count: number;
   views_devices: string[];
@@ -26,5 +27,6 @@ export default interface SellerInterface extends Document {
   cards: Card[];
   store: mongoose.Types.ObjectId;
   user_type: "seller";
+  visible: boolean;
   ratings: number[];
 }

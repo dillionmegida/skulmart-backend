@@ -5,24 +5,26 @@ type EmailConfirmationArgs = {
   generatedHash: string;
   email: string;
   store: string;
-  type?: string;
-  name: string;
+  name?: string | null;
+  type?: "welcome" | "";
   user_type: "buyer" | "seller";
 };
 const emailConfirmation = async ({
   generatedHash,
   email,
-  name,
+  name = null,
   store,
   type = "",
   user_type,
 }: EmailConfirmationArgs) => {
   const subject = `Confirm your email address on ${siteName}`;
   const html = `
-        <h2>Hi ${name} 👋</h2>
+        <h2>Hi ${name ?? "there"} 👋</h2>
         <p>Please confirm your email address (${email})
           which you used when registering as a 
-          ${user_type} ${user_type === 'seller' ? 'for ' + store  + ' store ': ''}
+          ${user_type} ${
+    user_type === "seller" ? "for " + store + " store " : ""
+  }
           on ${siteName}.</p>
         <a
             style='
@@ -43,8 +45,15 @@ const emailConfirmation = async ({
         >
             Confirm Email Address
         </a>
-        <p style="margin-top: 30px; font-size: 14px">This email was sent to you because your email address was entered during a registration process @ ${siteName}. Ignore this email if it wasn't you.</p>
-        <p>Also, remember to always keep an eye on your emails for notifications on transactions, updates or anything : )</p>
+        <p>-----</p>
+        <p>
+            Remember to always keep an eye on your emails for
+            notifications on transactions, updates or anything : )</p>
+        <p style="margin-top: 30px; font-size: 13px">
+            This email was sent to you because your email address
+            was entered during a registration process at ${siteName}.
+            Kindly ignore this email if it wasn't you.
+        </p>
     `;
 
   const mailResponse = await sendMail({

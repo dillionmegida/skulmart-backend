@@ -15,7 +15,9 @@ import { getToken } from "utils/token";
 export default async function createUser(req: any, res: any) {
   const body: SellerInterface | BuyerInterface = { ...req.body };
 
-  const { email, store: store_id } = body;
+  const { email: _email, store: store_id, password, user_type } = body;
+
+  const email = _email.trim();
 
   try {
     const store = await Store.findOne({
@@ -46,147 +48,59 @@ export default async function createUser(req: any, res: any) {
       });
     }
 
-    if (body.user_type === "seller") {
-      const sellerWithSameUsername = await Seller.findOne({
-        username: body.username,
-      });
+    const encryptedPassword = await bcryptPromise(password);
 
-      // check if user already exists by username and email address
-      if (sellerWithSameUsername) {
-        // return if user exists
-        return res.status(400).json({
-          message: `Seller with username '${body.username}' already exists.`,
-        });
-      }
-    }
+    let newUser: SellerInterface | BuyerInterface | null = null;
 
-    let user = null;
-
-    let uploadImageResult: { public_id: null | string; url: null | string } = {
-      public_id: null,
-      url: null,
-    };
-
-    if (req.file !== undefined && body.user_type !== "buyer") {
-      // only buyers can skip image upload
-
-      const uploadResponse = await uploadImage({
-        path: req.file.path,
-        filename: replaceString({
-          str: body.fullname,
-          replace: " ",
-          _with: "-",
-        }).toLowerCase(),
-        folder: CLOUDINARY_USER_IMAGES_FOLDER,
-      });
-
-      if (!uploadResponse.success)
-        return res.status(400).json({
-          error: "Saving image failed. Please try again",
-        });
-
-      uploadImageResult.public_id = uploadResponse.public_id;
-      uploadImageResult.url = uploadResponse.url;
-    }
-
-    if (body.user_type === "buyer") {
-      let { fullname, email, password, phone } = body;
-
-      // confirm formats of inputs
-      fullname = capitalize(fullname.trim());
-      email = email.trim();
-
-      // create an object of the body entry
-      const newBuyer = new Buyer({
-        img: {
-          public_id: uploadImageResult.public_id,
-          url: uploadImageResult.url,
-        },
-        fullname,
+    if (user_type === "seller") {
+      newUser = new Seller({
         email,
-        password,
-        store,
-        store_name: shortname,
-        phone,
-      });
-
-      newBuyer.password = await bcryptPromise(newBuyer.password);
-
-      await newBuyer.save();
-
-      user = Object.create(newBuyer);
-    } else if (body.user_type === "seller") {
-      let {
-        fullname,
-        brand_name,
-        username,
-        brand_desc,
-        whatsapp,
-        email,
-        password,
-      } = body;
-
-      // confirm formats of inputs
-      fullname = capitalize(fullname.trim());
-      brand_name = capitalize(brand_name.trim());
-      // remove spaces - though this is handled in the client side already but just incase
-      username = username.trim().replace(/\s/g, "").toLowerCase();
-      email = email.trim();
-
-      const newSeller = new Seller({
-        img: {
-          public_id: uploadImageResult.public_id,
-          url: uploadImageResult.url,
-        },
-        fullname,
-        brand_name,
-        username,
-        brand_desc,
-        whatsapp,
-        email,
-        password,
+        password: encryptedPassword,
         store: store_id,
-        store_name: shortname,
       });
-
-      newSeller.password = await bcryptPromise(newSeller.password);
-
-      await newSeller.save();
-
-      user = Object.create(newSeller);
+      await newUser.save();
+    } else {
+      newUser = new Buyer({
+        email,
+        password: encryptedPassword,
+        store: store_id,
+      });
+      await newUser.save();
     }
+
+    if (!newUser)
+      return res
+        .status(400)
+        .json({ message: "An error occured. Please try again." });
 
     const generatedHash = randomNumber();
 
     const newEmailToBeConfirmed = new EmailConfirmation({
       generatedHash,
       // user_id would be sent with email, so that on verification, the email_confirm field would be true
-      user_id: user._id,
-      user_type: body.user_type,
+      user_id: newUser._id,
+      user_type,
     });
 
     await newEmailToBeConfirmed.save();
 
-    const token = getToken({ _id: user._id });
+    const token = getToken({ _id: newUser._id });
 
     const sendEmailResponse = await emailConfirmation({
       generatedHash,
-      email: user.email,
-      name: user.fullname,
+      email: newUser.email,
       store: shortname,
-      user_type: body.user_type,
+      user_type,
       type: "welcome",
     });
 
-    if (!sendEmailResponse.error) {
-      // then the email went successfully
-      res.json({
-        token,
-        message:
-          "Account Created Successfully 💛. Please check your email to confirm your email address.",
-      });
-    } else {
-      // well the seller was still saved even if email wasn't sent
+    res.json({
+      token,
+      message:
+        "Account Created Successfully 💛. Please check your email to confirm your email address.",
+    });
+
+    if (sendEmailResponse.error) {
       console.log(
         chalk.red(
           "Email confirmation couldn't be sent >> ",

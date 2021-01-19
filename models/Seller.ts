@@ -4,38 +4,44 @@ import mongoose, { Schema } from "mongoose";
 const SellerSchema: Schema = new Schema(
   {
     img: {
-      public_id: { type: String, required: true },
-      url: { type: String, required: true },
+      public_id: { type: String, default: null },
+      url: { type: String, default: null },
     },
     wallet: {
       balance: { type: Number, default: 0 },
     },
     fullname: {
       type: String,
-      required: true,
+      default: null,
     },
     brand_name: {
       type: String,
+      default: null,
     },
     user_type: {
       type: String,
       default: "seller",
     },
+    visible: {
+      type: Boolean,
+      default: false,
+    },
     username: {
       type: String,
-      required: true,
+      default: null,
       unique: true,
     },
     brand_desc: {
       type: String,
-      required: true,
+      default: null,
     },
     whatsapp: {
       type: String,
-      required: true,
+      default: null,
     },
     twitter: String,
     instagram: String,
+    facebook: String,
     email: {
       type: String,
       required: true,

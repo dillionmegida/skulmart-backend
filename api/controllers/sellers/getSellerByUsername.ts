@@ -5,6 +5,7 @@ export default async function getSellerByUsername(req: any, res: any) {
   const seller = await Seller.findOne({
     username: req.params.username,
     store: req.store_id,
+    visible: true,
     subscription_type: { $ne: undefined },
   }).select("-password");
   if (seller === null) {

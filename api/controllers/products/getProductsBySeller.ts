@@ -9,7 +9,9 @@ export default async function getProductsBySeller(req: any, res: any) {
 
     const { username } = req.params;
 
-    const seller = await Seller.findOne({ username }).select("-password");
+    const seller = await Seller.findOne({ username, visible: true }).select(
+      "-password"
+    );
 
     if (!seller)
       return res.status(400).json({

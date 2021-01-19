@@ -9,7 +9,7 @@ export default async function deleteProduct(req: any, res: any) {
     await Product.findByIdAndDelete(product._id);
 
     await deleteImage({
-      public_id: product.img.public_id,
+      public_id: product.img.public_id as string,
       errorMsg: "Could not delete product image",
     });
 

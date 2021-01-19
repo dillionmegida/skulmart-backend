@@ -7,6 +7,7 @@ export default async function getSellerBySearch(req: any, res: any) {
   const criteria = {
     store: req.store_id,
     email_confirm: true,
+    visible: true,
     $or: [
       {
         fullname: { $regex: searchRegex },

@@ -1,4 +1,4 @@
 export default interface ImageInterface {
-  public_id: string;
-  url: string;
+  public_id: string | null;
+  url: string | null;
 }

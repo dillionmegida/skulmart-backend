@@ -6,6 +6,7 @@ export default async function getAllSellers(req: any, res: any) {
   const criteria = {
     store: req.store_id,
     email_confirm: true,
+    visible: true,
   };
   const page = parseInt(_page);
   const totalCount = await Seller.countDocuments({ ...criteria });

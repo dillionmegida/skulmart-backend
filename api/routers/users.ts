@@ -23,7 +23,7 @@ import upload from "utils/multer";
 const router = express.Router();
 
 // Create new user
-router.post("/", upload.single("avatar"), userTypeRequired, createUser);
+router.post("/", userTypeRequired, createUser);
 
 // Email confirmation
 router.get("/confirm_email/:hash", confirmEmail);

@@ -7,6 +7,8 @@ import {
   getSellerBySearch,
   getSellerByUsername,
   initializeSubscription,
+  onboarding1,
+  onboarding2,
   subscriptionCallback,
   updateSellerViews,
   withdrawFromWallet,
@@ -14,6 +16,7 @@ import {
 import express from "express";
 const router = express.Router();
 import isAuthenticated from "middlewares/isAuthenticated";
+import upload from "utils/multer";
 
 // Get all sellers in a store
 router.get("/", getAllSellers);
@@ -37,6 +40,10 @@ router.get("/search/query", getSellerBySearch);
  */
 
 router.use(isAuthenticated);
+
+router.post("/onboarding/1", upload.single("avatar"), onboarding1);
+
+router.post("/onboarding/2", onboarding2);
 
 // Get all products of logged in seller
 router.get("/products/all", getAuthSellerProducts);

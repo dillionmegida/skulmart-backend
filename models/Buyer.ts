@@ -13,7 +13,7 @@ const BuyerSchema: Schema = new Schema(
     },
     fullname: {
       type: String,
-      required: true,
+      default: null,
     },
     email: {
       type: String,
@@ -25,7 +25,7 @@ const BuyerSchema: Schema = new Schema(
     },
     phone: {
       type: String,
-      required: true,
+      default: null,
     },
     cart: [
       {

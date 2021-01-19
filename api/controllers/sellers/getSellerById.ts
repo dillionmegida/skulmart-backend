@@ -6,6 +6,7 @@ export default async function getSellerById(req: any, res: any) {
     const seller = await Seller.findOne({
       _id: id,
       subscription_type: { $ne: undefined },
+      visible: true,
     }).select("-password");
     res.json({ seller });
   } catch {

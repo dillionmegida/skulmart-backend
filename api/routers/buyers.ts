@@ -1,12 +1,14 @@
 import {
   addToCart,
   getCart,
+  onboarding,
   removeFromCart,
   updateItemInCart,
 } from "api/controllers/buyers";
 import express from "express";
 const router = express.Router();
 import isAuthenticated from "middlewares/isAuthenticated";
+import upload from "utils/multer";
 
 /*
  *
@@ -15,6 +17,8 @@ import isAuthenticated from "middlewares/isAuthenticated";
  */
 
 router.use(isAuthenticated);
+
+router.post("/onboarding", upload.single("avatar"), onboarding);
 
 router.get("/cart", getCart);
 

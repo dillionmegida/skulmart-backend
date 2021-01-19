@@ -47,7 +47,7 @@ export default async function deleteUser(req: any, res: any) {
       // delete all seller's product images
       for (let i = 0; i < products.length; i++) {
         await deleteImage({
-          public_id: products[i].img.public_id,
+          public_id: products[i].img.public_id as string,
           errorMsg: "Could not delete product image during seller deletion",
         });
       }
@@ -55,18 +55,22 @@ export default async function deleteUser(req: any, res: any) {
       await Seller.deleteOne({
         _id: user._id,
       });
-
-      await deleteImage({
-        public_id: user.img.public_id,
-        errorMsg: "Could not delete seller image during seller deletion",
-      });
     }
 
     res.json({
       message: "Successfully deleted user",
     });
+
+    if (
+      (user.user_type === "buyer" && user.img.public_id) ||
+      user.user_type === "seller"
+    )
+      await deleteImage({
+        public_id: user.img.public_id as string,
+        errorMsg: "Could not delete user image during user deletion",
+      });
   } catch (err) {
-    console.log("Could not delete seller >> ", err);
+    console.log("Could not delete user >> ", err);
     return res.status(400).json({
       error: err,
       message: "Problem occured. Please try again",
