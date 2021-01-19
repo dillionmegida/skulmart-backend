@@ -2,6 +2,7 @@ import chalk from "chalk";
 import { CLOUDINARY_USER_IMAGES_FOLDER } from "constants/index";
 import SellerInterface from "interfaces/Seller";
 import Seller from "models/Seller";
+import shortid from "shortid";
 import { uploadImage } from "utils/image";
 import { capitalize, replaceString } from "utils/strings";
 
@@ -13,27 +14,19 @@ export default async function onboarding1(req: any, res: any) {
   const { brand_name: _brand_name, brand_desc } = body;
 
   const brand_name = capitalize(_brand_name.trim());
-  const username = replaceString({
-    str: brand_name,
-    replace: " ",
-    _with: "-",
-  }).toLowerCase();
+  const username =
+    replaceString({
+      str: brand_name,
+      replace: " ",
+      _with: "-",
+    }).toLowerCase() +
+    "-" +
+    shortid.generate();
 
   try {
-    const sellerWithSameUsername = await Seller.findOne({
-      username: username,
-    });
-
-    //   check if user already exists by username
-    if (sellerWithSameUsername)
-      // return if user exists
-      return res.status(400).json({
-        message: `${brand_name}' has been taken.`,
-      });
-
     const uploadImageResult = await uploadImage({
       path: req.file.path,
-      filename: username.toLowerCase(),
+      filename: username,
       folder: CLOUDINARY_USER_IMAGES_FOLDER,
     });
 
