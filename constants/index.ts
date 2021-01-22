@@ -48,3 +48,5 @@ export async function BEARER_TOKEN() {
   if (auth.requestSuccessful === false) return null;
   else return "Bearer " + auth.responseBody.accessToken;
 }
+
+export const CHARGE_RATE = 5 / 100;

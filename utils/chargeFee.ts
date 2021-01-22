@@ -1,11 +1,9 @@
+import { CHARGE_RATE } from "constants/index";
+
 export default function chargeFee(
   amount: number
 ): { total: number; fee: number; minusFee: number } {
-  let fee = (1.5 / 100) * amount;
-
-  if (amount >= 2500) {
-    fee += 100;
-  }
+  let fee = CHARGE_RATE * amount;
 
   const total = amount + fee;
   const minusFee = amount - fee;
