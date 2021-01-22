@@ -73,6 +73,7 @@ export default async function updateUser(req: any, res: any) {
         whatsapp,
         instagram = "",
         twitter = "",
+        facebook = "",
       } = body;
 
       fullname = capitalize(fullname.trim());
@@ -99,6 +100,7 @@ export default async function updateUser(req: any, res: any) {
           whatsapp,
           instagram,
           twitter,
+          facebook,
         },
       });
     } else if (body.user_type === "buyer") {
