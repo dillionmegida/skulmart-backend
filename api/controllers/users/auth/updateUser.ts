@@ -5,6 +5,7 @@ import SellerInterface from "interfaces/Seller";
 import Buyer from "models/Buyer";
 import Seller from "models/Seller";
 import Store from "models/Store";
+import shortid from "shortid";
 import { deleteImage, uploadImage } from "utils/image";
 import { capitalize, replaceString } from "utils/strings";
 
@@ -68,32 +69,22 @@ export default async function updateUser(req: any, res: any) {
       let {
         fullname,
         brand_name,
-        username,
         brand_desc,
         whatsapp,
         instagram = "",
         twitter = "",
       } = body;
 
-      const existingUser = await Seller.findOne({
-        username,
-        _id: authUser._id,
-      });
-
-      if (
-        existingUser &&
-        existingUser._id.toString() !== authUser._id.toString()
-      ) {
-        // then there is a seller with the name
-        return res.status(400).json({
-          message: `Seller with the username '${username}' already exists`,
-        });
-      }
-
       fullname = capitalize(fullname.trim());
       brand_name = capitalize(brand_name.trim());
-      // remove spaces - though this is handled in the client side already but just incase
-      username = username.trim().replace(/\s/g, "").toLowerCase();
+      const username =
+        replaceString({
+          str: brand_name,
+          replace: " ",
+          _with: "-",
+        }).toLowerCase() +
+        "-" +
+        shortid.generate();
 
       await Seller.findByIdAndUpdate(authUser._id, {
         $set: {
