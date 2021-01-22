@@ -1,36 +1,32 @@
 import axios from "axios";
 import chalk from "chalk";
-import { BEARER_TOKEN, MONIFY_HOSTNAME } from "constants/index";
+import { PAYSTACK_HOSTNAME } from "constants/index";
+import addPaystackAuth from "utils/addPaystackAuth";
 
 export default async function getBanks(): Promise<
   | {
-      requestSuccessful: true;
-      responseMessage: string;
-      responseCode: string;
-      responseBody: {
+      status: true;
+      data: {
         name: string;
         code: string;
-        ussdTemplate: string;
-        baseUssdCode: string;
-        transferUssdTemplate: string;
       }[];
     }
-  | { requestSuccessful: false }
+  | { status: false }
 > {
   try {
     const response = await axios({
       method: "get",
-      url: MONIFY_HOSTNAME + "/banks",
+      url: PAYSTACK_HOSTNAME + "/bank",
       headers: {
-        authorization: await BEARER_TOKEN(),
+        ...addPaystackAuth(),
       },
     });
 
-    if (!response.data.requestSuccessful) return { requestSuccessful: false };
+    if (!response.data.status) return { status: false };
 
     return response.data;
   } catch (err) {
     console.log(chalk.red("Could not fetch banks"), err);
-    return { requestSuccessful: false };
+    return { status: false };
   }
 }

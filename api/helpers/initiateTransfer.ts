@@ -1,25 +1,30 @@
 import axios from "axios";
 import chalk from "chalk";
-import { BASIC_AUTHORIZATION, env, MONIFY_HOSTNAME_V2 } from "constants/index";
+import { PAYSTACK_HOSTNAME } from "constants/index";
+import OrderInterface from "interfaces/OrderInterface";
+import Order from "models/Order";
+import addPaystackAuth from "utils/addPaystackAuth";
+import { convertToKobo } from "utils/money";
 
-type Props = {
+type Args = {
   amount: number;
   reference: string;
   reason?: string;
   destination: {
     bank_code: string;
     account_number: string;
+    account_name: string;
   };
 };
 
 export default async function initiateTransfer({
   amount,
-  reference,
   reason = "Initiate transfer",
-  destination,
-}: Props): Promise<
+  destination: { bank_code, account_number, account_name },
+  reference,
+}: Args): Promise<
   | {
-      requestSuccessful: true;
+      status: true;
       responseMessage: string;
       responseCode: string;
       responseBody: {
@@ -30,28 +35,50 @@ export default async function initiateTransfer({
         totalFee: number;
       };
     }
-  | { requestSuccessful: false }
+  | { status: false }
 > {
+  const amountToPayInKobo = convertToKobo(amount);
+
   try {
-    const res = await axios({
-      url: MONIFY_HOSTNAME_V2 + "/disbursements/single",
-      data: {
-        amount,
-        reference,
-        narration: reason,
-        destinationBankCode: destination.bank_code,
-        destinationAccountNumber: destination.account_number,
-        currency: "NGN",
-        sourceAccountNumber: env.MONIFY_ACCOUNT_NUMBER,
-      },
-      headers: {
-        authoriation: BASIC_AUTHORIZATION,
-      },
+    // create transfer receipt
+    const transferReceiptResponse = await axios({
       method: "post",
+      url: PAYSTACK_HOSTNAME + "/transferrecipient",
+      headers: {
+        ...addPaystackAuth(),
+      },
+      data: {
+        type: "nuban",
+        bank_code,
+        account_number,
+        name: account_name,
+      },
     });
+
+    if (transferReceiptResponse.data.status === false)
+      throw new Error("Transfer receipt could not be created");
+
+    const { recipient_code } = transferReceiptResponse.data.data;
+
+    // initiate transfer
+    const res = await axios({
+      method: "post",
+      url: PAYSTACK_HOSTNAME + "/transfer",
+      headers: {
+        ...addPaystackAuth(),
+      },
+      data: {
+        source: "balance",
+        amount: amountToPayInKobo,
+        recipient: recipient_code,
+        reason,
+        reference,
+      },
+    });
+
     return res.data;
   } catch (err) {
     console.log(chalk.red("Could not initiate transfer >> "), err);
-    return { requestSuccessful: false };
+    return { status: false };
   }
 }

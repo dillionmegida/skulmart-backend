@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import BuyerInterface from "interfaces/Buyer";
 import SellerInterface from "interfaces/Seller";
 import Buyer from "models/Buyer";
@@ -22,7 +23,10 @@ export default async function removeBankAccount(req: any, res: any) {
 
     existingBanks.splice(bankToBeRemoved, 1);
 
-    if (user.banks[bankToBeRemoved]._default === true)
+    if (
+      user.banks[bankToBeRemoved]._default === true && // if bank to be removed is the default
+      existingBanks.length > 1 // and there are more than one bank available
+    )
       existingBanks[0]._default = true; // make the next account true
 
     if (user.user_type === "buyer") {
@@ -42,5 +46,8 @@ export default async function removeBankAccount(req: any, res: any) {
     res.json({
       message: "Bank account removed successfully",
     });
-  } catch (err) {}
+  } catch (err) {
+    console.log(chalk.red("Error occured while removing bank account"), err);
+    res.status(500).json({ message: "An error occured. Please try again" });
+  }
 }

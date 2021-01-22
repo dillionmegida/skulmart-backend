@@ -5,12 +5,12 @@ export default async function getBanks(req: any, res: any) {
   try {
     const response = await getBanksApi();
 
-    if (response.requestSuccessful === false)
+    if (response.status === false)
       return res.status(400).json({
         message: "Banks could not be fetched",
       });
 
-    res.json({ banks: response.responseBody });
+    res.json({ banks: response.data });
   } catch (err) {
     console.log(
       chalk.red("An error occured during fetching of banks >> "),

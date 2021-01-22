@@ -1,6 +1,6 @@
 import axios from "axios";
 import chalk from "chalk";
-import { MONIFY_HOSTNAME } from "constants/index";
+import { PAYSTACK_HOSTNAME } from "constants/index";
 import addPaystackAuth from "utils/addPaystackAuth";
 
 type Args = {
@@ -13,44 +13,40 @@ export default async function verifyAccountNumber({
   bank_code,
 }: Args): Promise<
   | {
-      requestSuccessful: true;
-      responseMessage: string;
-      responseCode: string;
-      responseBody: {
-        accountNumber: string;
-        accountName: string;
-      };
+      status: true;
+      data: { account_number: string; account_name: string };
     }
   | {
-      requestSuccessful: false;
+      status: false;
     }
 > {
   try {
     const resolveResponse = await axios({
       method: "GET",
       url:
-        MONIFY_HOSTNAME +
-        "/disbursements/account/validate?accountNumber=" +
+        PAYSTACK_HOSTNAME +
+        "/bank/resolve?account_number=" +
         account_number +
-        "&bankCode=" +
+        "&bank_code=" +
         bank_code,
+      headers: {
+        ...addPaystackAuth(),
+      },
     });
 
     const { data } = resolveResponse;
 
-    if (data.status === false) return { requestSuccessful: false };
+    if (data.status === false) return { status: false };
 
     return {
-      requestSuccessful: true,
-      responseMessage: data.responseMessage,
-      responseCode: data.responseCode,
-      responseBody: data.responseBody,
+      status: true,
+      data: data.data,
     };
   } catch (err) {
     console.log(
-      chalk.red("Error occured during verifying account number"),
+      chalk.red("Error occured during account number verification"),
       err
     );
-    return { requestSuccessful: false };
+    return { status: false };
   }
 }

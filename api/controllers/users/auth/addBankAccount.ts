@@ -20,20 +20,20 @@ export default async function addBankAccount(req: any, res: any) {
       bank_code,
     });
 
-    if (resolveResponse.requestSuccessful === false)
+    if (resolveResponse.status === false)
       return res.status(400).json({
         message:
           "Bank account provided is not yours. Please provide valid credentials",
       });
 
     const {
-      responseBody: { accountNumber, accountName },
+      data: { account_name: acctName, account_number: acctNumber },
     } = resolveResponse;
 
     const existingBanks = [...user.banks];
     const doesNewBankExist =
       existingBanks.findIndex(
-        ({ account_number }) => accountNumber === account_number
+        ({ account_number }) => acctNumber === account_number
       ) !== -1;
 
     if (doesNewBankExist)
@@ -45,8 +45,8 @@ export default async function addBankAccount(req: any, res: any) {
       await Buyer.findByIdAndUpdate(user._id, {
         $set: {
           banks: existingBanks.concat({
-            account_name: accountName,
-            account_number: accountNumber,
+            account_name: acctName,
+            account_number: acctNumber,
             bank_code,
             bank_name,
             _default: user.banks.length === 0,
@@ -58,8 +58,8 @@ export default async function addBankAccount(req: any, res: any) {
       await Seller.findByIdAndUpdate(user._id, {
         $set: {
           banks: existingBanks.concat({
-            account_name: accountName,
-            account_number: accountNumber,
+            account_name: acctName,
+            account_number: acctNumber,
             bank_code,
             bank_name,
             _default: user.banks.length === 0,
@@ -73,7 +73,7 @@ export default async function addBankAccount(req: any, res: any) {
       message: "Bank account verified successfully",
       data: {
         bank_name,
-        account_name: accountName,
+        account_name: acctName,
       },
     });
   } catch (err) {

@@ -5,13 +5,14 @@ import SellerInterface from "interfaces/Seller";
 import sellerIssuedAWithdraw from "mails/sellerIssuedAWithdraw";
 import Seller from "models/Seller";
 import shortid from "shortid";
-import addPaystackAuth from "utils/addPaystackAuth";
 import { formatCurrency } from "utils/currency";
+import { convertToKobo } from "utils/money";
 
 export default async function withdrawFromWallet(req: any, res: any) {
   const seller = req.user as SellerInterface;
-  const { amount: _amount } = req.body as {
+  const { amount: _amount, account_number } = req.body as {
     amount: string;
+    account_number: string;
   };
 
   const amount = parseInt(_amount, 10);
@@ -21,57 +22,51 @@ export default async function withdrawFromWallet(req: any, res: any) {
       message: "You cannot withdraw " + formatCurrency(0),
     });
 
-  const amountToStr = amount.toString();
-
   try {
     if (seller.banks.length === 0)
       res.status(400).json({
         message: "No bank account found",
       });
 
-    const defaultBank = seller.banks.find((a) => a._default === true);
-    if (!defaultBank) throw new Error(chalk.red("No bank account found"));
+    const selectedBank = seller.banks.find(
+      (b) => b.account_number === account_number
+    );
+
+    if (!selectedBank)
+      return res
+        .status(400)
+        .json({ message: "Selected bank account does not exist" });
 
     // verify account number
     const verifyAcctNumberResponse = await verifyAccountNumber({
-      account_number: defaultBank.account_number,
-      bank_code: defaultBank.bank_code,
+      account_number: selectedBank.account_number,
+      bank_code: selectedBank.bank_code,
     });
 
-    if (verifyAcctNumberResponse.requestSuccessful === false)
+    if (verifyAcctNumberResponse.status === false)
       return res.status(400).json({
         message:
           "Bank account is invalid. Please ensure that this account is still open",
       });
 
-    const {
-      responseBody: { accountNumber, accountName },
-    } = verifyAcctNumberResponse;
-
-    const [naira, kobo] = amountToStr.split(".");
-
-    const amountToPayInKobo =
-      kobo === undefined // the amount sent is just the naira format
-        ? parseInt(naira, 10) * 100
-        : kobo.length === 1 // the amount sent has kobo, but just 1 digit
-        ? parseInt(naira, 10) * 10
-        : amount;
+    const amountToPayInKobo = convertToKobo(amount);
 
     const transferReference = shortid.generate();
 
     const transferRes = await initiateTransfer({
-      amount,
+      amount: amountToPayInKobo,
       reason: "Seller made withdrawal",
       destination: {
-        bank_code: defaultBank.bank_code,
-        account_number: defaultBank.account_number,
+        bank_code: selectedBank.bank_code,
+        account_number: selectedBank.account_number,
+        account_name: selectedBank.account_name,
       },
       reference: transferReference,
     });
 
-    const { requestSuccessful } = transferRes;
+    const { status } = transferRes;
 
-    if (!requestSuccessful) throw new Error("Transfer request not successful");
+    if (!status) throw new Error("Transfer request not successful");
 
     await Seller.findByIdAndUpdate(seller._id, {
       $set: {
