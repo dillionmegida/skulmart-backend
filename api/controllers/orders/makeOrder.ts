@@ -44,7 +44,7 @@ export default async function makeOrder(req: any, res: any) {
     const order = orders[i];
     const sellerUsername =
       process.env.NODE_ENV === "dev"
-        ? "deeesignsstudios" // in development, I want to use this user for testing
+        ? "deeesigns-studios-sIYE4Ib6T" // in development, I want to use this user for testing
         : order.seller_username;
 
     const sellerItems = groupItemsPurchasedBySeller[sellerUsername] || null;

@@ -21,6 +21,7 @@ export default async function updateUser(req: any, res: any) {
       });
 
   const authUser = req.user as SellerInterface | BuyerInterface;
+  const seller = authUser as SellerInterface;
 
   try {
     const store = await Store.findOne({
@@ -79,13 +80,15 @@ export default async function updateUser(req: any, res: any) {
       fullname = capitalize(fullname.trim());
       brand_name = capitalize(brand_name.trim());
       const username =
-        replaceString({
-          str: brand_name,
-          replace: " ",
-          _with: "-",
-        }).toLowerCase() +
-        "-" +
-        shortid.generate();
+        seller.brand_name === brand_name
+          ? seller.username
+          : replaceString({
+              str: brand_name,
+              replace: " ",
+              _with: "-",
+            }).toLowerCase() +
+            "-" +
+            shortid.generate();
 
       await Seller.findByIdAndUpdate(authUser._id, {
         $set: {
