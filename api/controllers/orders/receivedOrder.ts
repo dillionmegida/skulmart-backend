@@ -7,6 +7,7 @@ import buyerHasReceivedOrder from "mails/buyerHasReceivedOrder";
 import Order from "models/Order";
 import Product from "models/Product";
 import Seller from "models/Seller";
+import { getActivityMessage } from "utils/activities";
 import chargeFee from "utils/chargeFee";
 
 export default async function receivedOrder(req: any, res: any) {
@@ -33,11 +34,13 @@ export default async function receivedOrder(req: any, res: any) {
       },
     });
 
+    const priceSellerGets = chargeFee(totalPricePaid).minusFee;
+
     await Seller.findByIdAndUpdate(seller?._id, {
       $set: {
         ratings: seller?.ratings.concat(rating),
         wallet: {
-          balance: seller.wallet.balance + chargeFee(totalPricePaid).minusFee,
+          balance: seller.wallet.balance + priceSellerGets,
         },
       },
     });
@@ -56,6 +59,11 @@ export default async function receivedOrder(req: any, res: any) {
       product,
       seller_rating: rating,
       seller_review: review,
+    });
+
+    const activityMessage = getActivityMessage({
+      type: "BUYER_RECEIVED_ORDER",
+      options: { orderPrice: priceSellerGets },
     });
   } catch (err) {
     console.log(chalk.red("An error occured during receiving order >>> "), err);

@@ -21,9 +21,10 @@ export const links = {
 };
 
 export const PAYSTACK_KEY =
-  process.env.NODE_ENV === "dev"
-    ? process.env.PAYSTACK_TEST_SECRET_KEY
-    : process.env.PAYSTACK_SECRET_KEY;
+//   process.env.NODE_ENV === "dev"
+    // ? process.env.PAYSTACK_TEST_SECRET_KEY
+    // : 
+    process.env.PAYSTACK_SECRET_KEY;
 
 export const PAYSTACK_HOSTNAME = "https://api.paystack.co";
 export const MONIFY_HOSTNAME = "https://sandbox.monnify.com/api/v1";

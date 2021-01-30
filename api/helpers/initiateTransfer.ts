@@ -1,10 +1,7 @@
 import axios from "axios";
 import chalk from "chalk";
 import { PAYSTACK_HOSTNAME } from "constants/index";
-import OrderInterface from "interfaces/OrderInterface";
-import Order from "models/Order";
 import addPaystackAuth from "utils/addPaystackAuth";
-import { convertToKobo } from "utils/money";
 
 type Args = {
   amount: number;
@@ -37,8 +34,6 @@ export default async function initiateTransfer({
     }
   | { status: false }
 > {
-  const amountToPayInKobo = convertToKobo(amount);
-
   try {
     // create transfer receipt
     const transferReceiptResponse = await axios({
@@ -69,7 +64,7 @@ export default async function initiateTransfer({
       },
       data: {
         source: "balance",
-        amount: amountToPayInKobo,
+        amount,
         recipient: recipient_code,
         reason,
         reference,
