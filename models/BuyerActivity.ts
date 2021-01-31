@@ -3,9 +3,10 @@ import mongoose, { Schema } from "mongoose";
 
 const BuyerActivitySchema: Schema = new Schema(
   {
-    user: { type: Schema.Types.ObjectId, ref: "Buyer", required: true },
-    user_type: { type: String, default: "buyer" },
-    message: { type: String, required: true },
+    buyer: { type: Schema.Types.ObjectId, ref: "Buyer", required: true },
+    order: { type: Schema.Types.ObjectId, ref: "Order", default: null },
+    type: { type: String, required: true },
+    options: { type: Object, default: null },
   },
   {
     timestamps: true,

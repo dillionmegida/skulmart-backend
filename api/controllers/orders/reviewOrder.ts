@@ -6,6 +6,7 @@ import Order from "models/Order";
 import Product from "models/Product";
 import ProductReview from "models/ProductReview";
 import Seller from "models/Seller";
+import { saveActivity } from "utils/activities";
 
 export default async function reviewOrder(req: any, res: any) {
   const buyer = req.user as BuyerInterface;
@@ -67,6 +68,15 @@ export default async function reviewOrder(req: any, res: any) {
       rating,
       review,
       buyer,
+    });
+
+    await saveActivity({
+      type: "BUYER_REVIEWED_ORDER",
+      options: {
+        order_id: order._id,
+        buyer_id: order.buyer,
+        seller_id: order.seller,
+      },
     });
   } catch (err) {
     console.log(chalk.red("An error occured during reviewing order >>> "), err);

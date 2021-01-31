@@ -1,4 +1,5 @@
 import {
+  getActivities,
   getAllSellers,
   getAuthSellerProducts,
   getNotification,
@@ -47,6 +48,9 @@ router.post("/onboarding/2", onboarding2);
 
 // Get all products of logged in seller
 router.get("/products/all", getAuthSellerProducts);
+
+// Get seller activities
+router.get("/activities/all", getActivities);
 
 // Withdraw from wallet
 router.post("/withdraw", withdrawFromWallet);

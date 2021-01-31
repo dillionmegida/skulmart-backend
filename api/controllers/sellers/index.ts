@@ -11,3 +11,4 @@ export { default as updateSellerViews } from "./updateSellerViews";
 export { default as withdrawFromWallet } from "./auth/withdrawFromWallet";
 export { default as onboarding1 } from "./auth/onboarding1";
 export { default as onboarding2 } from "./auth/onboarding2";
+export { default as getActivities } from "./auth/getActivities";

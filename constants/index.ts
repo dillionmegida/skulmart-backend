@@ -3,6 +3,7 @@ import btoa from "btoa";
 
 export const PRODUCTS_PER_PAGE = 20;
 export const SELLERS_PER_PAGE = 20;
+export const ACTIVITY_PER_PAGE = 10;
 
 export const SERVER_URL = "http://skulmart-backend.herokuapp.com";
 

@@ -7,7 +7,7 @@ import buyerHasReceivedOrder from "mails/buyerHasReceivedOrder";
 import Order from "models/Order";
 import Product from "models/Product";
 import Seller from "models/Seller";
-import { getActivityMessage } from "utils/activities";
+import { saveActivity } from "utils/activities";
 import chargeFee from "utils/chargeFee";
 
 export default async function receivedOrder(req: any, res: any) {
@@ -49,9 +49,6 @@ export default async function receivedOrder(req: any, res: any) {
       message: "Order received successfully",
     });
 
-    // TODO: I may want to send this email using a webhook as that ensures
-    // 100% success
-    // or send here, and a webhook
     await buyerHasReceivedOrder({
       order,
       seller: seller,
@@ -61,9 +58,13 @@ export default async function receivedOrder(req: any, res: any) {
       seller_review: review,
     });
 
-    const activityMessage = getActivityMessage({
+    await saveActivity({
       type: "BUYER_RECEIVED_ORDER",
-      options: { orderPrice: priceSellerGets },
+      options: {
+        order_id: order._id,
+        buyer_id: order.buyer,
+        seller_id: order.seller,
+      },
     });
   } catch (err) {
     console.log(chalk.red("An error occured during receiving order >>> "), err);
