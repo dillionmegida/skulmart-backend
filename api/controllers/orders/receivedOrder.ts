@@ -59,7 +59,7 @@ export default async function receivedOrder(req: any, res: any) {
     });
 
     await saveActivity({
-      type: "BUYER_RECEIVED_ORDER",
+      type: "ORDER_RECEIVED",
       options: {
         order_id: order._id,
         buyer_id: order.buyer,

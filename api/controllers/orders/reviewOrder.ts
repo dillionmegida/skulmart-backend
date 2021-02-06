@@ -71,7 +71,7 @@ export default async function reviewOrder(req: any, res: any) {
     });
 
     await saveActivity({
-      type: "BUYER_REVIEWED_ORDER",
+      type: "ORDER_REVIEWED",
       options: {
         order_id: order._id,
         buyer_id: order.buyer,

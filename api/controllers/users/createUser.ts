@@ -7,6 +7,7 @@ import Buyer from "models/Buyer";
 import EmailConfirmation from "models/EmailConfirmation";
 import Seller from "models/Seller";
 import Store from "models/Store";
+import shortid from "shortid";
 import { uploadImage } from "utils/image";
 import { randomNumber } from "utils/numbers";
 import { bcryptPromise, capitalize, replaceString } from "utils/strings";
@@ -57,6 +58,7 @@ export default async function createUser(req: any, res: any) {
         email,
         password: encryptedPassword,
         store: store_id,
+        username: shortid.generate(),
       });
       await newUser.save();
     } else {

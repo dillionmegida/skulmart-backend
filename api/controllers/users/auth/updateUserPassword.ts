@@ -4,6 +4,7 @@ import BuyerInterface from "interfaces/Buyer";
 import SellerInterface from "interfaces/Seller";
 import Buyer from "models/Buyer";
 import Seller from "models/Seller";
+import { saveActivity } from "utils/activities";
 import { bcryptPromise } from "utils/strings";
 
 export default async function updateUserPassword(req: any, res: any) {
@@ -60,11 +61,22 @@ export default async function updateUserPassword(req: any, res: any) {
       });
     }
 
-    return res.json({
+    res.json({
       message: "Successfully updated password",
     });
+
+    await saveActivity({
+      type: "PASSWORD_CHANGED",
+      options: {
+        who: user_type,
+        user_id: authUser._id,
+      },
+    });
   } catch (err) {
-    console.log(chalk.red("Error occurred during password update process >> "));
+    console.log(
+      chalk.red("Error occurred during password update process >> "),
+      err
+    );
     res.status(400).json({
       error: err,
       message: "Error occured! Please try again.",

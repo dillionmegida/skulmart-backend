@@ -1,13 +1,22 @@
 import mongoose, { Document } from "mongoose";
 
+export type ActivityType =
+  | "PASSWORD_CHANGED"
+  | "EMAIL_CHANGED"
+  | "ORDER_BOUGHT"
+  | "ORDER_RECEIVED"
+  | "ORDER_REVIEWED"
+  | "ITEM_LISTED"
+  | "MONEY_WITHDRAWN"
+  | "ITEMS_REMOVED";
+
 export default interface ActivityInterface extends Document {
   _id: mongoose.Types.ObjectId;
-  seller?: mongoose.Types.ObjectId;
-  user_type: "buyer" | "seller";
-  buyer?: mongoose.Types.ObjectId;
-  order?: mongoose.Types.ObjectId;
-  options: {
-    type: "SELLER_WITHDRAW";
-    withdraw_amount: number;
-  };
+  type: ActivityType;
+  for_buyer: boolean;
+  for_seller: boolean;
+  order: mongoose.Types.ObjectId;
+  buyer: mongoose.Types.ObjectId;
+  seller: mongoose.Types.ObjectId;
+  options: { [x: string]: any };
 }

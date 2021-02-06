@@ -1,6 +1,6 @@
 import { ACTIVITY_PER_PAGE } from "constants/index";
 import SellerInterface from "interfaces/Seller";
-import SellerActivity from "models/SellerActivity";
+import Activity from "models/Activity";
 
 export default async function getActivities(req: any, res: any) {
   try {
@@ -13,10 +13,10 @@ export default async function getActivities(req: any, res: any) {
       seller: loggedInSeller._id,
     };
 
-    const totalCount = await SellerActivity.countDocuments({ ...criteria });
+    const totalCount = await Activity.countDocuments({ ...criteria });
     const totalPages = Math.ceil(totalCount / ACTIVITY_PER_PAGE) - 1;
 
-    const activities = await SellerActivity.find({ ...criteria })
+    const activities = await Activity.find({ ...criteria })
       .limit(ACTIVITY_PER_PAGE)
       .skip(page * ACTIVITY_PER_PAGE)
       .populate({ path: "seller", select: "-password -views_devices" })

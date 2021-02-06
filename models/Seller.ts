@@ -28,8 +28,7 @@ const SellerSchema: Schema = new Schema(
     },
     username: {
       type: String,
-      default: null,
-      unique: true,
+      default: null
     },
     brand_desc: {
       type: String,
