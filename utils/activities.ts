@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { ActivityType } from "interfaces/Activity";
 import Activity from "models/Activity";
 
 type Args =
@@ -13,7 +12,7 @@ type Args =
     }
   | {
       type: "MONEY_WITHDRAWN";
-      options: { withdraw_amount: number; seller_id: mongoose.Types.ObjectId };
+      options: { amount: number; seller_id: mongoose.Types.ObjectId };
     }
   | {
       type: "ORDER_REVIEWED";
@@ -45,12 +44,14 @@ export async function saveActivity(args: Args) {
   }
 
   if (args.type === "MONEY_WITHDRAWN") {
-    const { withdraw_amount, seller_id } = args.options;
+    const { amount, seller_id } = args.options;
     return await new Activity({
       type: args.type,
       seller: seller_id,
-      options: {
-        withdraw_amount,
+      for_buyer: false,
+      for_seller: true,
+      meta: {
+        amount,
       },
     }).save();
   }

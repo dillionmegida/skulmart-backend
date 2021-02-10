@@ -5,7 +5,6 @@ import addPaystackAuth from "utils/addPaystackAuth";
 
 type Args = {
   amount: number;
-  reference: string;
   reason?: string;
   destination: {
     bank_code: string;
@@ -18,7 +17,6 @@ export default async function initiateTransfer({
   amount,
   reason = "Initiate transfer",
   destination: { bank_code, account_number, account_name },
-  reference,
 }: Args): Promise<
   | {
       status: true;
@@ -67,7 +65,6 @@ export default async function initiateTransfer({
         amount,
         recipient: recipient_code,
         reason,
-        reference,
       },
     });
 

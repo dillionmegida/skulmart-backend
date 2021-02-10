@@ -22,7 +22,7 @@ const ActivitySchema: Schema = new Schema(
     order: { type: Schema.Types.ObjectId, ref: "Order" },
     seller: { type: Schema.Types.ObjectId, ref: "Seller" },
     buyer: { type: Schema.Types.ObjectId, ref: "Buyer" },
-    options: { type: Object, default: null },
+    meta: { type: Object, default: null },
   },
   {
     timestamps: true,

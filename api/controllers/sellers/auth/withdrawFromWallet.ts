@@ -4,7 +4,7 @@ import chalk from "chalk";
 import SellerInterface from "interfaces/Seller";
 import sellerIssuedAWithdraw from "mails/sellerIssuedAWithdraw";
 import Seller from "models/Seller";
-import shortid from "shortid";
+import { saveActivity } from "utils/activities";
 import { formatCurrency } from "utils/currency";
 import { convertToKobo } from "utils/money";
 
@@ -51,17 +51,14 @@ export default async function withdrawFromWallet(req: any, res: any) {
 
     const amountToPayInKobo = convertToKobo(amount);
 
-    const transferReference = shortid.generate();
-
     const transferRes = await initiateTransfer({
       amount: amountToPayInKobo,
-      reason: "Seller made withdrawal",
+      reason: "Withdrawal - " + seller.fullname,
       destination: {
         bank_code: selectedBank.bank_code,
         account_number: selectedBank.account_number,
         account_name: selectedBank.account_name,
       },
-      reference: transferReference,
     });
 
     const { status } = transferRes;
@@ -73,6 +70,14 @@ export default async function withdrawFromWallet(req: any, res: any) {
         wallet: {
           balance: seller.wallet.balance - amount,
         },
+      },
+    });
+
+    await saveActivity({
+      type: "MONEY_WITHDRAWN",
+      options: {
+        amount,
+        seller_id: seller._id,
       },
     });
 

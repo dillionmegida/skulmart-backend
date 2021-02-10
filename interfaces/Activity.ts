@@ -18,5 +18,5 @@ export default interface ActivityInterface extends Document {
   order: mongoose.Types.ObjectId;
   buyer: mongoose.Types.ObjectId;
   seller: mongoose.Types.ObjectId;
-  options: { [x: string]: any };
+  meta: { [x: string]: any };
 }

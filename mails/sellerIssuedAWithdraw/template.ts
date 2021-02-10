@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { formatCurrency } from "utils/currency";
 
 type Args = {
@@ -9,10 +10,9 @@ export default function sellerIssuedAWithdrawTemplate({ amount }: Args) {
 <div>
   <h2 style='font-size: 20px;'>You issued a refund of ${formatCurrency(
     amount
-  )} from your wallet.</h2>
+  )} from your wallet on ${format(new Date(), "do LLL, yyyy")}.</h2>
   <p>
-    This will be transferred to the default bank account you provided
-    in your dashboard.
+    This will be transferred to the bank account you selected when issuing the refund.
   </p>
   <p>
     If you do not get the refund in 24 hours, kindly contact us

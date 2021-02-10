@@ -39,3 +39,5 @@ export const replaceString = ({
   const reg = new RegExp(replace, "g");
   return str.replace(reg, _with);
 };
+
+export const removeSpecialChars = (str: string) => str.replace(/\W/g, '')
