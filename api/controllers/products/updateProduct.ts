@@ -2,6 +2,7 @@ import chalk from "chalk";
 import { CLOUDINARY_PRODUCT_IMAGES_FOLDER } from "constants/index";
 import SellerInterface from "interfaces/Seller";
 import Product from "models/Product";
+import ProductReview from "models/ProductReview";
 import Store from "models/Store";
 import { deleteImage, uploadImage } from "utils/image";
 import { capitalize, replaceString } from "utils/strings";
@@ -29,7 +30,13 @@ export default async function updateProduct(req: any, res: any) {
       name,
       seller: authUser._id,
     });
-    if (existingProduct && existingProduct._id.toString() !== req.params.id) {
+
+    if (!existingProduct)
+      return res.status(404).json({
+        message: "Product to be updated is not found",
+      });
+
+    if (existingProduct._id.toString() !== req.params.id) {
       // then there is an existing product with the name
       return res.status(400).json({
         message: `Product with the name '${name}' already exists`,
@@ -40,7 +47,6 @@ export default async function updateProduct(req: any, res: any) {
 
     if (store === null) {
       // then the store does not exist
-      // this may never happen though, because if there is no store, server.js will redirectoy to homepage
       return res.status(400).json({
         error: "Store unavailable",
         message: "Error updating product. Please try again",
@@ -53,6 +59,18 @@ export default async function updateProduct(req: any, res: any) {
 
     if (req.file !== undefined) {
       // then a new image was selected
+
+      const productReviews = await ProductReview.find({
+        product: existingProduct._id,
+      });
+
+      if (productReviews.length > 0)
+        return res.status(400).json({
+          message:
+            // to help avoid changing to a different image after buyers have been convinced from reviews
+            // that they are about purchasing a great product
+            "You cannot change the image of a product that buyers have written reviews on",
+        });
 
       // delete the previous image stored
       await deleteImage({
