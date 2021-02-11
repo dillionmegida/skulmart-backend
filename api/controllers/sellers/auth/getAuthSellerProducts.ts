@@ -26,7 +26,7 @@ export default async function getAuthSellerProducts(req: any, res: any) {
       .skip(page * PRODUCTS_PER_PAGE)
       .populate("store");
 
-    res.json({ products, totalPages });
+    res.json({ products: products.reverse(), totalPages });
   } catch (err) {
     res.status(404).json({
       error: err,

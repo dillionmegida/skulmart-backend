@@ -9,7 +9,7 @@ export default async function getOrdersByBuyer(req: any, res: any) {
     const allBuyersOrders = await Order.find({ buyer: buyer._id }).populate(
       "product"
     );
-    res.json({ orders: allBuyersOrders });
+    res.json({ orders: allBuyersOrders.reverse() });
   } catch (err) {
     console.log(
       chalk.red("An error occured during getting buyer's orders >> "),

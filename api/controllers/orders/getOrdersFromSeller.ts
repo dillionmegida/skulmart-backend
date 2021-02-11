@@ -10,7 +10,7 @@ export default async function getOrders(req: any, res: any) {
       .populate({ path: "product", select: "-views_devices" })
       .populate("buyer")
       .populate("review");
-    res.json({ orders: allSellerOrders });
+    res.json({ orders: allSellerOrders.reverse() });
   } catch (err) {
     console.log(
       chalk.red("An error occured during getting buyer's orders >> "),

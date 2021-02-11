@@ -22,7 +22,7 @@ export default async function getActivities(req: any, res: any) {
       .populate({ path: "seller", select: "-password -views_devices" })
       .populate("order");
 
-    res.json({ activities, totalPages });
+    res.json({ activities: activities.reverse(), totalPages });
   } catch (err) {
     res.status(500).json({
       error: err,

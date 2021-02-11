@@ -1,5 +1,6 @@
 import { SELLERS_PER_PAGE } from "constants/index";
 import Seller from "models/Seller";
+import { shuffleArray } from "utils/arrays";
 
 export default async function getAllSellers(req: any, res: any) {
   const { page: _page = 0 } = req.query;
@@ -19,5 +20,9 @@ export default async function getAllSellers(req: any, res: any) {
 
   const totalPages = Math.ceil(totalCount / SELLERS_PER_PAGE) - 1; // since pages start from 0;
 
-  return res.json({ sellers, totalPages, totalSellers: totalCount });
+  return res.json({
+    sellers: shuffleArray(sellers),
+    totalPages,
+    totalSellers: totalCount,
+  });
 }

@@ -7,5 +7,5 @@ export default async function getNotifications(req: any, res: any) {
   const unreadNotifications = allNotifications.filter((n) => {
     return !n.viewedIds.includes(sellerId);
   });
-  res.json({ notifications: unreadNotifications });
+  res.json({ notifications: unreadNotifications.reverse() });
 }

@@ -16,7 +16,7 @@ export default async function getProductReviews(req: any, res: any) {
 
     const reviews = await ProductReview.find({ product: id }).populate("buyer");
 
-    res.json({ product, reviews });
+    res.json({ product, reviews: reviews.reverse() });
   } catch (err) {
     console.log(chalk.red("Product reviews could not be retrived >> "), err);
     return res
