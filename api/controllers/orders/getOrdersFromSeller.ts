@@ -2,6 +2,7 @@ import chalk from "chalk";
 import { ORDERS_PER_PAGE } from "constants/index";
 import SellerInterface from "interfaces/Seller";
 import Order from "models/Order";
+import { sliceAndReverse } from "utils/arrays";
 
 export default async function getOrders(req: any, res: any) {
   const seller = req.user as SellerInterface;
@@ -16,15 +17,19 @@ export default async function getOrders(req: any, res: any) {
     const totalCount = await Order.countDocuments({ ...criteria });
 
     const allSellerOrders = await Order.find({ ...criteria })
-      .limit(ORDERS_PER_PAGE)
-      .skip(page * ORDERS_PER_PAGE)
       .populate({ path: "product", select: "-views_devices" })
       .populate("buyer")
       .populate("review");
 
+    const modifiedOrders = sliceAndReverse({
+      arr: allSellerOrders,
+      limit: ORDERS_PER_PAGE,
+      currentPage: page,
+    });
+
     const totalPages = Math.ceil(totalCount / ORDERS_PER_PAGE) - 1; // since pages start from 0;
 
-    res.json({ orders: allSellerOrders.reverse(), totalPages });
+    res.json({ orders: modifiedOrders, totalPages });
   } catch (err) {
     console.log(
       chalk.red("An error occured during getting buyer's orders >> "),

@@ -1,6 +1,7 @@
 import { PRODUCTS_PER_PAGE } from "constants/index";
 import SellerInterface from "interfaces/Seller";
 import Product from "models/Product";
+import { sliceAndReverse } from "utils/arrays";
 
 export default async function getAuthSellerProducts(req: any, res: any) {
   try {
@@ -22,11 +23,15 @@ export default async function getAuthSellerProducts(req: any, res: any) {
       ...criteria,
     })
       .select("-views_devices")
-      .limit(PRODUCTS_PER_PAGE)
-      .skip(page * PRODUCTS_PER_PAGE)
       .populate("store");
 
-    res.json({ products: products.reverse(), totalPages });
+    const modifiedProducts = sliceAndReverse({
+      arr: products,
+      limit: PRODUCTS_PER_PAGE,
+      currentPage: page,
+    });
+
+    res.json({ products: modifiedProducts, totalPages });
   } catch (err) {
     res.status(404).json({
       error: err,

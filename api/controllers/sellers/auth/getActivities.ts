@@ -1,6 +1,7 @@
 import { ACTIVITY_PER_PAGE } from "constants/index";
 import SellerInterface from "interfaces/Seller";
 import Activity from "models/Activity";
+import { sliceAndReverse } from "utils/arrays";
 
 export default async function getActivities(req: any, res: any) {
   try {
@@ -17,12 +18,16 @@ export default async function getActivities(req: any, res: any) {
     const totalPages = Math.ceil(totalCount / ACTIVITY_PER_PAGE) - 1;
 
     const activities = await Activity.find({ ...criteria })
-      .limit(ACTIVITY_PER_PAGE)
-      .skip(page * ACTIVITY_PER_PAGE)
       .populate({ path: "seller", select: "-password -views_devices" })
       .populate("order");
 
-    res.json({ activities: activities.reverse(), totalPages });
+    const modifiedActivities = sliceAndReverse({
+      arr: activities,
+      limit: ACTIVITY_PER_PAGE,
+      currentPage: page,
+    });
+
+    res.json({ activities: modifiedActivities, totalPages });
   } catch (err) {
     res.status(500).json({
       error: err,

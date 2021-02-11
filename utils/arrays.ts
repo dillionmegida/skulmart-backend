@@ -13,3 +13,19 @@ export function getRandom(arr: any[]) {
   const randomNumber = Math.floor(Math.random() * arr.length);
   return arr[randomNumber];
 }
+
+// this method is an alternative to skip and limit method in mongoose because
+// we are reversing the total documents available
+// not only the limited ones from .limit
+type SliceAndReverseArgs = {
+  arr: any[];
+  limit: number;
+  currentPage: number;
+};
+export function sliceAndReverse({
+  arr,
+  limit,
+  currentPage,
+}: SliceAndReverseArgs) {
+  return arr.reverse().slice(currentPage * limit, limit + currentPage * limit);
+}
