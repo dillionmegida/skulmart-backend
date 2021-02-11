@@ -22,6 +22,14 @@ export default async function withdrawFromWallet(req: any, res: any) {
       message: "You cannot withdraw " + formatCurrency(0),
     });
 
+  if (amount > seller.wallet.balance)
+    return res.status(400).json({
+      message:
+        "You cannot withdraw more than your current balance (" +
+        formatCurrency(seller.wallet.balance) +
+        ")",
+    });
+
   try {
     if (seller.banks.length === 0)
       res.status(400).json({
