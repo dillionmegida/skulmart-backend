@@ -4,6 +4,7 @@ import btoa from "btoa";
 export const PRODUCTS_PER_PAGE = 20;
 export const SELLERS_PER_PAGE = 20;
 export const ACTIVITY_PER_PAGE = 10;
+export const ORDERS_PER_PAGE = 10;
 
 export const SERVER_URL = "http://skulmart-backend.herokuapp.com";
 
@@ -22,10 +23,10 @@ export const links = {
 };
 
 export const PAYSTACK_KEY =
-//   process.env.NODE_ENV === "dev"
-    // ? process.env.PAYSTACK_TEST_SECRET_KEY
-    // : 
-    process.env.PAYSTACK_SECRET_KEY;
+  //   process.env.NODE_ENV === "dev"
+  // ? process.env.PAYSTACK_TEST_SECRET_KEY
+  // :
+  process.env.PAYSTACK_SECRET_KEY;
 
 export const PAYSTACK_HOSTNAME = "https://api.paystack.co";
 export const MONIFY_HOSTNAME = "https://sandbox.monnify.com/api/v1";
