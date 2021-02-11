@@ -14,6 +14,7 @@ export default interface OrderInterface extends Document {
   quantity: number;
   price_when_bought: number;
   createdAt: Date;
+  did_buyer_close: boolean;
   // the following properties are when the buyer has received
   has_buyer_received: boolean;
   buyer_received_date?: Date | null;

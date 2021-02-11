@@ -9,6 +9,7 @@ const OrderSchema: Schema = new Schema(
     seller: { type: Schema.Types.ObjectId, required: true, ref: "Seller" },
     quantity: { type: Number, required: true },
     price_when_bought: { type: Number, required: true },
+    did_buyer_close: { type: Boolean, default: false },
     // the following properties are when the buyer has received
     has_buyer_received: { type: Boolean, default: false },
     buyer_received_date: { type: Date, default: null },
