@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import { CLOUDINARY_PRODUCT_IMAGES_FOLDER } from "constants/index";
 import SellerInterface from "interfaces/Seller";
+import Order from "models/Order";
 import Product from "models/Product";
-import ProductReview from "models/ProductReview";
 import Store from "models/Store";
 import { deleteImage, uploadImage } from "utils/image";
 import { capitalize, replaceString } from "utils/strings";
@@ -60,16 +60,16 @@ export default async function updateProduct(req: any, res: any) {
     if (req.file !== undefined) {
       // then a new image was selected
 
-      const productReviews = await ProductReview.find({
+      const orders = await Order.find({
         product: existingProduct._id,
       });
 
-      if (productReviews.length > 0)
+      if (orders.length > 0)
         return res.status(400).json({
           message:
-            // to help avoid changing to a different image after buyers have been convinced from reviews
-            // that they are about purchasing a great product
-            "You cannot change the image of a product that buyers have written reviews on",
+            // to help avoid changing to a different image after some buyers have bought a product
+            // and probably added a review to it
+            "You cannot change the image of a product that buyers have bought",
         });
 
       // delete the previous image stored
