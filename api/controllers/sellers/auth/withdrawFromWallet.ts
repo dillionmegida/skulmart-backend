@@ -32,7 +32,7 @@ export default async function withdrawFromWallet(req: any, res: any) {
 
   try {
     if (seller.banks.length === 0)
-      res.status(400).json({
+      return res.status(400).json({
         message: "No bank account found",
       });
 
@@ -61,7 +61,7 @@ export default async function withdrawFromWallet(req: any, res: any) {
 
     const transferRes = await initiateTransfer({
       amount: amountToPayInKobo,
-      reason: "Withdrawal - " + seller.fullname,
+      reason: "Withdrawal " + seller.fullname,
       destination: {
         bank_code: selectedBank.bank_code,
         account_number: selectedBank.account_number,
@@ -93,7 +93,11 @@ export default async function withdrawFromWallet(req: any, res: any) {
       message: "Withdraw successful. Money will be in your account soon.",
     });
 
-    await sellerIssuedAWithdraw({ amount, email: seller.email });
+    await sellerIssuedAWithdraw({
+      amount,
+      email: seller.email,
+      bank: selectedBank,
+    });
   } catch (err) {
     console.log(chalk.red("Could not issue withdrawal >>> "), err);
     res.status(500).json({ message: "An error occured. Please try again" });
