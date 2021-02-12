@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import { CLOUDINARY_PRODUCT_IMAGES_FOLDER } from "constants/index";
 import SellerInterface from "interfaces/Seller";
+import ProductInterface from "interfaces/Product";
 import Order from "models/Order";
 import Product from "models/Product";
 import Store from "models/Store";
@@ -31,12 +32,7 @@ export default async function updateProduct(req: any, res: any) {
       seller: authUser._id,
     });
 
-    if (!existingProduct)
-      return res.status(404).json({
-        message: "Product to be updated is not found",
-      });
-
-    if (existingProduct._id.toString() !== req.params.id) {
+    if (existingProduct && existingProduct._id.toString() !== req.params.id) {
       // then there is an existing product with the name
       return res.status(400).json({
         message: `Product with the name '${name}' already exists`,
@@ -61,7 +57,7 @@ export default async function updateProduct(req: any, res: any) {
       // then a new image was selected
 
       const orders = await Order.find({
-        product: existingProduct._id,
+        product: (existingProduct as ProductInterface)._id,
       });
 
       if (orders.length > 0)
