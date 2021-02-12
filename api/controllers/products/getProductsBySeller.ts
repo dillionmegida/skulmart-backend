@@ -4,7 +4,7 @@ import Seller from "models/Seller";
 
 export default async function getProductsBySeller(req: any, res: any) {
   try {
-    const { page: _page } = req.query;
+    const { page: _page = 0 } = req.query;
     const page = parseInt(_page);
 
     const { username } = req.params;

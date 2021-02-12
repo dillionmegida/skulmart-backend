@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { ORDERS_PER_PAGE } from "constants/";
+import { ORDERS_PER_PAGE } from "constants/index";
 import BuyerInterface from "interfaces/Buyer";
 import Order from "models/Order";
 import { sliceAndReverse } from "utils/arrays";

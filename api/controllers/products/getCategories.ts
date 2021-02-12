@@ -4,7 +4,7 @@ import Product from "models/Product";
 // categories are fetched this way to ensure that
 // there is at least a product with that category
 export default async function getCategories(req: any, res: any) {
-  const { page: _page } = req.query;
+  const { page: _page = 0 } = req.query;
   const page = parseInt(_page);
 
   const criteria = {

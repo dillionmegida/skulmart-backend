@@ -5,7 +5,7 @@ import { sliceAndReverse } from "utils/arrays";
 
 export default async function getActivities(req: any, res: any) {
   try {
-    const { page: _page } = req.query;
+    const { page: _page = 0 } = req.query;
     const page = parseInt(_page, 10);
 
     const loggedInSeller = req.user as SellerInterface;

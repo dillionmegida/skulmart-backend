@@ -2,7 +2,7 @@ import { PRODUCTS_PER_PAGE } from "constants/index";
 import Product from "models/Product";
 
 export default async function getProductsByCategory(req: any, res: any) {
-  const { page: _page } = req.query;
+  const { page: _page = 0 } = req.query;
   const page = parseInt(_page);
 
   const { category } = req.params;
