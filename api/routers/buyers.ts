@@ -1,5 +1,6 @@
 import {
   addToCart,
+  getActivities,
   getCart,
   onboarding,
   removeFromCart,
@@ -21,6 +22,9 @@ router.use(isAuthenticated);
 router.post("/onboarding", upload.single("avatar"), onboarding);
 
 router.get("/cart", getCart);
+
+// Get seller activities
+router.get("/activities/all", getActivities);
 
 // add item to cart
 router.post("/cart/:product_id", addToCart);
