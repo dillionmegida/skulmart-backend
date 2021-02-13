@@ -4,10 +4,13 @@ import Card from "./Card";
 import ImageInterface from "./Image";
 import Wallet from "./Wallet";
 
+export type CATEGORY = "FASHION" | "FOOD AND DRINKS" | "ELECTRONICS" | "NONE";
+
 export default interface SellerInterface extends Document {
   _id: mongoose.Types.ObjectId;
   img: ImageInterface;
   wallet: Wallet;
+  brand_category: CATEGORY;
   fullname: string;
   brand_name: string;
   username: string;

@@ -14,6 +14,10 @@ const SellerSchema: Schema = new Schema(
       type: String,
       default: null,
     },
+    brand_category: {
+      type: String,
+      enum: ["FASHION", "FOOD AND DRINKS", "ELECTRONICS", "NONE"],
+    },
     brand_name: {
       type: String,
       default: null,
@@ -28,7 +32,7 @@ const SellerSchema: Schema = new Schema(
     },
     username: {
       type: String,
-      default: null
+      default: null,
     },
     brand_desc: {
       type: String,

@@ -11,7 +11,7 @@ export default async function onboarding1(req: any, res: any) {
 
   const body: SellerInterface = { ...req.body };
 
-  const { brand_name: _brand_name, brand_desc } = body;
+  const { brand_name: _brand_name, brand_desc, brand_category } = body;
 
   const brand_name = capitalize(_brand_name.trim());
   const username =
@@ -46,6 +46,7 @@ export default async function onboarding1(req: any, res: any) {
         username,
         brand_name,
         brand_desc,
+        brand_category,
       },
     });
 
