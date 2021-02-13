@@ -36,11 +36,14 @@ export default async function orderMadeEmailForSeller({
       name: buyer.fullname,
       phone: buyer.phone,
     },
-    products: orders.map((i) => ({
+    orders: orders.map((i) => ({
       name: i.product.name,
       quantity: i.quantity,
       price: i.price_when_bought,
       confirm_order_url: i.confirm_order_url,
+      product: {
+        quantity_available: i.product.quantity,
+      },
     })),
     message,
   });

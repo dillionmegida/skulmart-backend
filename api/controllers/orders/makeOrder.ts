@@ -18,6 +18,7 @@ import orderMadeEmailForBuyer from "mails/orderMadeEmailForBuyer";
 import Buyer from "models/Buyer";
 import { shortenUrlAndSave } from "utils/urls";
 import { getConfirmOrderReceivedLinkForBuyer } from "utils/order";
+import Product from "models/Product";
 
 export default async function makeOrder(req: any, res: any) {
   const buyer = req.user as BuyerInterface;
@@ -138,11 +139,13 @@ export default async function makeOrder(req: any, res: any) {
 
       for (let j = 0; j < orders.length; j++) {
         const order = orders[j];
+        const productId = order.product_populated._id;
+
         const newOrder = new Order({
           confirm_order_url: "",
           ref: orderRef,
           buyer: buyer._id,
-          product: order.product_populated._id,
+          product: productId,
           seller: seller_info._id,
           quantity: order.quantity,
           price_when_bought: order.price_when_bought,
@@ -157,13 +160,24 @@ export default async function makeOrder(req: any, res: any) {
         const shortenRes = await shortenUrlAndSave(confirmOrderReceivedLink);
 
         newOrder.confirm_order_url = shortenRes.short_url;
-        
+
         await newOrder.save();
 
         shortenedConfirmOrderUrls.push({
           _id: newOrder._id,
           url: shortenRes.short_url,
         });
+
+        if (process.env.NODE_ENV !== "dev") {
+          await Product.findByIdAndUpdate(productId, {
+            $set: {
+              // increase quantity of product sold
+              quantity_sold:
+                order.product_populated.quantity_sold + order.quantity,
+              quantity: order.product_populated.quantity - order.quantity,
+            },
+          });
+        }
       }
 
       await orderMadeEmailForSeller({

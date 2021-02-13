@@ -4,19 +4,23 @@ import { formatCurrency } from "utils/currency";
 import { anchorLinkText } from "utils/strings";
 
 type Args = {
-  products: {
+  orders: {
     name: string;
     quantity: number;
     price: number;
     confirm_order_url: string;
+    product: {
+      quantity_available: number;
+    };
   }[];
   message: string;
   buyer: { name: string; phone: string };
 };
 
-export default function orderMadeForSeller({ buyer, products, message }: Args) {
+export default function orderMadeForSeller({ buyer, orders, message }: Args) {
   let totalPrice = 0;
-  products.forEach((p) => (totalPrice += p.quantity * p.price));
+  orders.forEach((p) => (totalPrice += p.quantity * p.price));
+
   return `
   <div style='width: 100%; margin: auto;'>
   <h2 style='font-size: 20px;'>${buyer.name} purchased from you 🎉</h2>
@@ -24,25 +28,33 @@ export default function orderMadeForSeller({ buyer, products, message }: Args) {
   <p>Here are the details of the purchase:</p>
   <div>
     <ul>
-      ${products
-        .map(
-          (i) =>
-            `<li>
-                <b>${i.name.toUpperCase()}</b> --- <b>${i.quantity}</b> qty(s)
-                <br/>
-                Paid: <b>${formatCurrency(i.price * i.quantity)}</b>
-                <br/>
-                <span style="font-size: 14px">
-                    Confirm order received link (for buyer):
-                    <span style='letter-spacing: 1px'>
-                        ${anchorLinkText({
-                          link: i.confirm_order_url,
-                          text: i.confirm_order_url.replace("https://", ""),
-                        })}
-                    <span>
-                </span>
-            </li>`
-        )
+      ${orders
+        .map((i) => {
+          const qtyProductsAvailable =
+            i.product.quantity_available - i.quantity < 1
+              ? 0
+              : i.product.quantity_available - i.quantity;
+          return `<li>
+              <b>${i.name.toUpperCase()}</b> --- <b>${i.quantity}</b> qty(s)
+              <br/>
+              Paid: <b>${formatCurrency(i.price * i.quantity)}</b>
+              <br/>
+              <span style="font-size: 15px">
+                  Confirm order received link (for buyer):
+                  <span style='letter-spacing: 1px'>
+                      ${anchorLinkText({
+                        link: i.confirm_order_url,
+                        text: i.confirm_order_url.replace("https://", ""),
+                      })}
+                  </span>
+              </span>
+              <br/>
+              <span style="font-size: 14px">
+                You have ${qtyProductsAvailable} qty(s) of this product remaining.
+              </span>
+              <br/>
+          </li>`;
+        })
         .join("<br/>")}
     </ul>
     <p>Total price: <b>${formatCurrency(totalPrice)}</b></p>
@@ -71,6 +83,10 @@ export default function orderMadeForSeller({ buyer, products, message }: Args) {
     When the buyer receives the order, you'll get <b>${formatCurrency(
       chargeFee(totalPrice).minusFee
     )}</b> added to your wallet.
+  </p>
+  <p>
+    One last info, but not the least, <b>Remember</b> to increase the quantity of products you have in your
+    dashboard. Only products with at least 1 quantity above will appear in the store.
   </p>
 </div>
   `;
