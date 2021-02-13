@@ -1,28 +1,33 @@
 import BuyerInterface from "interfaces/Buyer";
-import { GroupedItemsPurchasedBySeller } from "interfaces/OrderInterface";
+import { GroupedOrdersPurchasedFromSeller } from "interfaces/OrderInterface";
 import sendMail from "..";
 import orderMadeForBuyer from "./template";
+import mongoose from "mongoose";
+import { format } from "date-fns";
 
 type Args = {
   buyer: BuyerInterface;
-  items: GroupedItemsPurchasedBySeller;
+  orders: GroupedOrdersPurchasedFromSeller;
+  confirmOrderLinks: { _id: mongoose.Types.ObjectId; url: string }[];
   price_paid: number;
   message: string;
 };
 
 export default async function orderMadeEmailForBuyer({
   price_paid,
-  items,
+  orders,
   message,
   buyer,
+  confirmOrderLinks,
 }: Args) {
-  const subject = `Order Receipt`;
+  const subject = `Order Receipt (${format(new Date(), "do LLL, yyyy")})`;
   const html = orderMadeForBuyer({
     buyerPhone: buyer.phone,
-    items,
+    orders,
     pricePaid: price_paid,
     message,
     emailSubject: subject,
+    confirmOrderLinks,
   });
 
   const mailResponse = await sendMail({

@@ -40,4 +40,11 @@ export const replaceString = ({
   return str.replace(reg, _with);
 };
 
-export const removeSpecialChars = (str: string) => str.replace(/\W|_/g, '')
+export const removeSpecialChars = (str: string) => str.replace(/\W|_/g, "");
+
+type AnchorLinkTextArgs = {
+  link: string;
+  text?: string;
+};
+export const anchorLinkText = ({ link, text }: AnchorLinkTextArgs) =>
+  `<a href="${link}">${text ?? link}</a>`;

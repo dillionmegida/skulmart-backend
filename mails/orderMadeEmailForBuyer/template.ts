@@ -1,23 +1,27 @@
-import { GroupedItemsPurchasedBySeller } from "interfaces/OrderInterface";
+import { GroupedOrdersPurchasedFromSeller } from "interfaces/OrderInterface";
 import { formatCurrency } from "utils/currency";
 import { getSellerProfileLink } from "utils/getLinks";
+import mongoose from "mongoose";
+import { anchorLinkText } from "utils/strings";
 
 type Args = {
-  items: GroupedItemsPurchasedBySeller;
+  orders: GroupedOrdersPurchasedFromSeller;
   buyerPhone: string;
   pricePaid: number;
   message: string;
   emailSubject: string;
+  confirmOrderLinks: { _id: mongoose.Types.ObjectId; url: string }[];
 };
 
 export default function orderMadeForBuyer({
-  items,
+  orders,
   pricePaid,
   buyerPhone,
   message,
   emailSubject,
+  confirmOrderLinks,
 }: Args) {
-  const sellerUsernames = Object.keys(items);
+  const sellerUsernames = Object.keys(orders);
   return `
 <div>
   <h2 style='font-size: 20px;'>${emailSubject}</h2>
@@ -25,7 +29,7 @@ export default function orderMadeForBuyer({
   <div>
     ${sellerUsernames
       .map((username) => {
-        const { seller_info, items: _items } = items[username];
+        const { seller_info, orders: _orders } = orders[username];
         return `
           <span>From <a href="${getSellerProfileLink({
             username: seller_info.username,
@@ -35,7 +39,7 @@ export default function orderMadeForBuyer({
           </span>
           <br/>
           <ul>
-            ${_items
+            ${_orders
               .map((i) => {
                 return `
                 <li>
@@ -48,6 +52,13 @@ export default function orderMadeForBuyer({
                   Paid: <b>
                     ${formatCurrency(i.price_when_bought * i.quantity)}
                   </b>
+                  <br/>
+                  ${anchorLinkText({
+                    link: (confirmOrderLinks.find(
+                      ({ _id }) => _id.toString() === i._id.toString()
+                    ) as { url: string }).url,
+                    text: "Confirm order received",
+                  })}
                 </li>
               `;
               })
@@ -79,7 +90,7 @@ export default function orderMadeForBuyer({
       <ul>
       ${sellerUsernames
         .map((username) => {
-          const { seller_info } = items[username];
+          const { seller_info } = orders[username];
           return `
             <li>
               ${seller_info.brand_name}

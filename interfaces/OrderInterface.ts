@@ -15,6 +15,7 @@ export default interface OrderInterface extends Document {
   price_when_bought: number;
   createdAt: Date;
   did_buyer_close: boolean;
+  confirm_order_url: string;
   // the following properties are when the buyer has received
   has_buyer_received: boolean;
   buyer_received_date?: Date | null;
@@ -25,9 +26,10 @@ export default interface OrderInterface extends Document {
   seller_receipt_code?: string; // to initiate transfer
 }
 
-export type GroupedItemsPurchasedBySeller = {
+export type GroupedOrdersPurchasedFromSeller = {
   [username: string]: {
-    items: {
+    orders: {
+      _id: mongoose.Types.ObjectId;
       product_populated: ProductInterface;
       quantity: number;
       price_when_bought: number;

@@ -1,9 +1,10 @@
 import chalk from "chalk";
+import mongoose from "mongoose";
 import BuyerInterface from "interfaces/Buyer";
 import SellerInterface from "interfaces/Seller";
 import StoreInterface from "interfaces/Store";
 import OrderInterface, {
-  GroupedItemsPurchasedBySeller,
+  GroupedOrdersPurchasedFromSeller,
 } from "interfaces/OrderInterface";
 import Seller from "models/Seller";
 import Order from "models/Order";
@@ -15,6 +16,8 @@ import Cart from "models/Cart";
 import orderMadeEmailForSeller from "mails/orderMadeEmailForSeller";
 import orderMadeEmailForBuyer from "mails/orderMadeEmailForBuyer";
 import Buyer from "models/Buyer";
+import { shortenUrlAndSave } from "utils/urls";
+import { getConfirmOrderReceivedLinkForBuyer } from "utils/order";
 
 export default async function makeOrder(req: any, res: any) {
   const buyer = req.user as BuyerInterface;
@@ -38,7 +41,7 @@ export default async function makeOrder(req: any, res: any) {
   if (!cardToPayWith)
     return res.status(400).json({ message: "Card to pay with does not exist" });
 
-  const groupItemsPurchasedBySeller: GroupedItemsPurchasedBySeller = {};
+  const groupOrdersPurchasedFromSeller: GroupedOrdersPurchasedFromSeller = {};
 
   for (let i = 0; i < orders.length; i++) {
     const order = orders[i];
@@ -47,11 +50,11 @@ export default async function makeOrder(req: any, res: any) {
         ? "deeesigns-studios-sIYE4Ib6T" // in development, I want to use this user for testing
         : order.seller_username;
 
-    const sellerItems = groupItemsPurchasedBySeller[sellerUsername] || null;
+    const sellerOrders = groupOrdersPurchasedFromSeller[sellerUsername] || null;
 
-    if (sellerItems) {
+    if (sellerOrders) {
       // seller already has item in the group
-      sellerItems.items.push(order);
+      sellerOrders.orders.push(order);
     } else {
       const seller = (await Seller.findOne({
         username: sellerUsername,
@@ -65,8 +68,9 @@ export default async function makeOrder(req: any, res: any) {
             "Error occured. Please try again or contact support if you have been debited",
         });
 
-      const items = [
+      const orders = [
         {
+          _id: order._id,
           price_when_bought: order.price_when_bought,
           has_buyer_received: order.has_buyer_received,
           product_populated: order.product_populated,
@@ -74,45 +78,55 @@ export default async function makeOrder(req: any, res: any) {
         },
       ];
 
-      groupItemsPurchasedBySeller[sellerUsername] = {
-        items,
+      groupOrdersPurchasedFromSeller[sellerUsername] = {
+        orders,
         seller_info: seller,
       };
     }
   }
 
   try {
-    // const payRes = await axios({
-    //   url: PAYSTACK_HOSTNAME + "/transaction/charge_authorization",
-    //   method: "post",
-    //   headers: {
-    //     ...addPaystackAuth(),
-    //   },
-    //   data: {
-    //     email: buyer.email,
-    //     amount: totalAmountInKobo,
-    //     authorization_code: cardToPayWith.authorization_code,
-    //   },
-    // });
+    const shortenedConfirmOrderUrls: {
+      _id: mongoose.Types.ObjectId;
+      url: string;
+    }[] = [];
+    const getConfirmLinkFromUrls = (id: mongoose.Types.ObjectId) => {
+      const confirmLink = shortenedConfirmOrderUrls.find(
+        ({ _id }) => _id.toString() === id.toString()
+      ) as { url: string };
+      return confirmLink.url;
+    };
 
-    // if (!payRes.data.status)
-    //   return res
-    //     .status(400)
-    //     .json({ message: "Making order failed. Please try again" });
+    if (process.env.NODE_ENV !== "dev") {
+      const payRes = await axios({
+        url: PAYSTACK_HOSTNAME + "/transaction/charge_authorization",
+        method: "post",
+        headers: {
+          ...addPaystackAuth(),
+        },
+        data: {
+          email: buyer.email,
+          amount: totalAmountInKobo,
+          authorization_code: cardToPayWith.authorization_code,
+        },
+      });
+      if (!payRes.data.status)
+        return res
+          .status(400)
+          .json({ message: "Making order failed. Please try again" });
+      await Buyer.findByIdAndUpdate(buyer._id, {
+        $set: {
+          cart: [],
+        },
+      });
+      await Cart.deleteMany({ buyer: buyer._id });
+    }
 
-    // await Buyer.findByIdAndUpdate(buyer._id, {
-    //   $set: {
-    //     cart: [],
-    //   },
-    // });
-
-    // await Cart.deleteMany({ buyer: buyer._id });
-
-    const sellerUsernames = Object.keys(groupItemsPurchasedBySeller);
+    const sellerUsernames = Object.keys(groupOrdersPurchasedFromSeller);
 
     for (let i = 0; i < sellerUsernames.length; i++) {
       const sellerUsername = sellerUsernames[i];
-      const { items, seller_info } = groupItemsPurchasedBySeller[
+      const { orders, seller_info } = groupOrdersPurchasedFromSeller[
         sellerUsername
       ];
       const orderRef = shortId.generate();
@@ -122,38 +136,61 @@ export default async function makeOrder(req: any, res: any) {
         seller: seller_info._id,
       });
 
-      for (let j = 0; j < items.length; j++) {
-        const item = items[j];
+      for (let j = 0; j < orders.length; j++) {
+        const order = orders[j];
         const newOrder = new Order({
+          confirm_order_url: "",
           ref: orderRef,
           buyer: buyer._id,
-          product: item.product_populated._id,
+          product: order.product_populated._id,
           seller: seller_info._id,
-          quantity: item.quantity,
-          price_when_bought: item.price_when_bought,
+          quantity: order.quantity,
+          price_when_bought: order.price_when_bought,
         });
+
+        order._id = newOrder._id; // because the _id coming from frontend is not valid
+
+        const confirmOrderReceivedLink = getConfirmOrderReceivedLinkForBuyer({
+          order_id: newOrder._id,
+          store: seller_info.store.shortname,
+        });
+        const shortenRes = await shortenUrlAndSave(confirmOrderReceivedLink);
+
+        newOrder.confirm_order_url = shortenRes.short_url;
+        
         await newOrder.save();
+
+        shortenedConfirmOrderUrls.push({
+          _id: newOrder._id,
+          url: shortenRes.short_url,
+        });
       }
 
       await orderMadeEmailForSeller({
         seller: seller_info,
         buyer,
-        items: groupItemsPurchasedBySeller[sellerUsername].items.map((i) => ({
-          product: i.product_populated,
-          price_when_bought: i.price_when_bought,
-          quantity: i.quantity,
-        })),
+        orders: groupOrdersPurchasedFromSeller[sellerUsername].orders.map(
+          (i) => {
+            return {
+              product: i.product_populated,
+              price_when_bought: i.price_when_bought,
+              quantity: i.quantity,
+              confirm_order_url: getConfirmLinkFromUrls(i._id),
+            };
+          }
+        ),
         first_purchase: currentCountOfSellerOrders < 1,
         message,
       });
-    }
 
-    await orderMadeEmailForBuyer({
-      items: groupItemsPurchasedBySeller,
-      price_paid: totalAmount,
-      message,
-      buyer,
-    });
+      await orderMadeEmailForBuyer({
+        orders: groupOrdersPurchasedFromSeller,
+        price_paid: totalAmount,
+        message,
+        buyer,
+        confirmOrderLinks: shortenedConfirmOrderUrls,
+      });
+    }
 
     res.json({ message: "Order completed" });
   } catch (err) {
