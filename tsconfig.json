@@ -17,6 +17,7 @@
       "helpers/*": ["helpers/*"],
       "interfaces/*": ["interfaces/*"],
       "mails/*": ["mails/*"],
+      "sms/*": ["sms/*"],
       "middlewares/*": ["middlewares/*"],
       "models/*": ["models/*"],
       "routers/*": ["routers/*"],

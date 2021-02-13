@@ -19,6 +19,7 @@ import Buyer from "models/Buyer";
 import { shortenUrlAndSave } from "utils/urls";
 import { getConfirmOrderReceivedLinkForBuyer } from "utils/order";
 import Product from "models/Product";
+import smsAfterBuyerMakesOrder from "sms/smsAfterBuyerMakesOrder";
 
 export default async function makeOrder(req: any, res: any) {
   const buyer = req.user as BuyerInterface;
@@ -197,14 +198,25 @@ export default async function makeOrder(req: any, res: any) {
         message,
       });
 
-      await orderMadeEmailForBuyer({
-        orders: groupOrdersPurchasedFromSeller,
-        price_paid: totalAmount,
-        message,
-        buyer,
-        confirmOrderLinks: shortenedConfirmOrderUrls,
+      await smsAfterBuyerMakesOrder({
+        buyer: {
+          phone: buyer.phone,
+        },
+        seller: {
+          phone: seller_info.whatsapp,
+          brand: seller_info.brand_name,
+          name: seller_info.fullname,
+        },
       });
     }
+
+    await orderMadeEmailForBuyer({
+      orders: groupOrdersPurchasedFromSeller,
+      price_paid: totalAmount,
+      message,
+      buyer,
+      confirmOrderLinks: shortenedConfirmOrderUrls,
+    });
 
     res.json({ message: "Order completed" });
   } catch (err) {
