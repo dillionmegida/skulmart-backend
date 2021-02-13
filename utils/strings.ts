@@ -40,4 +40,4 @@ export const replaceString = ({
   return str.replace(reg, _with);
 };
 
-export const removeSpecialChars = (str: string) => str.replace(/\W/g, '')
+export const removeSpecialChars = (str: string) => str.replace(/\W|_/g, '')
