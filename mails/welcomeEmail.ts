@@ -34,7 +34,7 @@ const welcomeEmail = async ({
   const subject = `Welcome to ${siteName}`;
   const html = `
         <div style='width: 100%; margin: auto'>
-          <h2>Welcome ${profile.fullname} 🙌</h2>
+          <h2>Welcome to ${siteName} 🙌</h2>
           <p>Your email has been confirmed successfully.
             <br/>
             ${
@@ -54,9 +54,9 @@ const welcomeEmail = async ({
               : `You have automatically received a free plan. This plan supports uploading a maximum of ${
                   FREE_PLAN.max_products
                 } products.
-            So, head over to <a href=${
+            So, head over to <a href="${
               links.MERCHANT_SITE
-            }>your dashboard</a> and start managing your products on ${siteName} 🎉.
+            }">your dashboard</a> and start managing your products 🎉.
             <br/><br/>
             You can also join the <a href="${
               links.SELLER_WHATSAPP_GROUP

@@ -41,6 +41,8 @@ export default async function confirmEmail(req: any, res: any) {
     });
 
     // after verification, all seller's views should be visible
+    // TODO if a new plan comes out, that prolly supports more products, remember to
+    // conditionally update visible true of products depending on what the plan supports
     await Product.updateMany(
       { seller: updateEmailStatus?._id },
       {
