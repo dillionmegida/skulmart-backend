@@ -24,15 +24,34 @@ import smsAfterBuyerMakesOrder from "sms/smsAfterBuyerMakesOrder";
 export default async function makeOrder(req: any, res: any) {
   const buyer = req.user as BuyerInterface;
 
-  const { orders, message, card_signature } = req.body as {
+  const { orders: allOrders, message, card_signature } = req.body as {
     message: string;
-    orders: OrderInterface[];
+    orders: [OrderInterface & { quantity_available: number }];
     card_signature: string;
   };
 
   let totalAmount = 0;
+  const unsoldOrders: OrderInterface[] = [];
 
-  orders.forEach((p) => (totalAmount += p.price_when_bought * p.quantity));
+  allOrders.forEach((o) => {
+    if (typeof o.quantity_available !== "number") {
+      // Ensure that quantity_available is provided
+      // as this is the way to ensure that the products to be bought
+      // have not been bought
+      throw new Error("`quantity_available` must be sent from client");
+    }
+
+    if (o.quantity_available < 1) return; // the item in this order has been sold
+
+    if (o.quantity > o.quantity_available) {
+      // qty in cart is higher than available
+      // also, the client has to show that the qtys buyers pay for
+      // is lower than what they added to cart, due to some items sold
+      o.quantity = o.quantity_available;
+    }
+    unsoldOrders.push(o);
+    totalAmount += o.price_when_bought * o.quantity;
+  });
 
   const totalAmountInKobo = totalAmount * 100;
 
@@ -45,49 +64,50 @@ export default async function makeOrder(req: any, res: any) {
 
   const groupOrdersPurchasedFromSeller: GroupedOrdersPurchasedFromSeller = {};
 
-  for (let i = 0; i < orders.length; i++) {
-    const order = orders[i];
-    const sellerUsername =
-      process.env.NODE_ENV === "dev"
-        ? "deeesigns-studios-sIYE4Ib6T" // in development, I want to use this user for testing
-        : order.seller_username;
-
-    const sellerOrders = groupOrdersPurchasedFromSeller[sellerUsername] || null;
-
-    if (sellerOrders) {
-      // seller already has item in the group
-      sellerOrders.orders.push(order);
-    } else {
-      const seller = (await Seller.findOne({
-        username: sellerUsername,
-      }).populate("store")) as SellerInterface & {
-        store: StoreInterface;
-      };
-
-      if (!seller)
-        return res.status(400).json({
-          message:
-            "Error occured. Please try again or contact support if you have been debited",
-        });
-
-      const orders = [
-        {
-          _id: order._id,
-          price_when_bought: order.price_when_bought,
-          has_buyer_received: order.has_buyer_received,
-          product_populated: order.product_populated,
-          quantity: order.quantity,
-        },
-      ];
-
-      groupOrdersPurchasedFromSeller[sellerUsername] = {
-        orders,
-        seller_info: seller,
-      };
-    }
-  }
-
   try {
+    for (let i = 0; i < unsoldOrders.length; i++) {
+      const order = unsoldOrders[i];
+      const sellerUsername =
+        process.env.NODE_ENV === "dev"
+          ? "deeesigns-studios-sIYE4Ib6T" // in development, I want to use this user for testing
+          : order.seller_username;
+
+      const sellerOrders =
+        groupOrdersPurchasedFromSeller[sellerUsername] || null;
+
+      if (sellerOrders) {
+        // seller already has item in the group
+        sellerOrders.orders.push(order);
+      } else {
+        const seller = (await Seller.findOne({
+          username: sellerUsername,
+        }).populate("store")) as SellerInterface & {
+          store: StoreInterface;
+        };
+
+        if (!seller)
+          return res.status(400).json({
+            message:
+              "Error occured. Please try again or contact support if you have been debited",
+          });
+
+        const orders = [
+          {
+            _id: order._id,
+            price_when_bought: order.price_when_bought,
+            has_buyer_received: order.has_buyer_received,
+            product_populated: order.product_populated,
+            quantity: order.quantity,
+          },
+        ];
+
+        groupOrdersPurchasedFromSeller[sellerUsername] = {
+          orders,
+          seller_info: seller,
+        };
+      }
+    }
+
     const shortenedConfirmOrderUrls: {
       _id: mongoose.Types.ObjectId;
       url: string;
