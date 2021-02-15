@@ -14,7 +14,7 @@ const confirmChangedEmail = async ({
 }: ConfirmChangedEmailArgs) => {
   const subject = `Confirm your new email address on ${siteName}`;
   const html = `
-        <h2>Hi ${name} 👋</h2>
+        <h2>Hi ${name ?? "there"} 👋</h2>
         <p>Please confirm your new email address (${email}) to continue using ${siteName}
         </p>
         <a
