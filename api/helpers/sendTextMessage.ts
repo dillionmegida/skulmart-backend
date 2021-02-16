@@ -1,15 +1,15 @@
 import axios from "axios";
 import chalk from "chalk";
-import { TERMII_API_KEY, TERMII_API } from "constants/index";
+import { TERMII_API_KEY, TERMII_API, TERMII_SENDER_ID } from "constants/index";
 
 type Args = {
   recipient_num: string;
-  sender_name: string;
+  sender_id?: string;
   message: string;
 };
 export default async function sendTextMessage({
   recipient_num,
-  sender_name,
+  sender_id = TERMII_SENDER_ID,
   message,
 }: Args): Promise<
   | {
@@ -28,7 +28,7 @@ export default async function sendTextMessage({
       url: TERMII_API + "/sms/send",
       data: {
         to: recipient_num,
-        from: sender_name,
+        from: sender_id,
         sms: message,
         type: "plain",
         api_key: TERMII_API_KEY,

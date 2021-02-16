@@ -55,5 +55,6 @@ export async function BEARER_TOKEN() {
 
 export const CHARGE_RATE = 5 / 100;
 
+export const TERMII_SENDER_ID = "SkulMart";
 export const TERMII_API_KEY = process.env.TERMII_API_KEY;
 export const TERMII_API = "https://termii.com/api";

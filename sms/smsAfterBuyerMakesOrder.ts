@@ -22,11 +22,9 @@ export default async function smsAfterBuyerMakesOrder({
   const messageForBuyer =
     "You just made an order from " +
     brand +
-    " store. Your phone number (" +
+    " store. They'd contact you on " +
     buyer_phone +
-    ") has been sent to " +
-    seller_name +
-    " and they'd contact you to discuss the delivery process.";
+    " to discuss the delivery process.";
 
   const messageForSeller =
     "A buyer just made an order. Please check your email for the order details and call the buyer on " +
@@ -36,13 +34,11 @@ export default async function smsAfterBuyerMakesOrder({
   try {
     await sendTextMessage({
       recipient_num: buyerPhone,
-      sender_name: "talert",
       message: messageForBuyer,
     });
 
     await sendTextMessage({
       recipient_num: sellerPhone,
-      sender_name: "talert",
       message: messageForSeller,
     });
   } catch (err) {
