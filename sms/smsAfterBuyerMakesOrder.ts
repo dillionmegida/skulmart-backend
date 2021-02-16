@@ -27,7 +27,7 @@ export default async function smsAfterBuyerMakesOrder({
     " to discuss the delivery process.";
 
   const messageForSeller =
-    "A buyer just made an order. Please check your email for the order details and call the buyer on " +
+    "A buyer just made an order. Please check your email for the order details & call the buyer on " +
     buyer_phone +
     " to discuss the delivery process.";
 
