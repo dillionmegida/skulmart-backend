@@ -5,6 +5,7 @@ import SellerInterface from "interfaces/Seller";
 import sellerIssuedAWithdraw from "mails/sellerIssuedAWithdraw";
 import Seller from "models/Seller";
 import { saveActivity } from "utils/activities";
+import { chargeOnTransfer } from "utils/chargeFee";
 import { formatCurrency } from "utils/currency";
 import { convertToKobo } from "utils/money";
 
@@ -17,7 +18,7 @@ export default async function withdrawFromWallet(req: any, res: any) {
 
   const amount = parseInt(_amount, 10);
 
-  if (amount === 0)
+  if (isNaN(amount) || amount === 0)
     return res.status(400).json({
       message: "You cannot withdraw " + formatCurrency(0),
     });
@@ -30,21 +31,29 @@ export default async function withdrawFromWallet(req: any, res: any) {
         ")",
     });
 
+  const amountToWithdraw =
+    !seller.wallet.last_withdraw || // then seller has not withdrawn before
+    (seller.wallet.last_income as Date) > seller.wallet.last_withdraw // seller has not withdrawn since new income
+      ? amount // free withdraw
+      : amount - chargeOnTransfer(amount).fee;
+
+  const amountToWithdrawInKobo = convertToKobo(amountToWithdraw);
+
+  if (seller.banks.length === 0)
+    return res.status(400).json({
+      message: "No bank account found",
+    });
+
+  const selectedBank = seller.banks.find(
+    (b) => b.account_number === account_number
+  );
+
+  if (!selectedBank)
+    return res
+      .status(400)
+      .json({ message: "Selected bank account does not exist" });
+
   try {
-    if (seller.banks.length === 0)
-      return res.status(400).json({
-        message: "No bank account found",
-      });
-
-    const selectedBank = seller.banks.find(
-      (b) => b.account_number === account_number
-    );
-
-    if (!selectedBank)
-      return res
-        .status(400)
-        .json({ message: "Selected bank account does not exist" });
-
     // verify account number
     const verifyAcctNumberResponse = await verifyAccountNumber({
       account_number: selectedBank.account_number,
@@ -57,10 +66,8 @@ export default async function withdrawFromWallet(req: any, res: any) {
           "Bank account is invalid. Please ensure that this account is still open",
       });
 
-    const amountToPayInKobo = convertToKobo(amount);
-
     const transferRes = await initiateTransfer({
-      amount: amountToPayInKobo,
+      amount: amountToWithdrawInKobo,
       reason: "Withdrawal " + seller.fullname,
       destination: {
         bank_code: selectedBank.bank_code,
@@ -77,6 +84,7 @@ export default async function withdrawFromWallet(req: any, res: any) {
       $set: {
         wallet: {
           balance: seller.wallet.balance - amount,
+          last_withdraw: new Date(),
         },
       },
     });

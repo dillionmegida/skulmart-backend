@@ -9,6 +9,8 @@ const SellerSchema: Schema = new Schema(
     },
     wallet: {
       balance: { type: Number, default: 0 },
+      last_income: { type: Date, default: null },
+      last_withdraw: { type: Date, default: null },
     },
     fullname: {
       type: String,

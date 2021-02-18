@@ -41,6 +41,7 @@ export default async function receivedOrder(req: any, res: any) {
         ratings: seller?.ratings.concat(rating),
         wallet: {
           balance: seller.wallet.balance + priceSellerGets,
+          last_income: new Date(),
         },
       },
     });
