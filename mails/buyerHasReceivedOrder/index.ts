@@ -2,6 +2,7 @@ import BuyerInterface from "interfaces/Buyer";
 import OrderInterface from "interfaces/OrderInterface";
 import ProductInterface from "interfaces/Product";
 import SellerInterface from "interfaces/Seller";
+import { formatDate } from "utils/dateFormatter";
 import sendMail from "..";
 import mailTemplate from "./template";
 
@@ -24,7 +25,7 @@ export default async function buyerHasReceivedOrder({
 }: Args) {
   const { fullname: buyerFullname } = buyer;
   const { email } = seller;
-  const subject = `${buyerFullname} has received their order 😊`;
+  const subject = `${buyerFullname} has received their order 😊 - ${formatDate()}`;
   const html = mailTemplate({
     order,
     emailSubject: subject,

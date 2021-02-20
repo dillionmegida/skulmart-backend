@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import BuyerInterface from "interfaces/Buyer";
 import ProductInterface from "interfaces/Product";
 import SellerInterface from "interfaces/Seller";
+import { formatDate } from "utils/dateFormatter";
 import sendMail from "..";
 import mailTemplate from "./template";
 
@@ -27,10 +28,9 @@ export default async function orderMadeEmailForSeller({
 }: Args) {
   const subject = first_purchase
     ? `Congratulations on your first sales 🎉`
-    : `Someone purchased from your store (${seller.brand_name}) 🎉 - ${format(
-        new Date(),
-        "do LLL, yyyy"
-      )}`;
+    : `Someone purchased from your store (${
+        seller.brand_name
+      }) 🎉 - ${formatDate()}`;
   const html = mailTemplate({
     buyer: {
       name: buyer.fullname,

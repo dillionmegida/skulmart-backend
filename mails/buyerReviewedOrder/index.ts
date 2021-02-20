@@ -1,5 +1,6 @@
 import BuyerInterface from "interfaces/Buyer";
 import SellerInterface from "interfaces/Seller";
+import { formatDate } from "utils/dateFormatter";
 import sendMail from "..";
 import mailTemplate from "./template";
 
@@ -16,7 +17,7 @@ export default async function buyerReviewedOrder({
   rating,
   review,
 }: Args) {
-  const subject = `Someone wrote a review about an order. Check it out`;
+  const subject = `Someone wrote a review about an order - ${formatDate()}`;
   const { email } = seller;
   const html = mailTemplate({
     buyer_name: buyer.fullname,

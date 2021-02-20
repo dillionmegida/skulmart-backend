@@ -2,21 +2,23 @@ import sendMail from "..";
 import mailTemplate from "./template";
 import { format } from "date-fns";
 import Bank from "interfaces/Bank";
+import { formatDate } from "utils/dateFormatter";
 
 type Args = {
   amount: number;
   email: string;
-  bank: Bank
+  bank: Bank;
 };
 
-export default async function sellerIssuedAWithdraw({ amount, email, bank }: Args) {
-  const subject = `You issued a withdraw from your wallet 🤑 (${format(
-    new Date(),
-    "do LLL, yyyy"
-  )})`;
+export default async function sellerIssuedAWithdraw({
+  amount,
+  email,
+  bank,
+}: Args) {
+  const subject = `You issued a withdraw from your wallet 🤑 - ${formatDate()})`;
   const html = mailTemplate({
     amount,
-    bank
+    bank,
   });
 
   const mailResponse = await sendMail({

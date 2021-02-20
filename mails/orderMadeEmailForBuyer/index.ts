@@ -4,6 +4,7 @@ import sendMail from "..";
 import orderMadeForBuyer from "./template";
 import mongoose from "mongoose";
 import { format } from "date-fns";
+import { formatDate } from "utils/dateFormatter";
 
 type Args = {
   buyer: BuyerInterface;
@@ -20,7 +21,7 @@ export default async function orderMadeEmailForBuyer({
   buyer,
   confirmOrderLinks,
 }: Args) {
-  const subject = `Order Receipt (${format(new Date(), "do LLL, yyyy")})`;
+  const subject = `Order Receipt (${formatDate()})`;
   const html = orderMadeForBuyer({
     buyerPhone: buyer.phone,
     orders,
