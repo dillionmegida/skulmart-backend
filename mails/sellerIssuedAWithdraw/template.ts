@@ -19,7 +19,7 @@ export default function sellerIssuedAWithdrawTemplate({ amount, bank }: Args) {
     } - ${bank.bank_name}</b>.
   </p>
   <p>
-    If you do not get the refund in 24 hours, kindly contact us
+    If you do not get the money in 24 hours, kindly contact us
     so we can assist you. Thank you.
     </p>
 </div>

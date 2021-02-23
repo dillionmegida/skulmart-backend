@@ -16,6 +16,14 @@ export default async function withdrawFromWallet(req: any, res: any) {
     account_number: string;
   };
 
+  if (!seller.wallet.last_income)
+    return res
+      .status(400)
+      .json({
+        message:
+          "You cannot withdraw because you have not received any income.",
+      });
+
   const amount = parseInt(_amount, 10);
 
   if (isNaN(amount) || amount === 0)
@@ -85,6 +93,7 @@ export default async function withdrawFromWallet(req: any, res: any) {
         wallet: {
           balance: seller.wallet.balance - amount,
           last_withdraw: new Date(),
+          last_income: seller.wallet.last_income,
         },
       },
     });
