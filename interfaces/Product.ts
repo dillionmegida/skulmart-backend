@@ -7,7 +7,8 @@ export default interface ProductInterface extends Document {
   name: string;
   desc: string;
   category: string;
-  price: string;
+  price: number;
+  delivery_fee: number;
   quantity: number;
   quantity_sold: number;
   views_count: number;

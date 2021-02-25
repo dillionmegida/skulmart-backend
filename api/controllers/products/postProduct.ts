@@ -9,7 +9,28 @@ import { capitalize, replaceString } from "utils/strings";
 
 export default async function postProduct(req: any, res: any) {
   try {
-    let { name, desc, category, price, quantity } = req.body;
+    const {
+      name: _name,
+      desc: _desc,
+      category: _category,
+      price: _price,
+      quantity: _quantity,
+      delivery_fee: _delivery_fee,
+    } = req.body as {
+      name: string;
+      desc: string;
+      category: string;
+      price: string;
+      quantity: string;
+      delivery_fee: string;
+    };
+
+    const name = capitalize(_name.trim());
+    const category = _category.toLowerCase().trim();
+    const desc = _desc.trim();
+    const price = parseInt(_price, 10);
+    const quantity = parseInt(_quantity, 10);
+    const delivery_fee = parseInt(_delivery_fee, 10);
 
     const loggedInSeller: SellerInterface = req.user;
 
@@ -38,11 +59,6 @@ export default async function postProduct(req: any, res: any) {
         message: `The plan you subscribed for (${subscriptionType.name} plan) only supports maximum of ${maxProducts} products.
           You can delete one product to give room for another.`,
       });
-
-    name = capitalize(name.trim());
-    category = category.toLowerCase().trim();
-    desc = desc.trim();
-    quantity = parseInt(quantity);
 
     // Check if the same name has been posted by the same seller
     const existingProduct = await Product.findOne({
@@ -95,6 +111,7 @@ export default async function postProduct(req: any, res: any) {
       store: store._id,
       seller: loggedInSeller._id,
       visible: true,
+      delivery_fee,
       quantity,
     });
 

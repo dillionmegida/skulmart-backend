@@ -15,7 +15,7 @@ export default async function sellerIssuedAWithdraw({
   email,
   bank,
 }: Args) {
-  const subject = `You issued a withdraw from your wallet 🤑 - ${formatDate()})`;
+  const subject = `You issued a withdraw from your wallet 🤑 - ${formatDate()}`;
   const html = mailTemplate({
     amount,
     bank,

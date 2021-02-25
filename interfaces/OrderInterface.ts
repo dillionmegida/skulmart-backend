@@ -13,6 +13,7 @@ export default interface OrderInterface extends Document {
   seller_username: string;
   quantity: number;
   price_when_bought: number;
+  delivery_fee_when_bought: number;
   createdAt: Date;
   did_buyer_close: boolean;
   confirm_order_url: string;
@@ -33,6 +34,7 @@ export type GroupedOrdersPurchasedFromSeller = {
       product_populated: ProductInterface;
       quantity: number;
       price_when_bought: number;
+      delivery_fee_when_bought: number;
     }[];
     seller_info: SellerInterface & { store: StoreInterface };
   };

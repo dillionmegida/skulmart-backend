@@ -20,6 +20,7 @@ import { shortenUrlAndSave } from "utils/urls";
 import { getConfirmOrderReceivedLinkForBuyer } from "utils/order";
 import Product from "models/Product";
 import smsAfterBuyerMakesOrder from "sms/smsAfterBuyerMakesOrder";
+import { convertToKobo } from "utils/money";
 
 export default async function makeOrder(req: any, res: any) {
   const buyer = req.user as BuyerInterface;
@@ -51,9 +52,11 @@ export default async function makeOrder(req: any, res: any) {
     }
     unsoldOrders.push(o);
     totalAmount += o.price_when_bought * o.quantity;
+    if (o.delivery_fee_when_bought > 0)
+      totalAmount += o.delivery_fee_when_bought;
   });
 
-  const totalAmountInKobo = totalAmount * 100;
+  const totalAmountInKobo = convertToKobo(totalAmount);
 
   const cardToPayWith = buyer.cards.find(
     ({ signature }) => signature === card_signature
@@ -97,6 +100,7 @@ export default async function makeOrder(req: any, res: any) {
             price_when_bought: order.price_when_bought,
             has_buyer_received: order.has_buyer_received,
             product_populated: order.product_populated,
+            delivery_fee_when_bought: order.delivery_fee_when_bought,
             quantity: order.quantity,
           },
         ];
@@ -170,6 +174,7 @@ export default async function makeOrder(req: any, res: any) {
           seller: seller_info._id,
           quantity: order.quantity,
           price_when_bought: order.price_when_bought,
+          delivery_fee_when_bought: order.delivery_fee_when_bought,
         });
 
         order._id = newOrder._id; // because the _id coming from frontend is not valid

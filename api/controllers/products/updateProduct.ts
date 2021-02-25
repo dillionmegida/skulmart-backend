@@ -9,20 +9,32 @@ import { deleteImage, uploadImage } from "utils/image";
 import { capitalize, replaceString } from "utils/strings";
 
 export default async function updateProduct(req: any, res: any) {
-  let {
-    name,
-    desc,
-    category,
-    price,
+  const {
+    name: _name,
+    desc: _desc,
+    category: _category,
+    price: _price,
+    delivery_fee: _delivery_fee,
     img_public_id,
     img_url,
-    quantity,
-  } = req.body;
+    quantity: _quantity,
+  } = req.body as {
+    name: string;
+    desc: string;
+    category: string;
+    price: string;
+    img_public_id: string;
+    img_url: string;
+    delivery_fee: string;
+    quantity: string;
+  };
 
-  name = capitalize(name.trim());
-  category = category.toLowerCase().trim();
-  desc = desc.trim();
-  quantity = parseInt(quantity);
+  const name = capitalize(_name.trim());
+  const category = _category.toLowerCase().trim();
+  const desc = _desc.trim();
+  const quantity = parseInt(_quantity, 10);
+  const price = parseInt(_price, 10);
+  const delivery_fee = parseInt(_delivery_fee, 10);
 
   const authUser = req.user as SellerInterface;
 
@@ -107,6 +119,7 @@ export default async function updateProduct(req: any, res: any) {
         store: store._id,
         seller: authUser._id,
         quantity,
+        delivery_fee,
       },
     });
 
