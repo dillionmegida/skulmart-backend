@@ -17,6 +17,9 @@ export const CLOUDINARY_USER_IMAGES_FOLDER = process.env.IS_DEV
 export const CLOUDINARY_PRODUCT_IMAGES_FOLDER = process.env.IS_DEV
   ? "market-hub/testing"
   : "market-hub/product_images";
+export const CLOUDINARY_USER_VERIFICATION_DOCUMENTS_FOLDER = process.env.IS_DEV
+  ? "market-hub/testing"
+  : "market-hub/user_verification_documents";
 
 export const links = {
   MERCHANT_SITE: "https://merchant.skulmart.com",

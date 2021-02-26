@@ -10,6 +10,7 @@ import {
   initializeSubscription,
   onboarding1,
   onboarding2,
+  onboarding3,
   subscriptionCallback,
   updateSellerViews,
   withdrawFromWallet,
@@ -45,6 +46,8 @@ router.use(isAuthenticated);
 router.post("/onboarding/1", upload.single("avatar"), onboarding1);
 
 router.post("/onboarding/2", onboarding2);
+
+router.post("/onboarding/3", upload.single("document"), onboarding3);
 
 // Get all products of logged in seller
 router.get("/products/all", getAuthSellerProducts);

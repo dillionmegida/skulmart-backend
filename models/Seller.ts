@@ -28,6 +28,11 @@ const SellerSchema: Schema = new Schema(
       type: String,
       default: "seller",
     },
+    verified: {
+      type: String,
+      enum: ["NONE", "AWAITING_REVIEW", "VERIFIED"],
+      default: "NONE",
+    },
     visible: {
       type: Boolean,
       default: false,
