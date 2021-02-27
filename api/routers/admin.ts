@@ -1,9 +1,6 @@
 import { Router } from "express";
 const router = Router();
 
-import bcrypt from "bcryptjs";
-
-import Admin from "models/Admin";
 import Seller from "models/Seller";
 import Store from "models/Store";
 import Product from "models/Product";
@@ -12,8 +9,10 @@ import isAdminLoggedIn from "middlewares/isAdminLoggedIn";
 import {
   getPendingApproval,
   getPendingApprovals,
+  getPendingProductReviews,
   loginAdmin,
   submitValidationReview,
+  verifyProductReview,
 } from "api/controllers/admins";
 
 router.post("/login", loginAdmin);
@@ -29,18 +28,8 @@ router.get("/pending_approvals", getPendingApprovals);
 router.get("/pending_approvals/:id", getPendingApproval);
 router.post("/pending_approvals/:id", submitValidationReview);
 
-router.get("/isLoggedIn", (req: any, res: any) => {
-  if (req.session.admin_id === null || req.session.admin_id === undefined)
-    return res.status(403).json({
-      isLoggedIn: false,
-    });
-
-  return res.json({
-    isLoggedIn: true,
-  });
-});
-
-router.use(isAdminLoggedIn);
+router.post("/pending_product_reviews/:id", verifyProductReview);
+router.get("/pending_product_reviews", getPendingProductReviews);
 
 router.get("/sellers/:store", async (req: any, res: any) => {
   const { store } = req.params;

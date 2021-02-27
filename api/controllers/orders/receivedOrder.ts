@@ -38,7 +38,10 @@ export default async function receivedOrder(req: any, res: any) {
 
     await Seller.findByIdAndUpdate(seller?._id, {
       $set: {
-        ratings: seller?.ratings.concat(rating),
+        ratings: seller?.ratings.concat({
+          rating,
+          buyer_id: buyer._id,
+        }),
         wallet: {
           balance: seller.wallet.balance + priceSellerGets,
           last_income: new Date(),

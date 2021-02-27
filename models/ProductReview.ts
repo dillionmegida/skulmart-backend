@@ -8,6 +8,11 @@ const ProductReviewSchema: Schema = new Schema(
     buyer: { type: Schema.Types.ObjectId, required: true, ref: "Buyer" },
     rating: { type: Number, required: true },
     review: { type: String, required: true },
+    status: {
+      type: String,
+      default: "AWAITING_REVIEW",
+      enum: ["AWAITING_REVIEW", "DECLINED", "ACCEPTED"],
+    },
   },
   {
     timestamps: true,

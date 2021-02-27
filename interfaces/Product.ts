@@ -1,5 +1,6 @@
 import mongoose, { Document } from "mongoose";
 import ImageInterface from "./Image";
+import Ratings from "./Ratings";
 
 export default interface ProductInterface extends Document {
   img: ImageInterface;
@@ -16,5 +17,5 @@ export default interface ProductInterface extends Document {
   visible: boolean;
   store: mongoose.Types.ObjectId;
   seller: mongoose.Types.ObjectId;
-  ratings: number[];
+  ratings: Ratings;
 }

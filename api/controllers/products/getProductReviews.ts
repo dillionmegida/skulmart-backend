@@ -6,7 +6,7 @@ import { sliceAndReverse } from "utils/arrays";
 
 export default async function getProductReviews(req: any, res: any) {
   const { id } = req.params;
-  const { page: _page = 0 } = req.query;
+  const { page: _page = 0, all = false } = req.query;
   const page = parseInt(_page);
   try {
     const product = await Product.findOne({ _id: id })
@@ -18,7 +18,10 @@ export default async function getProductReviews(req: any, res: any) {
         message: "Product not found",
       });
 
-    const reviewsCriteria = { product: id };
+    const reviewsCriteria = {
+      product: id,
+      ...(() => (all ? {} : { status: "ACCEPTED" as "ACCEPTED" }))(),
+    };
 
     const totalCount = await ProductReview.countDocuments({
       ...reviewsCriteria,

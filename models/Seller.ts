@@ -118,7 +118,12 @@ const SellerSchema: Schema = new Schema(
         account_name: String,
       },
     ],
-    ratings: [Number],
+    ratings: [
+      {
+        buyer_id: Schema.Types.ObjectId,
+        rating: Number,
+      },
+    ],
   },
   {
     timestamps: true,

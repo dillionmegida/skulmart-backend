@@ -3,7 +3,6 @@ import BuyerInterface from "interfaces/Buyer";
 import SellerInterface from "interfaces/Seller";
 import buyerReviewedOrder from "mails/buyerReviewedOrder";
 import Order from "models/Order";
-import Product from "models/Product";
 import ProductReview from "models/ProductReview";
 import Seller from "models/Seller";
 import { saveActivity } from "utils/activities";
@@ -24,19 +23,6 @@ export default async function reviewOrder(req: any, res: any) {
       return res
         .status(400)
         .json({ message: "You have reviewed this order already" });
-
-    const product = await Product.findOne({ _id: order.product });
-    if (product) {
-      await Product.findByIdAndUpdate(product._id, {
-        $set: {
-          ratings: product.ratings.concat(rating),
-        },
-      });
-      // it's not necessary sending a bad request if the product does not exist
-      // because
-      // the seller may have deleted it, and that should not cause
-      // a bad experience for the buyer
-    }
 
     const seller = await Seller.findOne({ _id: order.seller });
 

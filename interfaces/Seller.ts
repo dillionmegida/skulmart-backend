@@ -2,6 +2,7 @@ import mongoose, { Document } from "mongoose";
 import Bank from "./Bank";
 import Card from "./Card";
 import ImageInterface from "./Image";
+import Ratings from "./Ratings";
 import Wallet from "./Wallet";
 
 export type CATEGORY = "FASHION" | "FOOD AND DRINKS" | "ELECTRONICS" | "NONE";
@@ -34,5 +35,5 @@ export default interface SellerInterface extends Document {
   store: mongoose.Types.ObjectId;
   user_type: "seller";
   visible: boolean;
-  ratings: number[];
+  ratings: Ratings;
 }

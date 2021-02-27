@@ -60,7 +60,12 @@ const ProductSchema: Schema = new Schema(
       ref: "Seller",
       required: true,
     },
-    ratings: [Number],
+    ratings: [
+      {
+        buyer_id: Schema.Types.ObjectId,
+        rating: Number,
+      },
+    ],
   },
   {
     timestamps: true,
