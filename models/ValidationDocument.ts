@@ -7,6 +7,11 @@ const ValidationDocumentSchema: Schema = new Schema(
       public_id: { type: String, required: true },
       url: { type: String, required: true },
     },
+    status: {
+      type: String,
+      enum: ["TO_BE_UPDATED", "TO_BE_REVIEWED"],
+      default: "TO_BE_REVIEWED",
+    },
     seller: {
       type: Schema.Types.ObjectId,
       ref: "Seller",

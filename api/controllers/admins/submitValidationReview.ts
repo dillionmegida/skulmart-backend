@@ -43,6 +43,11 @@ export default async function submitValidationReview(req: any, res: any) {
         validationDocument: validationDocument,
       });
     } else {
+      await ValidationDocument.findByIdAndUpdate(id, {
+        $set: {
+          status: "TO_BE_UPDATED",
+        },
+      });
       await Seller.findByIdAndUpdate(validationDocument.seller, {
         $set: {
           verified: "FAILED",

@@ -21,8 +21,6 @@ export default async function updateValidationDocument(req: any, res: any) {
           "Sorry we couldn't find your previously submitted document. Kindly contact us.",
       });
 
-    console.log({ ...submittedValidationDocument.img });
-
     await deleteImage({
       public_id: submittedValidationDocument.img.public_id as string,
       errorMsg: "Could not delete submitted validation document",
@@ -53,6 +51,7 @@ export default async function updateValidationDocument(req: any, res: any) {
             public_id,
             url,
           },
+          status: "TO_BE_REVIEWED",
         },
       }
     );
