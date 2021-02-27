@@ -9,33 +9,25 @@ import Store from "models/Store";
 import Product from "models/Product";
 
 import isAdminLoggedIn from "middlewares/isAdminLoggedIn";
+import {
+  getPendingApproval,
+  getPendingApprovals,
+  loginAdmin,
+  submitValidationReview,
+} from "api/controllers/admins";
 
-router.post("/login", async (req: any, res: any) => {
-  const { email, password } = req.body;
+router.post("/login", loginAdmin);
 
-  const admin = await Admin.findOne({ email });
+router.use(isAdminLoggedIn);
 
-  if (admin === null)
-    return res.status(400).json({
-      message: "Username or password is incorrect",
-    });
-
-  const isMatch = await bcrypt.compare(password, admin.password);
-  if (!isMatch)
-    // they they don't match
-    return res.status(400).json({
-      error: "Wrong credentials",
-      message: "Username or password is incorrect",
-    });
-
-  // setting a session of seller_id for the logged in seller
-  req.session.admin_id = admin._id;
-  // req.session.admin_id = "hi";
-
-  return res.json({
-    message: "Admin authenticated 👍",
-  });
+router.get("/me", async (req: any, res: any) => {
+  // req.admin is gotten from isAdminLoggedIn
+  res.json(req.admin);
 });
+
+router.get("/pending_approvals", getPendingApprovals);
+router.get("/pending_approvals/:id", getPendingApproval);
+router.post("/pending_approvals/:id", submitValidationReview);
 
 router.get("/isLoggedIn", (req: any, res: any) => {
   if (req.session.admin_id === null || req.session.admin_id === undefined)

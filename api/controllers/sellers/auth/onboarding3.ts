@@ -1,8 +1,9 @@
 import chalk from "chalk";
 import { CLOUDINARY_USER_VERIFICATION_DOCUMENTS_FOLDER } from "constants/index";
 import SellerInterface from "interfaces/Seller";
+import newVerificationDocument from "mails/newVerificationDocument";
 import Seller from "models/Seller";
-import VerifiedSeller from "models/VerifiedSeller";
+import ValidationDocument from "models/ValidationDocument";
 import { uploadImage } from "utils/image";
 import { replaceString } from "utils/strings";
 
@@ -27,7 +28,7 @@ export default async function onboarding3(req: any, res: any) {
 
     const { public_id, url } = uploadImageResult;
 
-    const newSellerToBeVerified = new VerifiedSeller();
+    const newSellerToBeVerified = new ValidationDocument();
     newSellerToBeVerified.seller = user._id;
     newSellerToBeVerified.img = {
       public_id,
@@ -40,6 +41,8 @@ export default async function onboarding3(req: any, res: any) {
         verified: "AWAITING_REVIEW",
       },
     });
+
+    await newVerificationDocument();
 
     res.json({
       message:

@@ -1,7 +1,12 @@
 import Store from "models/Store";
 
 export default async function getStore(req: any, res: any, next: any) {
-  const { store_name, main = null, merchant = null } = req.headers;
+  const {
+    store_name,
+    main = null,
+    merchant = null,
+    admin = null,
+  } = req.headers;
 
   if (main !== null)
     // then API requests are coming from the main app
@@ -11,10 +16,9 @@ export default async function getStore(req: any, res: any, next: any) {
     // then API requests are coming from the merchant app
     return next();
 
-  // if (subdomain === "admin") {
-  //   req.admin = true;
-  //   return next();
-  // }
+  if (admin !== null)
+    // then API requests are coming from the admin app
+    return next();
 
   const store = await Store.findOne({ shortname: store_name });
 

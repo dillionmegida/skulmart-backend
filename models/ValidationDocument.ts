@@ -1,7 +1,7 @@
-import VerifiedSellerInterface from "interfaces/VerifiedSeller";
+import ValidationDocumentInterface from "interfaces/ValidationDocument";
 import mongoose, { Schema } from "mongoose";
 
-const VerifiedSellerSchema: Schema = new Schema(
+const ValidationDocumentSchema: Schema = new Schema(
   {
     img: {
       public_id: { type: String, required: true },
@@ -18,8 +18,8 @@ const VerifiedSellerSchema: Schema = new Schema(
   }
 );
 
-export default mongoose.model<VerifiedSellerInterface>(
-  "VerifiedSeller",
-  VerifiedSellerSchema,
-  "verifiedSellers"
+export default mongoose.model<ValidationDocumentInterface>(
+  "ValidationDocument",
+  ValidationDocumentSchema,
+  "validationDocuments"
 );

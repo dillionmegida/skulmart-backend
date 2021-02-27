@@ -7,6 +7,8 @@ export const ACTIVITY_PER_PAGE = 10;
 export const ORDERS_PER_PAGE = 10;
 export const REVIEWS_PER_PAGE = 20;
 
+export const SITE_EMAIL = "support@skulmart.com";
+
 export const SERVER_URL = "http://skulmart-backend.herokuapp.com";
 
 export const MAILGUN_EMAIL = "support@mg.skulmart.com";
