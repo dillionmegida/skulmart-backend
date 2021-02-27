@@ -1,5 +1,4 @@
 import mongoose, { Schema } from "mongoose";
-import shortid from "shortid";
 import ProductInterface from "interfaces/Product";
 
 const ProductSchema: Schema = new Schema(

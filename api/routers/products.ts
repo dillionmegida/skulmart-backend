@@ -10,6 +10,7 @@ import {
   updateProduct,
   updateProductViews,
   getProductReviews,
+  saveProduct,
 } from "api/controllers/products";
 import express from "express";
 const router = express.Router();
@@ -48,6 +49,8 @@ router.get("/views/:id", updateProductViews);
 
 // Add a new product
 router.post("/", isAuthenticated, upload.single("prodImage"), postProduct);
+
+router.post("/save/:id", isAuthenticated, saveProduct);
 
 // Delete a product
 router.delete("/:id", isAuthenticated, deleteProduct);

@@ -8,4 +8,5 @@ export { default as getProductsBySeller } from "./getProductsBySeller";
 export { default as updateProductViews } from "./updateProductViews";
 export { default as postProduct } from "./postProduct";
 export { default as deleteProduct } from "./deleteProduct";
+export { default as saveProduct } from "./saveProduct";
 export { default as updateProduct } from "./updateProduct";
