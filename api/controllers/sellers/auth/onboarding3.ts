@@ -50,7 +50,7 @@ export default async function onboarding3(req: any, res: any) {
     });
   } catch (err) {
     console.log(
-      chalk.red("Error occuring during onboarding seller, stage 1 >> "),
+      chalk.red("Error submitting validation document for review >> "),
       err
     );
     res.status(500).json({ message: "An error occured. Please try again" });

@@ -6,7 +6,7 @@ import Wallet from "./Wallet";
 
 export type CATEGORY = "FASHION" | "FOOD AND DRINKS" | "ELECTRONICS" | "NONE";
 
-type VERIFIED_STATUS = "NONE" | "AWAITING_REVIEW" | "VERIFIED";
+type VERIFIED_STATUS = "NONE" | "AWAITING_REVIEW" | "VERIFIED" | "FAILED";
 
 export default interface SellerInterface extends Document {
   _id: mongoose.Types.ObjectId;

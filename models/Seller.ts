@@ -30,7 +30,7 @@ const SellerSchema: Schema = new Schema(
     },
     verified: {
       type: String,
-      enum: ["NONE", "AWAITING_REVIEW", "VERIFIED"],
+      enum: ["NONE", "AWAITING_REVIEW", "VERIFIED", "FAILED"],
       default: "NONE",
     },
     visible: {

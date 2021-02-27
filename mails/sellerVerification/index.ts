@@ -46,6 +46,13 @@ export default async function sellerVerification({ ...args }: Props) {
                 ---
                 <br/>
                 ${args.message.replace("\n", "<br/>")}
+                <br/>
+                ---
+                <br/>
+                Kindly upload another document ${anchorLinkText({
+                  link: links.MERCHANT_SITE,
+                  text: "your dashboard",
+                })}.
             `
         }
     </p>

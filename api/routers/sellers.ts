@@ -11,9 +11,11 @@ import {
   onboarding1,
   onboarding2,
   onboarding3,
+  getSubmittedValidationDocument,
   subscriptionCallback,
   updateSellerViews,
   withdrawFromWallet,
+  updateValidationDocument,
 } from "api/controllers/sellers";
 import express from "express";
 const router = express.Router();
@@ -48,6 +50,16 @@ router.post("/onboarding/1", upload.single("avatar"), onboarding1);
 router.post("/onboarding/2", onboarding2);
 
 router.post("/onboarding/3", upload.single("document"), onboarding3);
+
+router.patch(
+  "/onboarding/3",
+  upload.single("document"),
+  updateValidationDocument
+);
+
+// get submitted validation document
+// which was submitted in the 3rd onboarding stage
+router.get("/onboarding/3", getSubmittedValidationDocument);
 
 // Get all products of logged in seller
 router.get("/products/all", getAuthSellerProducts);
