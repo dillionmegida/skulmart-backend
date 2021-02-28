@@ -2,6 +2,7 @@ import chalk from "chalk";
 import SellerInterface from "interfaces/Seller";
 import welcomeEmail from "mails/welcomeEmail";
 import Seller from "models/Seller";
+import Store from "models/Store";
 import { capitalize } from "utils/strings";
 
 export default async function onboarding2(req: any, res: any) {
@@ -24,6 +25,13 @@ export default async function onboarding2(req: any, res: any) {
   const instagram = _instagram ? capitalize(_instagram.trim()) : "";
 
   try {
+    const store = await Store.findById(user.store);
+
+    if (!store)
+      return res.status(400).json({
+        message: "Selected store does not exist. Please contact support.",
+      });
+
     await Seller.findByIdAndUpdate(user._id, {
       $set: {
         fullname,
@@ -38,7 +46,7 @@ export default async function onboarding2(req: any, res: any) {
     const sendWelcomeEmailResponse = await welcomeEmail({
       email: user.email,
       profile: user,
-      store: req.store_name,
+      store: store.shortname,
     });
 
     if (sendWelcomeEmailResponse.error) {
