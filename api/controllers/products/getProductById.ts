@@ -1,4 +1,5 @@
 import Product from "models/Product";
+import { selectProductStr, sellerPopulate } from "utils/documentPopulate";
 
 export default async function getProductById(req: any, res: any) {
   try {
@@ -6,8 +7,8 @@ export default async function getProductById(req: any, res: any) {
       _id: req.params.id,
       visible: true,
     })
-      .populate({ path: "seller", select: "-views_devices" })
-      .select("-views_devices");
+      .populate({ ...sellerPopulate })
+      .select(selectProductStr);
     if (product === null)
       return res.status(404).json({
         error: "Invalid id",

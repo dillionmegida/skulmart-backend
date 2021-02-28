@@ -3,6 +3,12 @@ import Seller from "models/Seller";
 import SellerInterface from "interfaces/Seller";
 import BuyerInterface from "interfaces/Buyer";
 import Buyer from "models/Buyer";
+import {
+  cartPopulate,
+  selectBuyerStr,
+  selectSellerStr,
+  storePopulate,
+} from "utils/documentPopulate";
 
 export default async function isAuthenticated(req: any, res: any, next: any) {
   const token = getTokenFromCookie(req);
@@ -36,20 +42,16 @@ export default async function isAuthenticated(req: any, res: any, next: any) {
 
     if (decoded.user_type === "buyer") {
       const buyer = await Buyer.findById(decoded._id)
-        .select("-password")
+        .select(selectBuyerStr)
         .populate({
-          path: "cart",
-          populate: {
-            path: "product",
-            populate: [{ path: "seller" }, { path: "store" }],
-          },
+          ...cartPopulate,
         })
-        .populate("store");
+        .populate({ ...storePopulate });
       user = buyer && Object.create(buyer);
     } else if (decoded.user_type === "seller") {
       const seller = await Seller.findById(decoded._id)
-        .select("-password")
-        .populate("store");
+        .select(selectSellerStr)
+        .populate({ ...storePopulate });
       user = seller && Object.create(seller);
     }
 

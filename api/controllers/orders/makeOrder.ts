@@ -21,6 +21,7 @@ import { getConfirmOrderReceivedLinkForBuyer } from "utils/order";
 import Product from "models/Product";
 import smsAfterBuyerMakesOrder from "sms/smsAfterBuyerMakesOrder";
 import { convertToKobo } from "utils/money";
+import { storePopulate } from "utils/documentPopulate";
 
 export default async function makeOrder(req: any, res: any) {
   const buyer = req.user as BuyerInterface;
@@ -84,7 +85,7 @@ export default async function makeOrder(req: any, res: any) {
       } else {
         const seller = (await Seller.findOne({
           username: sellerUsername,
-        }).populate("store")) as SellerInterface & {
+        }).populate({ ...storePopulate })) as SellerInterface & {
           store: StoreInterface;
         };
 

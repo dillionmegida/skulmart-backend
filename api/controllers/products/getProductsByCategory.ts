@@ -1,5 +1,6 @@
 import { PRODUCTS_PER_PAGE } from "constants/index";
 import Product from "models/Product";
+import { selectProductStr } from "utils/documentPopulate";
 
 export default async function getProductsByCategory(req: any, res: any) {
   const { page: _page = 0 } = req.query;
@@ -22,7 +23,7 @@ export default async function getProductsByCategory(req: any, res: any) {
   const products = await Product.find({
     ...criteria,
   })
-    .select("-views_devices")
+    .select(selectProductStr)
     .limit(PRODUCTS_PER_PAGE)
     .skip(page * PRODUCTS_PER_PAGE);
 

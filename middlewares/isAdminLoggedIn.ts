@@ -1,4 +1,5 @@
 import Admin from "models/Admin";
+import { selectAdminStr } from "utils/documentPopulate";
 import { getTokenFromCookie, isTokenValid } from "utils/token";
 
 export default async function isAdminLoggedIn(req: any, res: any, next: any) {
@@ -19,8 +20,8 @@ export default async function isAdminLoggedIn(req: any, res: any, next: any) {
     if (!adminFromHeaders)
       return res.status(401).json({ message: "Not authorized" });
 
-    req.admin = await Admin.findById(decoded._id).select("-password");
-    next()
+    req.admin = await Admin.findById(decoded._id).select(selectAdminStr);
+    next();
   } catch {
     return res.status(401).json({ message: "Not authorized" });
   }

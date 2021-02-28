@@ -2,6 +2,7 @@ import { PRODUCTS_PER_PAGE } from "constants/index";
 import SellerInterface from "interfaces/Seller";
 import Product from "models/Product";
 import { sliceAndReverse } from "utils/arrays";
+import { selectProductStr, storePopulate } from "utils/documentPopulate";
 
 export default async function getAuthSellerProducts(req: any, res: any) {
   try {
@@ -22,8 +23,8 @@ export default async function getAuthSellerProducts(req: any, res: any) {
     const products = await Product.find({
       ...criteria,
     })
-      .select("-views_devices")
-      .populate("store");
+      .select(selectProductStr)
+      .populate({ ...storePopulate });
 
     const modifiedProducts = sliceAndReverse({
       arr: products,

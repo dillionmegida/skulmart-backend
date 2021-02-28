@@ -3,6 +3,7 @@ import { ORDERS_PER_PAGE } from "constants/index";
 import SellerInterface from "interfaces/Seller";
 import Order from "models/Order";
 import { sliceAndReverse } from "utils/arrays";
+import { buyerPopulate, productPopulate } from "utils/documentPopulate";
 
 export default async function getOrders(req: any, res: any) {
   const seller = req.user as SellerInterface;
@@ -17,8 +18,8 @@ export default async function getOrders(req: any, res: any) {
     const totalCount = await Order.countDocuments({ ...criteria });
 
     const allSellerOrders = await Order.find({ ...criteria })
-      .populate({ path: "product", select: "-views_devices" })
-      .populate("buyer")
+      .populate({ ...productPopulate })
+      .populate({ ...buyerPopulate })
       .populate("review");
 
     const modifiedOrders = sliceAndReverse({

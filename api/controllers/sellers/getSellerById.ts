@@ -1,4 +1,5 @@
 import Seller from "models/Seller";
+import { selectSellerStr } from "utils/documentPopulate";
 
 export default async function getSellerById(req: any, res: any) {
   const id = req.params.id;
@@ -7,7 +8,7 @@ export default async function getSellerById(req: any, res: any) {
       _id: id,
       subscription_type: { $ne: undefined },
       visible: true,
-    }).select("-password");
+    }).select(selectSellerStr);
     res.json({ seller });
   } catch {
     // then seller does not exist

@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import BuyerInterface from "interfaces/Buyer";
 import Order from "models/Order";
+import { productPopulate } from "utils/documentPopulate";
 
 export default async function getOrdersByRef(req: any, res: any) {
   const { ref } = req.params as { ref: string };
@@ -10,7 +11,7 @@ export default async function getOrdersByRef(req: any, res: any) {
     const allBuyersOrders = await Order.find({
       buyer: buyer._id,
       ref,
-    }).populate({ path: "product", select: "-views_devices" });
+    }).populate({ ...productPopulate });
     res.json({ orders: allBuyersOrders });
   } catch (err) {
     console.log(

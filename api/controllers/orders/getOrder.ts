@@ -1,13 +1,14 @@
 import Order from "models/Order";
+import { buyerPopulate, productPopulate } from "utils/documentPopulate";
 
 export default async function getOrder(req: any, res: any) {
   const { id } = req.params;
 
   try {
     const order = await Order.findById(id)
-      .populate({ path: "product", select: "-views_devices" })
+      .populate({ ...productPopulate })
       .populate("review")
-      .populate("buyer");
+      .populate({ ...buyerPopulate });
     res.json({
       order,
     });

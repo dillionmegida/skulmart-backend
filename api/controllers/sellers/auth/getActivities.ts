@@ -2,6 +2,7 @@ import { ACTIVITY_PER_PAGE } from "constants/index";
 import SellerInterface from "interfaces/Seller";
 import Activity from "models/Activity";
 import { sliceAndReverse } from "utils/arrays";
+import { sellerPopulate } from "utils/documentPopulate";
 
 export default async function getActivities(req: any, res: any) {
   try {
@@ -18,7 +19,7 @@ export default async function getActivities(req: any, res: any) {
     const totalPages = Math.ceil(totalCount / ACTIVITY_PER_PAGE) - 1;
 
     const activities = await Activity.find({ ...criteria })
-      .populate({ path: "seller", select: "-password -views_devices" })
+      .populate({ ...sellerPopulate })
       .populate("order");
 
     const modifiedActivities = sliceAndReverse({

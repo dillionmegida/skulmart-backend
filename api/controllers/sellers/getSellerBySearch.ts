@@ -1,5 +1,6 @@
 import { SELLERS_PER_PAGE } from "constants/index";
 import Seller from "models/Seller";
+import { selectSellerStr } from "utils/documentPopulate";
 
 export default async function getSellerBySearch(req: any, res: any) {
   const { q = null, page: _page } = req.query;
@@ -22,7 +23,7 @@ export default async function getSellerBySearch(req: any, res: any) {
   // clear whitespaces (%20), change query to small letters, and test query with small letters
   try {
     const sellers = await Seller.find({ ...criteria })
-      .select("-password")
+      .select(selectSellerStr)
       .limit(SELLERS_PER_PAGE)
       .skip(page * SELLERS_PER_PAGE);
     const totalPages = Math.ceil(totalCount / SELLERS_PER_PAGE) - 1; // since pages start from 0;;

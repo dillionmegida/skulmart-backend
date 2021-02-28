@@ -1,5 +1,6 @@
 import Product from "models/Product";
 import Seller from "models/Seller";
+import { selectSellerStr } from "utils/documentPopulate";
 
 export default async function getSellerByUsername(req: any, res: any) {
   const seller = await Seller.findOne({
@@ -7,7 +8,7 @@ export default async function getSellerByUsername(req: any, res: any) {
     store: req.store_id,
     visible: true,
     subscription_type: { $ne: undefined },
-  }).select("-password");
+  }).select(selectSellerStr);
   if (seller === null) {
     // seller does not exist
     return res.status(404).json({

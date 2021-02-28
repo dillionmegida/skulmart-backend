@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import ProductReview from "models/ProductReview";
+import { buyerPopulate, productPopulate } from "utils/documentPopulate";
 
 export default async function getPendingProductReviews(req: any, res: any) {
   try {
@@ -7,15 +8,10 @@ export default async function getPendingProductReviews(req: any, res: any) {
       status: "AWAITING_REVIEW",
     })
       .populate({
-        path: "buyer",
-        select: "-password",
+        ...buyerPopulate,
       })
       .populate({
-        path: "product",
-        select: "-views_devices",
-        populate: {
-          path: "store",
-        },
+        ...productPopulate,
       });
     res.json({ productReviews });
   } catch (err) {

@@ -1,6 +1,7 @@
 import { SELLERS_PER_PAGE } from "constants/index";
 import Seller from "models/Seller";
 import { shuffleArray } from "utils/arrays";
+import { selectSellerStr } from "utils/documentPopulate";
 
 export default async function getAllSellers(req: any, res: any) {
   const { page: _page = 0 } = req.query;
@@ -14,7 +15,7 @@ export default async function getAllSellers(req: any, res: any) {
   const sellers = await Seller.find({
     ...criteria,
   })
-    .select("-password")
+    .select(selectSellerStr)
     .limit(SELLERS_PER_PAGE)
     .skip(page * SELLERS_PER_PAGE);
 

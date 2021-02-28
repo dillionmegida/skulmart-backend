@@ -3,6 +3,7 @@ import { REVIEWS_PER_PAGE } from "constants/index";
 import Product from "models/Product";
 import ProductReview from "models/ProductReview";
 import { sliceAndReverse } from "utils/arrays";
+import { selectProductStr, sellerPopulate } from "utils/documentPopulate";
 
 export default async function getProductReviews(req: any, res: any) {
   const { id } = req.params;
@@ -10,8 +11,8 @@ export default async function getProductReviews(req: any, res: any) {
   const page = parseInt(_page);
   try {
     const product = await Product.findOne({ _id: id })
-      .populate({ path: "seller", select: "-views_devices" })
-      .select("-views_devices");
+      .populate({ ...sellerPopulate })
+      .select(selectProductStr);
 
     if (!product)
       return res.status(400).json({
