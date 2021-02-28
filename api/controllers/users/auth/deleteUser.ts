@@ -44,6 +44,17 @@ export default async function deleteUser(req: any, res: any) {
       });
 
     if (user.user_type === "buyer") {
+      const pendingOrders = await Order.find({
+        buyer: user._id,
+        has_buyer_received: false,
+      });
+
+      if (pendingOrders.length > 0)
+        return res.status(400).json({
+          message:
+            "You have pending orders. Please contact us if you want to go ahead with the delete process.",
+        });
+
       await Cart.deleteMany({ buyer: user._id });
 
       await Buyer.deleteOne({
@@ -55,7 +66,7 @@ export default async function deleteUser(req: any, res: any) {
         has_buyer_received: false,
       });
 
-      if (pendingOrders.length < 1)
+      if (pendingOrders.length > 0)
         return res.status(400).json({
           message:
             "You have pending orders to attend to. Please contact us if you want to go ahead with the delete process.",
