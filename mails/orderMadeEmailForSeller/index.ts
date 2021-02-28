@@ -42,6 +42,7 @@ export default async function orderMadeEmailForSeller({
       confirm_order_url: i.confirm_order_url,
       product: {
         quantity_available: i.product.quantity,
+        delivery_fee: i.product.delivery_fee,
       },
     })),
     message,

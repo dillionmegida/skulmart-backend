@@ -23,7 +23,8 @@ export default async function receivedOrder(req: any, res: any) {
     const seller = (await Seller.findById(order.seller)) as SellerInterface;
     const product = (await Product.findById(order.product)) as ProductInterface;
 
-    const totalPricePaid = order.price_when_bought;
+    const totalPricePaid =
+      order.price_when_bought * order.quantity + order.delivery_fee_when_bought;
 
     await Order.findByIdAndUpdate(order._id, {
       $set: {

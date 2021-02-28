@@ -11,6 +11,7 @@ type Args = {
     confirm_order_url: string;
     product: {
       quantity_available: number;
+      delivery_fee: number;
     };
   }[];
   message: string;
@@ -19,7 +20,10 @@ type Args = {
 
 export default function orderMadeForSeller({ buyer, orders, message }: Args) {
   let totalPrice = 0;
-  orders.forEach((p) => (totalPrice += p.quantity * p.price));
+  orders.forEach((p) => {
+    totalPrice += p.quantity * p.price;
+    if (p.product.delivery_fee > 0) totalPrice += p.product.delivery_fee;
+  });
 
   return `
   <div style='width: 100%; margin: auto;'>
