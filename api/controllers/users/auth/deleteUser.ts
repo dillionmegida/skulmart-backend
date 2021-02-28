@@ -5,6 +5,7 @@ import Product from "models/Product";
 import Seller from "models/Seller";
 import { deleteImage } from "utils/image";
 import bcrypt from "bcryptjs";
+import Activity from "models/Activity";
 
 export default async function deleteUser(req: any, res: any) {
   const { email, password } = req.body as { email: string; password: string };
@@ -69,6 +70,15 @@ export default async function deleteUser(req: any, res: any) {
         public_id: user.img.public_id as string,
         errorMsg: "Could not delete user image during user deletion",
       });
+
+    // buyers and sellers share some activities,
+    // so we need to ensure that only the unshared ones are deleted
+
+    if (user.user_type === "seller")
+      await Activity.deleteMany({ for_buyer: false, for_seller: true });
+
+    if (user.user_type === "buyer")
+      await Activity.deleteMany({ for_buyer: true, for_seller: false });
   } catch (err) {
     console.log("Could not delete user >> ", err);
     return res.status(400).json({
