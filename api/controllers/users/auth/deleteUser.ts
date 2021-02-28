@@ -7,6 +7,7 @@ import { deleteImage } from "utils/image";
 import bcrypt from "bcryptjs";
 import Activity from "models/Activity";
 import { formatCurrency } from "utils/currency";
+import Order from "models/Order";
 
 export default async function deleteUser(req: any, res: any) {
   const { email, password } = req.body as { email: string; password: string };
@@ -46,6 +47,17 @@ export default async function deleteUser(req: any, res: any) {
         _id: user._id,
       });
     } else {
+      const pendingOrders = await Order.find({
+        seller: user._id,
+        has_buyer_received: false,
+      });
+
+      if (pendingOrders.length < 1)
+        return res.status(400).json({
+          message:
+            "You have pending orders to attend to. Please contact us if you want to go ahead with the delete process.",
+        });
+
       const products = await Product.find({ seller: user._id });
 
       // delete all seller's product documents
