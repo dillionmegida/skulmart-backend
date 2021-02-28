@@ -6,6 +6,7 @@ import Seller from "models/Seller";
 import { deleteImage } from "utils/image";
 import bcrypt from "bcryptjs";
 import Activity from "models/Activity";
+import { formatCurrency } from "utils/currency";
 
 export default async function deleteUser(req: any, res: any) {
   const { email, password } = req.body as { email: string; password: string };
@@ -15,6 +16,13 @@ export default async function deleteUser(req: any, res: any) {
   if (email !== user.email)
     return res.status(400).json({
       message: "Please enter your valid email",
+    });
+
+  if (user.user_type === "seller" && user.wallet.balance > 0)
+    return res.status(400).json({
+      message: `You currently have ${formatCurrency(
+        user.wallet.balance
+      )} in your wallet. Please contact us if you want to go ahead with the delete process.`,
     });
 
   try {
