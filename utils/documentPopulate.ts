@@ -29,10 +29,7 @@ export const cartPopulate = {
   path: "cart",
   populate: {
     ...productPopulate,
-    populate: [
-      { ...sellerPopulate, populate: {} }, // remove the store populate since store is next
-      { ...storePopulate },
-    ],
+    populate: [{ ...sellerPopulate }, { ...storePopulate }],
   },
 };
 

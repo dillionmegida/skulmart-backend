@@ -9,6 +9,7 @@ import {
   selectSellerStr,
   storePopulate,
 } from "utils/documentPopulate";
+import chalk from "chalk";
 
 export default async function isAuthenticated(req: any, res: any, next: any) {
   const token = getTokenFromCookie(req);
@@ -60,7 +61,11 @@ export default async function isAuthenticated(req: any, res: any, next: any) {
     }
     req.user = Object.create(user);
     next();
-  } catch {
-    return res.status(401).json({ message: "Not logged in" });
+  } catch (err) {
+    console.log(
+      chalk.red("Error occured while checking if user is authenticated >>> "),
+      err
+    );
+    return res.status(500).json({ message: "Not logged in" });
   }
 }
