@@ -30,7 +30,9 @@ export default async function postProduct(req: any, res: any) {
     const desc = _desc.trim();
     const price = parseInt(_price, 10);
     const quantity = parseInt(_quantity, 10);
-    const delivery_fee = parseInt(_delivery_fee, 10);
+    const delivery_fee = isNaN(parseInt(_delivery_fee, 10))
+      ? 0
+      : parseInt(_delivery_fee, 10);
 
     const loggedInSeller: SellerInterface = req.user;
 
