@@ -8,6 +8,7 @@ import bcrypt from "bcryptjs";
 import Activity from "models/Activity";
 import { formatCurrency } from "utils/currency";
 import Order from "models/Order";
+import Cart from "models/Cart";
 
 export default async function deleteUser(req: any, res: any) {
   const { email, password } = req.body as { email: string; password: string };
@@ -43,6 +44,8 @@ export default async function deleteUser(req: any, res: any) {
       });
 
     if (user.user_type === "buyer") {
+      await Cart.deleteMany({ buyer: user._id });
+
       await Buyer.deleteOne({
         _id: user._id,
       });

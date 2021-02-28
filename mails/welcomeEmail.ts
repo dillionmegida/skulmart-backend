@@ -56,15 +56,16 @@ const welcomeEmail = async ({
                   FREE_PLAN.max_products
                 } products.
                 <br/>
+                <br/>
             In ${anchorLinkText({
-                text :'your dashboard',
-                link: links.MERCHANT_SITE
+              text: "your dashboard",
+              link: links.MERCHANT_SITE,
             })}, you'll have to provide a means of identification so we can verify you.
             Once you're verified, you can start managing your products and sales 🎉.
             <br/><br/>
             You can also join the ${anchorLinkText({
-                link: links.SELLER_WHATSAPP_GROUP,
-                text: 'SkulMart Sellers WhatsApp Group'
+              link: "https://chat.whatsapp.com/G3tJXGTuY2hC5gar4J6L8V",
+              text: "SkulMart Sellers WhatsApp Group",
             })} to get quick access to updates,
             suggest features, seek help, and also report issues.<br/><br/>
             Inform your contacts/followers on Twitter and Whatsapp that you now manage
