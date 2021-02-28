@@ -1,9 +1,10 @@
 import ShortenedUrl from "models/ShortenedUrl";
 
 export default async function getShortUrlDetails(req: any, res: any) {
-  const { short_url } = req.params as { short_url: string };
+  const { hash } = req.params as { hash: string };
+  const shortUrl = `https://skulmart.com/u/` + hash;
 
-  const url = await ShortenedUrl.findOne({ short_url });
+  const url = await ShortenedUrl.findOne({ short_url: shortUrl });
 
   if (!url)
     return res.status(404).json({ message: "URL not found", url: null });
