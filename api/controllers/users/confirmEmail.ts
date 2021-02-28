@@ -1,7 +1,6 @@
 import chalk from "chalk";
 import { links } from "constants/index";
 import { FREE_PLAN } from "constants/subscriptionTypes";
-import welcomeEmail from "mails/welcomeEmail";
 import Buyer from "models/Buyer";
 import EmailConfirmation from "models/EmailConfirmation";
 import Product from "models/Product";
@@ -9,7 +8,6 @@ import Seller from "models/Seller";
 import Store from "models/Store";
 
 export default async function confirmEmail(req: any, res: any) {
-  const { type: typeOfEmailConfirmation = "" } = req.query;
   const hash = await EmailConfirmation.findOne({
     generatedHash: req.params.hash,
   });
@@ -80,19 +78,6 @@ export default async function confirmEmail(req: any, res: any) {
 
     if (!store)
       return res.status(404).json({ message: "Store of user not found" });
-
-    if (typeOfEmailConfirmation === "welcome") {
-      const sendEmailResponse = await welcomeEmail({
-        email: confirmedUser.email,
-        profile: confirmedUser,
-        store: store.shortname,
-      });
-
-      if (sendEmailResponse.error) {
-        // then the email didn't go successfully
-        console.log(chalk.red(sendEmailResponse.error));
-      }
-    }
 
     const emailConfirmedLink =
       user_type === "seller"

@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import SellerInterface from "interfaces/Seller";
+import welcomeEmail from "mails/welcomeEmail";
 import Seller from "models/Seller";
 import { capitalize } from "utils/strings";
 
@@ -33,6 +34,17 @@ export default async function onboarding2(req: any, res: any) {
         visible: true,
       },
     });
+
+    const sendWelcomeEmailResponse = await welcomeEmail({
+      email: user.email,
+      profile: user,
+      store: req.store_name,
+    });
+
+    if (sendWelcomeEmailResponse.error) {
+      // then the email didn't go successfully
+      console.log(chalk.red(sendWelcomeEmailResponse.error));
+    }
 
     res.json({
       message: "Contact Information submitted successfully ✔",

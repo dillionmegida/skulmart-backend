@@ -6,6 +6,7 @@ import { shareTwitter, shareWhatsApp } from "utils/socialMediaSharing";
 import BuyerInterface from "interfaces/Buyer";
 import SellerInterface from "interfaces/Seller";
 import { getSellerProfileLink } from "utils/getLinks";
+import { anchorLinkText } from "utils/strings";
 
 type SellerShareMessageArgs = {
   username: string;
@@ -54,13 +55,17 @@ const welcomeEmail = async ({
               : `You have automatically received a free plan. This plan supports uploading a maximum of ${
                   FREE_PLAN.max_products
                 } products.
-            So, head over to <a href="${
-              links.MERCHANT_SITE
-            }">your dashboard</a> and start managing your products 🎉.
+                <br/>
+            In ${anchorLinkText({
+                text :'your dashboard',
+                link: links.MERCHANT_SITE
+            })}, you'll have to provide a means of identification so we can verify you.
+            Once you're verified, you can start managing your products and sales 🎉.
             <br/><br/>
-            You can also join the <a href="${
-              links.SELLER_WHATSAPP_GROUP
-            }">SkulMart Sellers WhatsApp Group</a> to get quick access to updates,
+            You can also join the ${anchorLinkText({
+                link: links.SELLER_WHATSAPP_GROUP,
+                text: 'SkulMart Sellers WhatsApp Group'
+            })} to get quick access to updates,
             suggest features, seek help, and also report issues.<br/><br/>
             Inform your contacts/followers on Twitter and Whatsapp that you now manage
             your products on ${siteName} by clicking the following links: 
