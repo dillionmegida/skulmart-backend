@@ -75,7 +75,7 @@ export default async function updateUser(req: any, res: any) {
         instagram = "",
         twitter = "",
         facebook = "",
-        brand_category = "NONE",
+        brand_category = "OTHERS",
       } = body;
 
       fullname = capitalize(fullname.trim());

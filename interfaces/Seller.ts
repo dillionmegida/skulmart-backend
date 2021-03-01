@@ -5,7 +5,13 @@ import ImageInterface from "./Image";
 import Ratings from "./Ratings";
 import Wallet from "./Wallet";
 
-export type CATEGORY = "FASHION" | "FOOD AND DRINKS" | "ELECTRONICS" | "NONE";
+export type CATEGORY =
+  | "FASHION"
+  | "FOOD AND DRINKS"
+  | "ELECTRONICS"
+  | "OTHERS"
+  | "GRAPHICS_DESIGN"
+  | "BOOKS";
 
 type VERIFIED_STATUS = "NONE" | "AWAITING_REVIEW" | "VERIFIED" | "FAILED";
 

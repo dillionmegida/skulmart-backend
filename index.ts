@@ -32,12 +32,12 @@ import getStore from "./middlewares/getstore";
 
 app.get("/test", async (req: any, res: any) => {
   // get all verified emails
-  // const emails = await Seller.find({email_confirm: true}).select("email");
-  // let emailString = "";
-  // for (let i = 0; i < emails.length; i++) {
-  //   emailString = emailString + emails[i].email + ",";
-  // }
-  // console.log({ emailString });
+//   const emails = await Seller.find({ email_confirm: true }).select("email");
+//   let emailString = "";
+//   for (let i = 0; i < emails.length; i++) {
+//     emailString = emailString + emails[i].email + ",";
+//   }
+//   console.log({ emailString });
 
   await cleanups();
 });
@@ -64,6 +64,7 @@ import paystackWebhook from "api/routers/paystackWebhook";
 
 import admin from "api/routers/admin";
 import { PAYSTACK_WEBHOOK } from "./constants";
+import Seller from "models/Seller";
 
 // api routes
 

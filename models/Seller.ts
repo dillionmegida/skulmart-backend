@@ -18,7 +18,14 @@ const SellerSchema: Schema = new Schema(
     },
     brand_category: {
       type: String,
-      enum: ["FASHION", "FOOD AND DRINKS", "ELECTRONICS", "NONE"],
+      enum: [
+        "FASHION",
+        "FOOD AND DRINKS",
+        "ELECTRONICS",
+        "OTHERS",
+        "GRAPHICS_DESIGN",
+        "BOOKS",
+      ],
     },
     brand_name: {
       type: String,
