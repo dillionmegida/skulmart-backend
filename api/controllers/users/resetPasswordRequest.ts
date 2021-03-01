@@ -30,7 +30,7 @@ export default async function resetPasswordRequest(req: any, res: any) {
       // then email does not exist
       return res.status(400).json({
         error: "Unable to find email",
-        message: `'${email}' was not the email you inserted during your registration process`,
+        message: `'${email}' is not associated with an account`,
       });
     }
 
