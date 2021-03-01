@@ -76,7 +76,7 @@ export default async function deleteUser(req: any, res: any) {
 
       // delete all seller's product documents
       await Product.deleteMany({
-        seller_id: user._id,
+        seller: user._id,
       });
 
       // delete all seller's product images
