@@ -14,15 +14,17 @@ export const SERVER_URL = "http://skulmart-backend.herokuapp.com";
 
 export const MAILGUN_EMAIL = "support@mg.skulmart.com";
 
+const TESTING_IMAGES_FOLDER = "testing";
+
 export const CLOUDINARY_USER_IMAGES_FOLDER = process.env.IS_DEV
-  ? "market-hub/testing"
-  : "market-hub/user_images";
+  ? TESTING_IMAGES_FOLDER
+  : "user_images";
 export const CLOUDINARY_PRODUCT_IMAGES_FOLDER = process.env.IS_DEV
-  ? "market-hub/testing"
-  : "market-hub/product_images";
+  ? TESTING_IMAGES_FOLDER
+  : "product_images";
 export const CLOUDINARY_USER_VERIFICATION_DOCUMENTS_FOLDER = process.env.IS_DEV
-  ? "market-hub/testing"
-  : "market-hub/user_verification_documents";
+  ? TESTING_IMAGES_FOLDER
+  : "user_verification_documents";
 
 export const links = {
   MERCHANT_SITE: "https://merchant.skulmart.com",
