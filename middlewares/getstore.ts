@@ -24,9 +24,10 @@ export default async function getStore(req: any, res: any, next: any) {
 
   // then store does not exist
   if (!store)
-    return res
-      .status(400)
-      .json({ message: "This request is not coming from a store" });
+    return res.status(400).json({
+      message: "This request is not coming from a valid store",
+      store_exists: false,
+    });
 
   req.store_id = store._id;
 

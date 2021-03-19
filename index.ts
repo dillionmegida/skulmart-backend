@@ -29,6 +29,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 import getStore from "./middlewares/getstore";
+app.use(getStore);
 
 app.get("/test", async (req: any, res: any) => {
   // get all verified emails
@@ -42,7 +43,6 @@ app.get("/test", async (req: any, res: any) => {
   await cleanups();
 });
 
-app.use(getStore);
 
 app.get("/cleanups", async (req: any, res: any) => {
   await cleanups();
