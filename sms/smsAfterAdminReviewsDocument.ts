@@ -18,8 +18,7 @@ export default async function smsAfterAdminReviewsDocument({
   if (type === "error") return; // for now, don't send messages if there's an error
 
   const message =
-    "Congratulations 🎉. Your document has been verified. " +
-    "You can now upload your products in your dashboard.";
+    "Congratulations 🎉. Your document has been verified successfully. ";
 
   try {
     await sendTextMessage({ recipient_num: sellerPhone, message });
