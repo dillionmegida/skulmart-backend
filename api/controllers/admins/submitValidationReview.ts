@@ -64,10 +64,11 @@ export default async function submitValidationReview(req: any, res: any) {
 
     res.json({ message: "Successfully submitted review" });
 
-    await smsAfterAdminReviewsDocument({
-      seller: { phone: seller.whatsapp },
-      type,
-    });
+    if (seller.whatsapp)
+      await smsAfterAdminReviewsDocument({
+        seller: { phone: seller.whatsapp },
+        type,
+      });
   } catch (err) {
     console.log(chalk.red("Could not validate seller's credentials >>> "), err);
     res.status(500).json({ message: "Error occured. Please try again" });
