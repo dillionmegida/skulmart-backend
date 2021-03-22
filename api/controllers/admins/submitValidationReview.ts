@@ -2,6 +2,7 @@ import chalk from "chalk";
 import sellerVerification from "mails/sellerVerification";
 import Seller from "models/Seller";
 import ValidationDocument from "models/ValidationDocument";
+import smsAfterAdminReviewsDocument from "sms/smsAfterAdminReviewsDocument";
 import { deleteImage } from "utils/image";
 
 export default async function submitValidationReview(req: any, res: any) {
@@ -62,6 +63,11 @@ export default async function submitValidationReview(req: any, res: any) {
     }
 
     res.json({ message: "Successfully submitted review" });
+
+    await smsAfterAdminReviewsDocument({
+      seller: { phone: seller.whatsapp },
+      type,
+    });
   } catch (err) {
     console.log(chalk.red("Could not validate seller's credentials >>> "), err);
     res.status(500).json({ message: "Error occured. Please try again" });
