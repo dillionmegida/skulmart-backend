@@ -9,9 +9,10 @@ import mongoose from "mongoose";
 export default async function addToCart(req: any, res: any) {
   const { product_id } = req.params;
 
-  const { quantity = 1, seller_id } = req.body as {
+  const { quantity = 1, seller_id, buyer_desc = "" } = req.body as {
     quantity: number;
     seller_id: string;
+    buyer_desc: string;
   };
 
   const sellerId = mongoose.Types.ObjectId(seller_id);
@@ -50,6 +51,7 @@ export default async function addToCart(req: any, res: any) {
       product: product_id,
       quantity,
       seller: seller._id,
+      buyer_desc,
     });
 
     // getting buyer again because the buyer from req.user

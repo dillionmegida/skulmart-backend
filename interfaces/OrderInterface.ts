@@ -13,6 +13,7 @@ export default interface OrderInterface extends Document {
   seller_username: string;
   quantity: number;
   price_when_bought: number;
+  buyer_desc: string;
   delivery_fee_when_bought: number;
   createdAt: Date;
   did_buyer_close: boolean;
@@ -33,6 +34,7 @@ export type GroupedOrdersPurchasedFromSeller = {
       _id: mongoose.Types.ObjectId;
       product_populated: ProductInterface;
       quantity: number;
+      buyer_desc: string;
       price_when_bought: number;
       delivery_fee_when_bought: number;
     }[];

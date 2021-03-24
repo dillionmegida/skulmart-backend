@@ -7,6 +7,7 @@ type Args = {
   orders: {
     name: string;
     quantity: number;
+    buyer_desc: string;
     price: number;
     confirm_order_url: string;
     product: {
@@ -42,6 +43,8 @@ export default function orderMadeForSeller({ buyer, orders, message }: Args) {
               <b>${i.name.toUpperCase()}</b> --- <b>${i.quantity}</b> qty(s)
               <br/>
               Paid: <b>${formatCurrency(i.price * i.quantity)}</b>
+              <br/>
+              Description from buyer: "<b>${i.buyer_desc}</b>"
               <br/>
               <span style="font-size: 15px">
                   Confirm order received link (for buyer):

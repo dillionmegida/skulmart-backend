@@ -4,6 +4,7 @@ import mongoose, { Schema } from "mongoose";
 const CartSchema: Schema = new Schema(
   {
     buyer: { type: Schema.Types.ObjectId, required: true, ref: "Buyer" },
+    buyer_desc: { type: String, default: null },
     product: {
       type: Schema.Types.ObjectId,
       required: true,

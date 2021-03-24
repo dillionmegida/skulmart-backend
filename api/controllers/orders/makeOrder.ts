@@ -23,6 +23,8 @@ import smsAfterBuyerMakesOrder from "sms/smsAfterBuyerMakesOrder";
 import { convertToKobo } from "utils/money";
 import { storePopulate } from "utils/documentPopulate";
 
+const IS_DEV = process.env.NODE_ENV === "dev";
+
 export default async function makeOrder(req: any, res: any) {
   const buyer = req.user as BuyerInterface;
 
@@ -71,10 +73,9 @@ export default async function makeOrder(req: any, res: any) {
   try {
     for (let i = 0; i < unsoldOrders.length; i++) {
       const order = unsoldOrders[i];
-      const sellerUsername =
-        process.env.NODE_ENV === "dev"
-          ? "deeesigns-studios" // in development, I want to use this user for testing
-          : order.seller_username;
+      const sellerUsername = IS_DEV
+        ? "deeesigns-studios" // in development, I want to use this user for testing
+        : order.seller_username;
 
       const sellerOrders =
         groupOrdersPurchasedFromSeller[sellerUsername] || null;
@@ -103,6 +104,7 @@ export default async function makeOrder(req: any, res: any) {
             product_populated: order.product_populated,
             delivery_fee_when_bought: order.delivery_fee_when_bought,
             quantity: order.quantity,
+            buyer_desc: order.buyer_desc,
           },
         ];
 
@@ -124,7 +126,7 @@ export default async function makeOrder(req: any, res: any) {
       return confirmLink.url;
     };
 
-    if (process.env.NODE_ENV !== "dev") {
+    if (!IS_DEV) {
       const payRes = await axios({
         url: PAYSTACK_HOSTNAME + "/transaction/charge_authorization",
         method: "post",
@@ -184,7 +186,10 @@ export default async function makeOrder(req: any, res: any) {
           order_id: newOrder._id,
           store: seller_info.store.shortname,
         });
-        const shortenRes = await shortenUrlAndSave(confirmOrderReceivedLink);
+
+        const shortenRes = IS_DEV
+          ? { short_url: "short_url" }
+          : await shortenUrlAndSave(confirmOrderReceivedLink);
 
         newOrder.confirm_order_url = shortenRes.short_url;
 
@@ -195,7 +200,7 @@ export default async function makeOrder(req: any, res: any) {
           url: shortenRes.short_url,
         });
 
-        if (process.env.NODE_ENV !== "dev") {
+        if (!IS_DEV) {
           await Product.findByIdAndUpdate(productId, {
             $set: {
               // increase quantity of product sold
@@ -217,6 +222,7 @@ export default async function makeOrder(req: any, res: any) {
               price_when_bought: i.price_when_bought,
               quantity: i.quantity,
               confirm_order_url: getConfirmLinkFromUrls(i._id),
+              buyer_desc: i.buyer_desc,
             };
           }
         ),

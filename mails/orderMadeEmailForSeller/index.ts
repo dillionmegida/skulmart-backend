@@ -9,6 +9,7 @@ type Args = {
   seller: SellerInterface;
   buyer: BuyerInterface;
   orders: {
+    buyer_desc: string;
     product: ProductInterface;
     quantity: number;
     price_when_bought: number;
@@ -40,6 +41,7 @@ export default async function orderMadeEmailForSeller({
       quantity: i.quantity,
       price: i.price_when_bought,
       confirm_order_url: i.confirm_order_url,
+      buyer_desc: i.buyer_desc,
       product: {
         quantity_available: i.product.quantity,
         delivery_fee: i.product.delivery_fee,

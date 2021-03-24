@@ -21,10 +21,12 @@ const sendMail = ({ receiver, subject, html }: SendMailArgs): Promise<any> => {
       subject,
       html: `
               <div style='
-                  width: 350px;   
+                  max-width: 500px;
+                  width: 100%;   
                   color: black;
                   font-size: 16px;
                   margin: auto    
+                  padding: 15px;
               '>
                   ${html}
                   <br/>

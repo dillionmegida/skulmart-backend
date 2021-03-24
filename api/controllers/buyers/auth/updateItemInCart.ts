@@ -1,12 +1,14 @@
 import chalk from "chalk";
-import BuyerInterface from "interfaces/Buyer";
 import Cart from "models/Cart";
 import mongoose from "mongoose";
 
 export default async function updateItemInCart(req: any, res: any) {
   const { cart_id } = req.params;
 
-  const { quantity } = req.body as { quantity: number };
+  const { quantity, buyer_desc = "" } = req.body as {
+    quantity: number;
+    buyer_desc: string;
+  };
 
   const cartId = mongoose.Types.ObjectId(cart_id);
 
@@ -21,6 +23,7 @@ export default async function updateItemInCart(req: any, res: any) {
     await Cart.findByIdAndUpdate(cart_id, {
       $set: {
         quantity,
+        buyer_desc,
       },
     });
 
