@@ -53,8 +53,13 @@ export default function orderMadeForBuyer({
                     ${formatCurrency(i.price_when_bought * i.quantity)}
                   </b>
                   <br/>
-                  Your description: "<b>${i.buyer_desc}</b>"
-                  <br/>
+                  ${
+                    i.buyer_desc &&
+                    i.buyer_desc.length > 0 &&
+                    `Your description: "<b>${i.buyer_desc}</b>"
+                      <br/>
+                      `
+                  }
                   ${anchorLinkText({
                     link: (confirmOrderLinks.find(
                       ({ _id }) => _id.toString() === i._id.toString()

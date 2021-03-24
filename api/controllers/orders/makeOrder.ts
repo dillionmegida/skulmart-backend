@@ -175,6 +175,7 @@ export default async function makeOrder(req: any, res: any) {
           buyer: buyer._id,
           product: productId,
           seller: seller_info._id,
+          buyer_desc: order.buyer_desc,
           quantity: order.quantity,
           price_when_bought: order.price_when_bought,
           delivery_fee_when_bought: order.delivery_fee_when_bought,
@@ -230,16 +231,17 @@ export default async function makeOrder(req: any, res: any) {
         message,
       });
 
-      await smsAfterBuyerMakesOrder({
-        buyer: {
-          phone: buyer.phone,
-        },
-        seller: {
-          phone: seller_info.whatsapp,
-          brand: seller_info.brand_name,
-          name: seller_info.fullname,
-        },
-      });
+      if (!IS_DEV)
+        await smsAfterBuyerMakesOrder({
+          buyer: {
+            phone: buyer.phone,
+          },
+          seller: {
+            phone: seller_info.whatsapp,
+            brand: seller_info.brand_name,
+            name: seller_info.fullname,
+          },
+        });
     }
 
     await orderMadeEmailForBuyer({

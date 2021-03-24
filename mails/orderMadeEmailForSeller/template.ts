@@ -44,8 +44,13 @@ export default function orderMadeForSeller({ buyer, orders, message }: Args) {
               <br/>
               Paid: <b>${formatCurrency(i.price * i.quantity)}</b>
               <br/>
-              Description from buyer: "<b>${i.buyer_desc}</b>"
-              <br/>
+              ${
+                i.buyer_desc &&
+                i.buyer_desc.length > 0 &&
+                `Description from buyer: "<b>${i.buyer_desc}</b>"
+                <br/>
+                `
+              }
               <span style="font-size: 15px">
                   Confirm order received link (for buyer):
                   <span style='letter-spacing: 1px'>
