@@ -10,6 +10,7 @@ import {
   updateProduct,
   updateProductViews,
   getProductReviews,
+  getSimilarProductsBySeller,
 } from "api/controllers/products";
 import express from "express";
 const router = express.Router();
@@ -36,6 +37,9 @@ router.get("/reviews/:id", getProductReviews);
 
 // Get products by seller
 router.get("/seller/:username", getProductsBySeller);
+
+// Get similar products by seller
+router.get("/seller/:username/similar", getSimilarProductsBySeller);
 
 // Update the number of views of a product
 router.get("/views/:id", updateProductViews);

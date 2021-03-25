@@ -5,6 +5,7 @@ export { default as getProductsBySearch } from "./getProductsBySearch";
 export { default as getProductById } from "./getProductById";
 export { default as getProductReviews } from "./getProductReviews";
 export { default as getProductsBySeller } from "./getProductsBySeller";
+export { default as getSimilarProductsBySeller } from "./getSimilarProductsBySeller";
 export { default as updateProductViews } from "./updateProductViews";
 export { default as postProduct } from "./postProduct";
 export { default as deleteProduct } from "./deleteProduct";
