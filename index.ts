@@ -33,16 +33,15 @@ app.use(getStore);
 
 app.get("/test", async (req: any, res: any) => {
   // get all verified emails
-//   const emails = await Seller.find({ email_confirm: true }).select("email");
-//   let emailString = "";
-//   for (let i = 0; i < emails.length; i++) {
-//     emailString = emailString + emails[i].email + ",";
-//   }
-//   console.log({ emailString });
+  //   const emails = await Seller.find({ email_confirm: true }).select("email");
+  //   let emailString = "";
+  //   for (let i = 0; i < emails.length; i++) {
+  //     emailString = emailString + emails[i].email + ",";
+  //   }
+  //   console.log({ emailString });
 
   await cleanups();
 });
-
 
 app.get("/cleanups", async (req: any, res: any) => {
   await cleanups();
@@ -56,6 +55,7 @@ app.get("/cleanups", async (req: any, res: any) => {
 import products from "api/routers/products";
 import sellers from "api/routers/sellers";
 import buyers from "api/routers/buyers";
+import negotiations from "api/routers/negotiations";
 import users from "api/routers/users";
 import stores from "api/routers/stores";
 import orders from "api/routers/orders";
@@ -71,6 +71,7 @@ import Seller from "models/Seller";
 app.use("/api/products", products);
 app.use("/api/sellers", sellers);
 app.use("/api/buyers", buyers);
+app.use("/api/negotiations", negotiations);
 app.use("/api/stores", stores);
 app.use("/api/users", users);
 app.use("/api/orders", orders);

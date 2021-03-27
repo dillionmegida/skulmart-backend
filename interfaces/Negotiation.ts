@@ -1,11 +1,10 @@
 import mongoose, { Document } from "mongoose";
 
-export default interface CartInterface extends Document {
+export default interface NegotiationInterface extends Document {
   _id: mongoose.Types.ObjectId;
   buyer: mongoose.Types.ObjectId;
-  buyer_desc: string;
   seller: mongoose.Types.ObjectId;
   product: mongoose.Types.ObjectId;
-  quantity: number;
-  negotiation: mongoose.Types.ObjectId | null;
+  negotiated_price: number;
+  status: "OPENED" | "CLOSED";
 }

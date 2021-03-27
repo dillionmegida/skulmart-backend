@@ -24,6 +24,10 @@ const ProductSchema: Schema = new Schema(
       required: true,
       min: 0,
     },
+    is_negotiable: {
+      type: Boolean,
+      default: false,
+    },
     delivery_fee: {
       type: Number,
       default: 0,
