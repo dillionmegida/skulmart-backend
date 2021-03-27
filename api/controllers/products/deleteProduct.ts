@@ -1,4 +1,3 @@
-import ProductInterface from "interfaces/Product";
 import Product from "models/Product";
 import ProductReview from "models/ProductReview";
 import { deleteImage } from "utils/image";

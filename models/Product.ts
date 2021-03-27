@@ -1,5 +1,4 @@
 import mongoose, { Schema } from "mongoose";
-import shortid from "shortid";
 import ProductInterface from "interfaces/Product";
 
 const ProductSchema: Schema = new Schema(
@@ -69,6 +68,21 @@ const ProductSchema: Schema = new Schema(
   },
   {
     timestamps: true,
+  }
+);
+
+ProductSchema.index(
+  {
+    name: "text",
+    desc: "text",
+    category: "text",
+  },
+  {
+    weights: {
+      name: 10,
+      category: 7,
+      desc: 4,
+    },
   }
 );
 

@@ -37,11 +37,7 @@ export default async function getProductsBySeller(req: any, res: any) {
       quantity: {
         $gt: 0,
       },
-      name: new RegExp(
-        // split the product name, and search for the patterns in the substrings
-        product.name + "|" + product.name.split(" ").join("|"),
-        "ig"
-      ),
+      $text: { $search: product.name },
     };
 
     const totalCount = await Product.countDocuments({ ...criteria });

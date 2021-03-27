@@ -5,7 +5,7 @@ import {
   getNotification,
   getNotifications,
   getSellerById,
-  getSellerBySearch,
+  getSellersBySearch,
   getSellerByUsername,
   initializeSubscription,
   onboarding1,
@@ -35,7 +35,7 @@ router.get("/:username", getSellerByUsername);
 router.get("/id/:id", getSellerById);
 
 // Get sellers by query
-router.get("/search/query", getSellerBySearch);
+router.get("/search/query", getSellersBySearch);
 
 /*
  *
