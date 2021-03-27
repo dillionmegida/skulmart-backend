@@ -8,10 +8,10 @@ export default async function getPendingProductReviews(req: any, res: any) {
       status: "AWAITING_REVIEW",
     })
       .populate({
-        ...buyerPopulate,
+        ...buyerPopulate({}),
       })
       .populate({
-        ...productPopulate,
+        ...productPopulate({}),
       });
     res.json({ productReviews });
   } catch (err) {

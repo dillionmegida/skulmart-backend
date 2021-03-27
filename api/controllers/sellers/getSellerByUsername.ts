@@ -8,7 +8,7 @@ export default async function getSellerByUsername(req: any, res: any) {
     store: req.store_id,
     visible: true,
     subscription_type: { $ne: undefined },
-  }).select(selectSellerStr);
+  }).select(selectSellerStr({ remove: ["wallet", "banks", "cards"] }));
   if (seller === null) {
     // seller does not exist
     return res.status(404).json({

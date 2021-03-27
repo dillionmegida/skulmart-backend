@@ -15,7 +15,7 @@ export default async function getProductsBySeller(req: any, res: any) {
     const { username } = req.params;
 
     const seller = await Seller.findOne({ username, visible: true }).select(
-      selectSellerStr
+      selectSellerStr({})
     );
 
     if (!seller)
@@ -46,7 +46,7 @@ export default async function getProductsBySeller(req: any, res: any) {
     const products = await Product.find({
       ...criteria,
     })
-      .select(selectProductStr)
+      .select(selectProductStr({}))
       .limit(PRODUCTS_PER_PAGE)
       .skip(page * PRODUCTS_PER_PAGE);
 

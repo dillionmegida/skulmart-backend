@@ -8,7 +8,7 @@ export default async function getSellerById(req: any, res: any) {
       _id: id,
       subscription_type: { $ne: undefined },
       visible: true,
-    }).select(selectSellerStr);
+    }).select(selectSellerStr({ remove: ["cards", "banks", "wallet"] }));
     res.json({ seller });
   } catch {
     // then seller does not exist

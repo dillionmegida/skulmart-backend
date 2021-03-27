@@ -6,9 +6,9 @@ export default async function getOrder(req: any, res: any) {
 
   try {
     const order = await Order.findById(id)
-      .populate({ ...productPopulate })
+      .populate({ ...productPopulate({}) })
       .populate("review")
-      .populate({ ...buyerPopulate });
+      .populate({ ...buyerPopulate({}) });
     res.json({
       order,
     });

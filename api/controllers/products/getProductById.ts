@@ -7,8 +7,8 @@ export default async function getProductById(req: any, res: any) {
       _id: req.params.id,
       visible: true,
     })
-      .populate({ ...sellerPopulate })
-      .select(selectProductStr);
+      .populate({ ...sellerPopulate({}) })
+      .select(selectProductStr({}));
     if (product === null)
       return res.status(404).json({
         error: "Invalid id",

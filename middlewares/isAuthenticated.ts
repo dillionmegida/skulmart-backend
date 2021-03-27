@@ -43,7 +43,7 @@ export default async function isAuthenticated(req: any, res: any, next: any) {
 
     if (decoded.user_type === "buyer") {
       const buyer = await Buyer.findById(decoded._id)
-        .select(selectBuyerStr)
+        .select(selectBuyerStr({}))
         .populate({
           ...cartPopulate,
         })
@@ -51,7 +51,7 @@ export default async function isAuthenticated(req: any, res: any, next: any) {
       user = buyer && Object.create(buyer);
     } else if (decoded.user_type === "seller") {
       const seller = await Seller.findById(decoded._id)
-        .select(selectSellerStr)
+        .select(selectSellerStr({}))
         .populate({ ...storePopulate });
       user = seller && Object.create(seller);
     }

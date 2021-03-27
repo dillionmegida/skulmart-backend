@@ -7,7 +7,7 @@ export default async function getCart(req: any, res: any) {
   try {
     const buyer = req.user as BuyerInterface;
     const carts = await Cart.find({ buyer: buyer._id }).populate({
-      ...productPopulate,
+      ...productPopulate({}),
     });
     res.json({ carts });
   } catch (err) {

@@ -19,7 +19,7 @@ export default async function getActivities(req: any, res: any) {
     const totalPages = Math.ceil(totalCount / ACTIVITY_PER_PAGE) - 1;
 
     const activities = await Activity.find({ ...criteria })
-      .populate({ ...sellerPopulate })
+      .populate({ ...sellerPopulate({}) })
       .populate("order");
 
     const modifiedActivities = sliceAndReverse({
