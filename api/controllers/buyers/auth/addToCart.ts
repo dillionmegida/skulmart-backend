@@ -61,10 +61,16 @@ export default async function addToCart(req: any, res: any) {
           .status(400)
           .json({ message: "This product has not been negotiated yet." });
 
-      if (negotiation.status === "OPENED")
+      if (!negotiation.negotiated_price)
         return res.status(400).json({
           message: "The negotiation for this product has not been concluded",
         });
+
+      await Negotation.findByIdAndUpdate(negotiation._id, {
+        $set: {
+          status: "CLOSED",
+        },
+      });
     }
 
     const newCart = new Cart({
@@ -92,5 +98,8 @@ export default async function addToCart(req: any, res: any) {
     res.json({ message: "Product successfully added to cart" });
   } catch (err) {
     console.log(chalk.red("Could not add product to cart because >>> "), err);
+    res
+      .status(500)
+      .json({ message: "An error occured. Please try again later" });
   }
 }

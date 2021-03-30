@@ -47,12 +47,12 @@ export default async function isAuthenticated(req: any, res: any, next: any) {
         .populate({
           ...cartPopulate,
         })
-        .populate({ ...storePopulate });
+        .populate({ ...storePopulate() });
       user = buyer && Object.create(buyer);
     } else if (decoded.user_type === "seller") {
       const seller = await Seller.findById(decoded._id)
         .select(selectSellerStr({}))
-        .populate({ ...storePopulate });
+        .populate({ ...storePopulate() });
       user = seller && Object.create(seller);
     }
 

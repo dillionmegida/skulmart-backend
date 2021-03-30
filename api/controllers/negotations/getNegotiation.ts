@@ -11,7 +11,7 @@ export default async function getNegotiation(req: any, res: any) {
     const negotiation = await Negotation.findById(id)
       .populate(buyerPopulate({ remove: ["banks", "cards"] }))
       .populate(sellerPopulate({ remove: ["wallet", "cards", "banks"] }))
-      .populate(productPopulate({}));   
+      .populate(productPopulate({}));
 
     if (!negotiation)
       return res.status(404).json({ message: "Negotiation does not exist" });

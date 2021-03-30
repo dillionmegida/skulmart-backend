@@ -19,9 +19,9 @@ const joinRemoveSelectStr = (arr: string[]) =>
   arr.map((field) => "-" + field).join(" ");
 
 // seller select and populate
-export const storePopulate = {
+export const storePopulate = () => ({
   path: "store",
-};
+});
 
 // seller select and populate
 type SellerFields = "banks" | "cards" | "password" | "views_devices" | "wallet";
@@ -34,7 +34,7 @@ export const sellerPopulate = ({
 }: PopulateArgs<SellerFields>): Populate => ({
   path: "seller",
   select: selectSellerStr({ remove: ["wallet", "cards", "banks"], ...remove }),
-  populate: { ...storePopulate },
+  populate: { ...storePopulate() },
 });
 
 // buyer select and populate
@@ -59,7 +59,7 @@ export const productPopulate = ({
 }: PopulateArgs<ProductFields>): Populate => ({
   path: "product",
   select: selectProductStr({ remove }),
-  populate: { ...storePopulate },
+  populate: { ...storePopulate() },
 });
 
 // cart select and populate
@@ -67,7 +67,7 @@ export const cartPopulate = {
   path: "cart",
   populate: {
     ...productPopulate({}),
-    populate: [{ ...sellerPopulate({}) }, { ...storePopulate }],
+    populate: [{ ...sellerPopulate({}) }, { ...storePopulate() }],
   },
 };
 

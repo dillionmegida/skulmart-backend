@@ -6,7 +6,7 @@ import sendMail from "..";
 import mailTemplate from "./template";
 
 type Args = {
-  seller: SellerInterface;
+  seller: { brand_name: string; email: string };
   buyer: BuyerInterface;
   orders: {
     buyer_desc: string;

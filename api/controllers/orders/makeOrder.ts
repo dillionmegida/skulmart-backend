@@ -84,17 +84,19 @@ export default async function makeOrder(req: any, res: any) {
         // seller already has item in the group
         sellerOrders.orders.push(order);
       } else {
-        const seller = (await Seller.findOne({
+        const seller = await Seller.findOne({
           username: sellerUsername,
-        }).populate({ ...storePopulate })) as SellerInterface & {
-          store: StoreInterface;
-        };
+        }).populate({ ...storePopulate() });
 
         if (!seller)
           return res.status(400).json({
             message:
               "Error occured. Please try again or contact support if you have been debited",
           });
+
+        const sellerAndStore = Object.create(seller) as SellerInterface & {
+          store: StoreInterface;
+        };
 
         const orders = [
           {
@@ -110,7 +112,8 @@ export default async function makeOrder(req: any, res: any) {
 
         groupOrdersPurchasedFromSeller[sellerUsername] = {
           orders,
-          seller_info: seller,
+          // @ts-ignore -- issues with SellerInterface & {store: StoreInterface} combining to one
+          seller_info: sellerAndStore,
         };
       }
     }
@@ -214,7 +217,10 @@ export default async function makeOrder(req: any, res: any) {
       }
 
       await orderMadeEmailForSeller({
-        seller: seller_info,
+        seller: {
+          brand_name: seller_info.brand_name,
+          email: seller_info.email,
+        },
         buyer,
         orders: groupOrdersPurchasedFromSeller[sellerUsername].orders.map(
           (i) => {
