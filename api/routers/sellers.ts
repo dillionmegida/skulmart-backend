@@ -17,6 +17,8 @@ import {
   withdrawFromWallet,
   updateValidationDocument,
 } from "api/controllers/sellers";
+import getNegotiation from "api/controllers/sellers/negotiations/getNegotiation";
+import getNegotiations from "api/controllers/sellers/negotiations/getNegotiations";
 import express from "express";
 const router = express.Router();
 import isAuthenticated from "middlewares/isAuthenticated";
@@ -29,7 +31,7 @@ router.get("/", getAllSellers);
 router.get("/views/:id", updateSellerViews);
 
 // Get seller by username
-router.get("/:username", getSellerByUsername);
+router.get("/username/:username", getSellerByUsername);
 
 // Get seller by id
 router.get("/id/:id", getSellerById);
@@ -81,6 +83,11 @@ router.get("/notifications/all", getNotifications);
 
 // Get notification
 router.get("/notifications/:id", getNotification);
+
+// negotiations
+router.get("/negotiations", getNegotiations);
+
+router.get("/negotiations/:id", getNegotiation);
 
 // paystack hits the path when a seller pays
 router.post("/subscription/activate", async (req: any, res: any) => {
