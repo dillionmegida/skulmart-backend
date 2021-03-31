@@ -18,8 +18,8 @@ export default async function getOrders(req: any, res: any) {
     const totalCount = await Order.countDocuments({ ...criteria });
 
     const allSellerOrders = await Order.find({ ...criteria })
-      .populate({ ...productPopulate })
-      .populate({ ...buyerPopulate })
+      .populate({ ...productPopulate({}) })
+      .populate({ ...buyerPopulate({}) })
       .populate("review");
 
     const modifiedOrders = sliceAndReverse({

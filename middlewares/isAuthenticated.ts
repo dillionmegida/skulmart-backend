@@ -5,6 +5,7 @@ import BuyerInterface from "interfaces/Buyer";
 import Buyer from "models/Buyer";
 import {
   cartPopulate,
+  negotiationPopulate,
   selectBuyerStr,
   selectSellerStr,
   storePopulate,
@@ -43,16 +44,16 @@ export default async function isAuthenticated(req: any, res: any, next: any) {
 
     if (decoded.user_type === "buyer") {
       const buyer = await Buyer.findById(decoded._id)
-        .select(selectBuyerStr)
+        .select(selectBuyerStr({}))
         .populate({
           ...cartPopulate,
         })
-        .populate({ ...storePopulate });
+        .populate({ ...storePopulate() });
       user = buyer && Object.create(buyer);
     } else if (decoded.user_type === "seller") {
       const seller = await Seller.findById(decoded._id)
-        .select(selectSellerStr)
-        .populate({ ...storePopulate });
+        .select(selectSellerStr({}))
+        .populate({ ...storePopulate() });
       user = seller && Object.create(seller);
     }
 

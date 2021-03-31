@@ -1,7 +1,7 @@
 import { PRODUCTS_PER_PAGE } from "constants/index";
 import Product from "models/Product";
 import Seller from "models/Seller";
-import { selectProductStr } from "utils/documentPopulate";
+import { selectProductStr, selectSellerStr } from "utils/documentPopulate";
 
 export default async function getProductsBySeller(req: any, res: any) {
   try {
@@ -11,7 +11,7 @@ export default async function getProductsBySeller(req: any, res: any) {
     const { username } = req.params;
 
     const seller = await Seller.findOne({ username, visible: true }).select(
-      "-password"
+      selectSellerStr({ remove: ["wallet", "cards", "banks"] })
     );
 
     if (!seller)
@@ -34,7 +34,7 @@ export default async function getProductsBySeller(req: any, res: any) {
     const products = await Product.find({
       ...criteria,
     })
-      .select(selectProductStr)
+      .select(selectProductStr({}))
       .limit(PRODUCTS_PER_PAGE)
       .skip(page * PRODUCTS_PER_PAGE);
     res.json({ products, totalPages, seller });

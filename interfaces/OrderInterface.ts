@@ -36,6 +36,7 @@ export type GroupedOrdersPurchasedFromSeller = {
       quantity: number;
       buyer_desc: string;
       price_when_bought: number;
+      negotiated_price: number | null;
       delivery_fee_when_bought: number;
     }[];
     seller_info: SellerInterface & { store: StoreInterface };

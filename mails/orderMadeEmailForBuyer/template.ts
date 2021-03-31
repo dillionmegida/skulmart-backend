@@ -50,7 +50,11 @@ export default function orderMadeForBuyer({
                   <b>${i.quantity}</b> qty(s)
                   <br/>
                   Paid: <b>
-                    ${formatCurrency(i.price_when_bought * i.quantity)}
+                    ${formatCurrency(
+                      (i.negotiated_price
+                        ? i.negotiated_price
+                        : i.price_when_bought) * i.quantity
+                    )}
                   </b>
                   <br/>
                   ${

@@ -23,8 +23,8 @@ export default async function getAuthSellerProducts(req: any, res: any) {
     const products = await Product.find({
       ...criteria,
     })
-      .select(selectProductStr)
-      .populate({ ...storePopulate });
+      .select(selectProductStr({}))
+      .populate({ ...storePopulate() });
 
     const modifiedProducts = sliceAndReverse({
       arr: products,

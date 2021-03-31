@@ -15,7 +15,7 @@ export default async function getAllSellers(req: any, res: any) {
   const sellers = await Seller.find({
     ...criteria,
   })
-    .select(selectSellerStr)
+    .select(selectSellerStr({ remove: ["wallet", "cards", "banks"] }))
     .limit(SELLERS_PER_PAGE)
     .skip(page * SELLERS_PER_PAGE);
 

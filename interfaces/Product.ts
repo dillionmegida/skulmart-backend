@@ -9,6 +9,7 @@ export default interface ProductInterface extends Document {
   desc: string;
   category: string;
   price: number;
+  is_negotiable: boolean;
   delivery_fee: number;
   quantity: number;
   quantity_sold: number;

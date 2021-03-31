@@ -137,6 +137,27 @@ const SellerSchema: Schema = new Schema(
   }
 );
 
+SellerSchema.index(
+  {
+    fullname: "text",
+    brand_name: "text",
+    brand_desc: "text",
+    brand_category: "text",
+    email: "text",
+    username: "text",
+  },
+  {
+    weights: {
+      brand_name: 10,
+      fullname: 8,
+      brand_category: 7,
+      brand_desc: 6,
+      email: 5,
+      username: 3,
+    },
+  }
+);
+
 export default mongoose.model<SellerInterface>(
   "Seller",
   SellerSchema,
