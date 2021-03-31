@@ -16,9 +16,6 @@ import {
   updateSellerViews,
   withdrawFromWallet,
   updateValidationDocument,
-  getNegotiation,
-  updateNegotiationPrice,
-  getNegotiations,
 } from "api/controllers/sellers";
 import express from "express";
 const router = express.Router();
@@ -84,13 +81,6 @@ router.get("/notifications/all", getNotifications);
 
 // Get notification
 router.get("/notifications/:id", getNotification);
-
-// negotiations
-router.get("/negotiations", getNegotiations);
-
-router.get("/negotiations/:id", getNegotiation);
-
-router.put("/negotiations/:id", updateNegotiationPrice);
 
 // paystack hits the path when a seller pays
 router.post("/subscription/activate", async (req: any, res: any) => {

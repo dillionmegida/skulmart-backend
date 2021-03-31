@@ -1,4 +1,4 @@
-import Negotation from "models/Negotation";
+import Negotation from "models/Negotiation";
 import {
   buyerPopulate,
   productPopulate,

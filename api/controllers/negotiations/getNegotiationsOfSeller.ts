@@ -1,16 +1,17 @@
-import BuyerInterface from "interfaces/Buyer";
-import Negotation from "models/Negotation";
+import SellerInterface from "interfaces/Seller";
+import Negotation from "models/Negotiation";
 import {
   buyerPopulate,
   productPopulate,
   sellerPopulate,
 } from "utils/documentPopulate";
 
-export default async function getNegotiations(req: any, res: any) {
-  const buyer = req.user as BuyerInterface;
+export default async function getNegotiationsOfSeller(req: any, res: any) {
+  console.log("got here");
+  const seller = req.user as SellerInterface;
 
   try {
-    const negotiations = await Negotation.find({ buyer: buyer._id })
+    const negotiations = await Negotation.find({ seller: seller._id })
       .populate(buyerPopulate({ remove: ["banks", "cards"] }))
       .populate(sellerPopulate({ remove: ["wallet", "cards", "banks"] }))
       .populate(productPopulate({}));

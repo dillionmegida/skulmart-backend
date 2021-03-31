@@ -30,12 +30,19 @@ export default async function makeOrder(req: any, res: any) {
 
   const { orders: allOrders, message, card_signature } = req.body as {
     message: string;
-    orders: [OrderInterface & { quantity_available: number }];
+    orders: [
+      OrderInterface & {
+        quantity_available: number;
+        negotiated_price: number | null;
+      }
+    ];
     card_signature: string;
   };
 
   let totalAmount = 0;
-  const unsoldOrders: OrderInterface[] = [];
+  const unsoldOrders: (OrderInterface & {
+    negotiated_price: number | null;
+  })[] = [];
 
   allOrders.forEach((o) => {
     if (typeof o.quantity_available !== "number") {
@@ -54,7 +61,13 @@ export default async function makeOrder(req: any, res: any) {
       o.quantity = o.quantity_available;
     }
     unsoldOrders.push(o);
-    totalAmount += o.price_when_bought * o.quantity;
+
+    // check if the price was negotiated
+    let priceToPay = o.negotiated_price
+      ? o.negotiated_price
+      : o.price_when_bought;
+    totalAmount += priceToPay * o.quantity;
+
     if (o.delivery_fee_when_bought > 0)
       totalAmount += o.delivery_fee_when_bought;
   });
@@ -102,6 +115,7 @@ export default async function makeOrder(req: any, res: any) {
           {
             _id: order._id,
             price_when_bought: order.price_when_bought,
+            negotiated_price: order.negotiated_price,
             has_buyer_received: order.has_buyer_received,
             product_populated: order.product_populated,
             delivery_fee_when_bought: order.delivery_fee_when_bought,
@@ -180,7 +194,9 @@ export default async function makeOrder(req: any, res: any) {
           seller: seller_info._id,
           buyer_desc: order.buyer_desc,
           quantity: order.quantity,
-          price_when_bought: order.price_when_bought,
+          price_when_bought: order.negotiated_price
+            ? order.negotiated_price
+            : order.price_when_bought,
           delivery_fee_when_bought: order.delivery_fee_when_bought,
         });
 
@@ -226,7 +242,9 @@ export default async function makeOrder(req: any, res: any) {
           (i) => {
             return {
               product: i.product_populated,
-              price_when_bought: i.price_when_bought,
+              price_when_bought: i.negotiated_price
+                ? i.negotiated_price
+                : i.price_when_bought,
               quantity: i.quantity,
               confirm_order_url: getConfirmLinkFromUrls(i._id),
               buyer_desc: i.buyer_desc,

@@ -18,6 +18,7 @@ export default async function updateProduct(req: any, res: any) {
     img_public_id,
     img_url,
     quantity: _quantity,
+    is_negotiable: _is_negotiable,
   } = req.body as {
     name: string;
     desc: string;
@@ -27,6 +28,7 @@ export default async function updateProduct(req: any, res: any) {
     img_url: string;
     delivery_fee: string;
     quantity: string;
+    is_negotiable: string;
   };
 
   const name = capitalize(_name.trim());
@@ -37,6 +39,7 @@ export default async function updateProduct(req: any, res: any) {
   const delivery_fee = isNaN(parseInt(_delivery_fee, 10))
     ? 0
     : parseInt(_delivery_fee, 10);
+  const is_negotiable = _is_negotiable === "true";
 
   const authUser = req.user as SellerInterface;
 
@@ -122,6 +125,7 @@ export default async function updateProduct(req: any, res: any) {
         seller: authUser._id,
         quantity,
         delivery_fee,
+        is_negotiable,
       },
     });
 

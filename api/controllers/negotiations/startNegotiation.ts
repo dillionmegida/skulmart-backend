@@ -1,10 +1,10 @@
 import BuyerInterface from "interfaces/Buyer";
-import Negotation from "models/Negotation";
+import Negotiation from "models/Negotiation";
 import Product from "models/Product";
 import Seller from "models/Seller";
 import { consoleMessage } from "utils/logs";
 
-export default async function startNegotation(req: any, res: any) {
+export default async function startNegotiation(req: any, res: any) {
   const buyer = req.user as BuyerInterface;
 
   const { product_id } = req.params;
@@ -15,6 +15,11 @@ export default async function startNegotation(req: any, res: any) {
     if (!product)
       return res.status(404).json({ message: "This product does not exist." });
 
+    if (!product.is_negotiable)
+      return res
+        .status(400)
+        .json({ message: "This product is not negotiable" });
+
     const seller = await Seller.findOne({ _id: product.seller });
 
     if (!seller)
@@ -22,11 +27,21 @@ export default async function startNegotation(req: any, res: any) {
         .status(404)
         .json({ message: "The seller for this product does not exist" });
 
-    const newNegotiation = new Negotation({
+    const existingNegotiation = await Negotiation.findOne({
+      product: product_id,
+      status: { $ne: "CLOSED" },
+    });
+
+    if (existingNegotiation)
+      return res
+        .status(400)
+        .json({ message: "You have an open negotiation for this product" });
+
+    const newNegotiation = new Negotiation({
       buyer,
       seller,
       product,
-      status: "OPENED",
+      status: "AWAITING SELLER",
     });
 
     await newNegotiation.save();

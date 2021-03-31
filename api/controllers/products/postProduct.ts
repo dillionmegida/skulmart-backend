@@ -16,6 +16,7 @@ export default async function postProduct(req: any, res: any) {
       price: _price,
       quantity: _quantity,
       delivery_fee: _delivery_fee,
+      is_negotiable: _is_negotiable = "false",
     } = req.body as {
       name: string;
       desc: string;
@@ -23,6 +24,7 @@ export default async function postProduct(req: any, res: any) {
       price: string;
       quantity: string;
       delivery_fee: string;
+      is_negotiable: string;
     };
 
     const name = capitalize(_name.trim());
@@ -33,6 +35,7 @@ export default async function postProduct(req: any, res: any) {
     const delivery_fee = isNaN(parseInt(_delivery_fee, 10))
       ? 0
       : parseInt(_delivery_fee, 10);
+    const is_negotiable = _is_negotiable === "true";
 
     const loggedInSeller: SellerInterface = req.user;
 
@@ -115,6 +118,7 @@ export default async function postProduct(req: any, res: any) {
       visible: true,
       delivery_fee,
       quantity,
+      is_negotiable,
     });
 
     await newProduct.save();

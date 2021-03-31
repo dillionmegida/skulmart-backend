@@ -1,5 +1,5 @@
 import Cart from "models/Cart";
-import Negotation from "models/Negotation";
+import Negotation from "models/Negotiation";
 import { consoleMessage } from "utils/logs";
 
 export default async function updateNegotiationPrice(req: any, res: any) {
@@ -12,21 +12,15 @@ export default async function updateNegotiationPrice(req: any, res: any) {
     if (!negotiation)
       return res.status(404).json({ message: "Negotiation does not exist" });
 
-    const cart = await Cart.findOne({
-      buyer: negotiation.buyer,
-      product: negotiation.product,
-    });
-
-    if (cart)
-      return res.status(400).json({
-        message:
-          "This item is in the buyer's cart, hence, cannot be renegotiated",
-      });
+    if (negotiation.status === "CLOSED")
+      return res
+        .status(400)
+        .json({ message: "This negotiation has been closed by the buyer" });
 
     await Negotation.findByIdAndUpdate(negotiation._id, {
       $set: {
         negotiated_price: price,
-        status: "OPENED",
+        status: "AWAITING BUYER",
       },
     });
 

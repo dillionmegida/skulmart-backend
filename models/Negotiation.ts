@@ -16,8 +16,8 @@ const NegotiationSchema: Schema = new Schema(
     },
     status: {
       type: String,
-      enum: ["OPENED", "CLOSED"],
-      default: "OPENED",
+      enum: ["AWAITING BUYER", "AWAITING SELLER", "CLOSED"],
+      default: "AWAITING SELLER",
     },
   },
   {

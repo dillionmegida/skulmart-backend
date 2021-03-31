@@ -6,5 +6,5 @@ export default interface NegotiationInterface extends Document {
   seller: mongoose.Types.ObjectId;
   product: mongoose.Types.ObjectId;
   negotiated_price: number;
-  status: "OPENED" | "CLOSED";
+  status: "AWAITING BUYER" | "AWAITING SELLER" | "CLOSED";
 }

@@ -17,6 +17,7 @@ const CartSchema: Schema = new Schema(
     negotiation: {
       type: Schema.Types.ObjectId,
       default: null,
+      ref: "Negotiation",
     },
     seller: { type: Schema.Types.ObjectId, required: true, ref: "Seller" },
   },

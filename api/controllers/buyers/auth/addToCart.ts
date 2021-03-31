@@ -2,7 +2,7 @@ import chalk from "chalk";
 import BuyerInterface from "interfaces/Buyer";
 import Buyer from "models/Buyer";
 import Cart from "models/Cart";
-import Negotation from "models/Negotation";
+import Negotation from "models/Negotiation";
 import Product from "models/Product";
 import Seller from "models/Seller";
 import mongoose from "mongoose";

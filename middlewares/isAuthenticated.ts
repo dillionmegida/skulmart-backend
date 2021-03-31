@@ -47,7 +47,6 @@ export default async function isAuthenticated(req: any, res: any, next: any) {
         .select(selectBuyerStr({}))
         .populate({
           ...cartPopulate,
-          populate: { ...negotiationPopulate() },
         })
         .populate({ ...storePopulate() });
       user = buyer && Object.create(buyer);
