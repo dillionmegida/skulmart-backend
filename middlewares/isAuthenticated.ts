@@ -5,6 +5,7 @@ import BuyerInterface from "interfaces/Buyer";
 import Buyer from "models/Buyer";
 import {
   cartPopulate,
+  negotiationPopulate,
   selectBuyerStr,
   selectSellerStr,
   storePopulate,
@@ -46,6 +47,7 @@ export default async function isAuthenticated(req: any, res: any, next: any) {
         .select(selectBuyerStr({}))
         .populate({
           ...cartPopulate,
+          populate: { ...negotiationPopulate() },
         })
         .populate({ ...storePopulate() });
       user = buyer && Object.create(buyer);

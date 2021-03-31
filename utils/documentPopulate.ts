@@ -63,6 +63,11 @@ export const productPopulate = ({
 });
 
 // cart select and populate
+export const negotiationPopulate = () => ({
+  path: "negotiation",
+});
+
+// cart select and populate
 export const cartPopulate = {
   path: "cart",
   populate: {

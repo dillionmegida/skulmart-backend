@@ -15,3 +15,6 @@ export { default as onboarding3 } from "./auth/onboarding3";
 export { default as updateValidationDocument } from "./auth/updateValidationDocument";
 export { default as getSubmittedValidationDocument } from "./auth/getSubmittedValidationDocument";
 export { default as getActivities } from "./auth/getActivities";
+export { default as getNegotiations } from "./auth/negotiations/getNegotiations";
+export { default as getNegotiation } from "./auth/negotiations/getNegotiation";
+export { default as updateNegotiationPrice } from "./auth/negotiations/updateNegotiationPrice";
