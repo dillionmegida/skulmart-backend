@@ -23,6 +23,7 @@ import smsAfterBuyerMakesOrder from "sms/smsAfterBuyerMakesOrder";
 import { convertToKobo } from "utils/money";
 import { storePopulate } from "utils/documentPopulate";
 import { allParametersExist } from "utils/validateBodyParameters";
+import { saveActivity } from "utils/activities";
 
 const IS_DEV = process.env.NODE_ENV === "dev";
 
@@ -175,12 +176,13 @@ export default async function makeOrder(req: any, res: any) {
 
     const sellerUsernames = Object.keys(groupOrdersPurchasedFromSeller);
 
+    const orderRef = shortId.generate();
+
     for (let i = 0; i < sellerUsernames.length; i++) {
       const sellerUsername = sellerUsernames[i];
       const { orders, seller_info } = groupOrdersPurchasedFromSeller[
         sellerUsername
       ];
-      const orderRef = shortId.generate();
 
       // TODO: find a better way to know if this is the seller's first order
       const currentCountOfSellerOrders = await Order.countDocuments({
@@ -268,7 +270,6 @@ export default async function makeOrder(req: any, res: any) {
           seller: {
             phone: seller_info.whatsapp,
             brand: seller_info.brand_name,
-            name: seller_info.fullname,
           },
         });
     }
@@ -282,6 +283,15 @@ export default async function makeOrder(req: any, res: any) {
     });
 
     res.json({ message: "Order completed" });
+
+    await saveActivity({
+      type: "ORDERS_BOUGHT",
+      options: {
+        buyer_id: buyer._id,
+        ordersRef: orderRef,
+        nOrders: unsoldOrders.length,
+      },
+    });
   } catch (err) {
     console.log(chalk.red("An error occured during making order >>> "), err);
     res.status(500).json({
