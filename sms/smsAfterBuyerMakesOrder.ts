@@ -8,13 +8,12 @@ type Args = {
   };
   seller: {
     phone: string;
-    name: string;
     brand: string;
   };
 };
 export default async function smsAfterBuyerMakesOrder({
   buyer: { phone: buyer_phone },
-  seller: { phone: seller_phone, brand, name: seller_name },
+  seller: { phone: seller_phone, brand },
 }: Args) {
   const buyerPhone = getAcceptablePhoneNo(buyer_phone);
   const sellerPhone = getAcceptablePhoneNo(seller_phone);
