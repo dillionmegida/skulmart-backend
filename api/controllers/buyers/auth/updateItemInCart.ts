@@ -1,18 +1,21 @@
 import chalk from "chalk";
 import Cart from "models/Cart";
 import mongoose from "mongoose";
+import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function updateItemInCart(req: any, res: any) {
   const { cart_id } = req.params;
 
-  const { quantity, buyer_desc = "" } = req.body as {
-    quantity: number;
-    buyer_desc: string;
-  };
-
-  const cartId = mongoose.Types.ObjectId(cart_id);
-
   try {
+    allParametersExist(req.body, "quantity", "buyer_desc");
+
+    const { quantity, buyer_desc = "" } = req.body as {
+      quantity: number;
+      buyer_desc: string;
+    };
+
+    const cartId = mongoose.Types.ObjectId(cart_id);
+
     const cartItem = await Cart.findOne({ _id: cartId });
 
     if (!cartItem)

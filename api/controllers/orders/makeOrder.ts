@@ -22,68 +22,73 @@ import Product from "models/Product";
 import smsAfterBuyerMakesOrder from "sms/smsAfterBuyerMakesOrder";
 import { convertToKobo } from "utils/money";
 import { storePopulate } from "utils/documentPopulate";
+import { allParametersExist } from "utils/validateBodyParameters";
 
 const IS_DEV = process.env.NODE_ENV === "dev";
 
 export default async function makeOrder(req: any, res: any) {
-  const buyer = req.user as BuyerInterface;
-
-  const { orders: allOrders, message, card_signature } = req.body as {
-    message: string;
-    orders: [
-      OrderInterface & {
-        quantity_available: number;
-        negotiated_price: number | null;
-      }
-    ];
-    card_signature: string;
-  };
-
-  let totalAmount = 0;
-  const unsoldOrders: (OrderInterface & {
-    negotiated_price: number | null;
-  })[] = [];
-
-  allOrders.forEach((o) => {
-    if (typeof o.quantity_available !== "number") {
-      // Ensure that quantity_available is provided
-      // as this is the way to ensure that the products to be bought
-      // have not been bought
-      throw new Error("`quantity_available` must be sent from client");
-    }
-
-    if (o.quantity_available < 1) return; // the item in this order has been sold
-
-    if (o.quantity > o.quantity_available) {
-      // qty in cart is higher than available
-      // also, the client has to show that the qtys buyers pay for
-      // is lower than what they added to cart, due to some items sold
-      o.quantity = o.quantity_available;
-    }
-    unsoldOrders.push(o);
-
-    // check if the price was negotiated
-    let priceToPay = o.negotiated_price
-      ? o.negotiated_price
-      : o.price_when_bought;
-    totalAmount += priceToPay * o.quantity;
-
-    if (o.delivery_fee_when_bought > 0)
-      totalAmount += o.delivery_fee_when_bought;
-  });
-
-  const totalAmountInKobo = convertToKobo(totalAmount);
-
-  const cardToPayWith = buyer.cards.find(
-    ({ signature }) => signature === card_signature
-  );
-
-  if (!cardToPayWith)
-    return res.status(400).json({ message: "Card to pay with does not exist" });
-
-  const groupOrdersPurchasedFromSeller: GroupedOrdersPurchasedFromSeller = {};
-
   try {
+    allParametersExist(req.body, "orders", "message", "card_signature");
+
+    const buyer = req.user as BuyerInterface;
+
+    const { orders: allOrders, message, card_signature } = req.body as {
+      message: string;
+      orders: [
+        OrderInterface & {
+          quantity_available: number;
+          negotiated_price: number | null;
+        }
+      ];
+      card_signature: string;
+    };
+
+    let totalAmount = 0;
+    const unsoldOrders: (OrderInterface & {
+      negotiated_price: number | null;
+    })[] = [];
+
+    allOrders.forEach((o) => {
+      if (typeof o.quantity_available !== "number") {
+        // Ensure that quantity_available is provided
+        // as this is the way to ensure that the products to be bought
+        // have not been bought
+        throw new Error("`quantity_available` must be sent from client");
+      }
+
+      if (o.quantity_available < 1) return; // the item in this order has been sold
+
+      if (o.quantity > o.quantity_available) {
+        // qty in cart is higher than available
+        // also, the client has to show that the qtys buyers pay for
+        // is lower than what they added to cart, due to some items sold
+        o.quantity = o.quantity_available;
+      }
+      unsoldOrders.push(o);
+
+      // check if the price was negotiated
+      let priceToPay = o.negotiated_price
+        ? o.negotiated_price
+        : o.price_when_bought;
+      totalAmount += priceToPay * o.quantity;
+
+      if (o.delivery_fee_when_bought > 0)
+        totalAmount += o.delivery_fee_when_bought;
+    });
+
+    const totalAmountInKobo = convertToKobo(totalAmount);
+
+    const cardToPayWith = buyer.cards.find(
+      ({ signature }) => signature === card_signature
+    );
+
+    if (!cardToPayWith)
+      return res
+        .status(400)
+        .json({ message: "Card to pay with does not exist" });
+
+    const groupOrdersPurchasedFromSeller: GroupedOrdersPurchasedFromSeller = {};
+
     for (let i = 0; i < unsoldOrders.length; i++) {
       const order = unsoldOrders[i];
       const sellerUsername = IS_DEV

@@ -4,17 +4,20 @@ import BuyerInterface from "interfaces/Buyer";
 import SellerInterface from "interfaces/Seller";
 import Buyer from "models/Buyer";
 import Seller from "models/Seller";
+import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function addBankAccount(req: any, res: any) {
   const user = req.user as BuyerInterface | SellerInterface;
 
-  const { bank_code, account_number, bank_name } = req.body as {
-    account_number: string;
-    bank_code: string;
-    bank_name: string;
-  };
-
   try {
+    allParametersExist(req.body, "bank_code", "account_number", "bank_name");
+
+    const { bank_code, account_number, bank_name } = req.body as {
+      account_number: string;
+      bank_code: string;
+      bank_name: string;
+    };
+
     const resolveResponse = await verifyAccountNumber({
       account_number,
       bank_code,

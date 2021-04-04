@@ -3,13 +3,16 @@ import BuyerInterface from "interfaces/Buyer";
 import SellerInterface from "interfaces/Seller";
 import Buyer from "models/Buyer";
 import Seller from "models/Seller";
+import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function removeBankAccount(req: any, res: any) {
   const user = req.user as BuyerInterface | SellerInterface;
 
-  const { account_number } = req.body as { account_number: string };
-
   try {
+    allParametersExist(req.body, "account_number");
+
+    const { account_number } = req.body as { account_number: string };
+
     const existingBanks = [...user.banks];
 
     const bankToBeRemoved = existingBanks.findIndex(

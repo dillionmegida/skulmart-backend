@@ -10,6 +10,8 @@ export default async function startNegotiation(req: any, res: any) {
   const { product_id } = req.params;
 
   try {
+
+    
     const product = await Product.findOne({ _id: product_id });
 
     if (!product)

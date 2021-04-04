@@ -9,25 +9,28 @@ import Activity from "models/Activity";
 import { formatCurrency } from "utils/currency";
 import Order from "models/Order";
 import Cart from "models/Cart";
+import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function deleteUser(req: any, res: any) {
-  const { email, password } = req.body as { email: string; password: string };
-
   const user = req.user as SellerInterface | BuyerInterface;
 
-  if (email !== user.email)
-    return res.status(400).json({
-      message: "Please enter your valid email",
-    });
-
-  if (user.user_type === "seller" && user.wallet.balance > 0)
-    return res.status(400).json({
-      message: `You currently have ${formatCurrency(
-        user.wallet.balance
-      )} in your wallet. Please contact us if you want to go ahead with the delete process.`,
-    });
-
   try {
+    allParametersExist(req.body, "email", "password");
+
+    const { email, password } = req.body as { email: string; password: string };
+
+    if (email !== user.email)
+      return res.status(400).json({
+        message: "Please enter your valid email",
+      });
+
+    if (user.user_type === "seller" && user.wallet.balance > 0)
+      return res.status(400).json({
+        message: `You currently have ${formatCurrency(
+          user.wallet.balance
+        )} in your wallet. Please contact us if you want to go ahead with the delete process.`,
+      });
+
     let isPasswordMatch = false;
 
     if (user.user_type === "buyer") {

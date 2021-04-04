@@ -9,16 +9,20 @@ import Product from "models/Product";
 import Seller from "models/Seller";
 import { saveActivity } from "utils/activities";
 import chargeFee from "utils/chargeFee";
+import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function receivedOrder(req: any, res: any) {
   const buyer = req.user as BuyerInterface;
-  const { id } = req.params;
-  const { rating, review } = req.body as {
-    rating: number;
-    review: string;
-  };
 
   try {
+    allParametersExist(req.body, "rating", "review");
+
+    const { id } = req.params;
+    const { rating, review } = req.body as {
+      rating: number;
+      review: string;
+    };
+
     const order = (await Order.findById(id)) as OrderInterface;
     const seller = (await Seller.findById(order.seller)) as SellerInterface;
     const product = (await Product.findById(order.product)) as ProductInterface;
