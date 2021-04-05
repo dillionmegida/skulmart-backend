@@ -7,7 +7,7 @@ import Buyer from "models/Buyer";
 import EmailConfirmation from "models/EmailConfirmation";
 import Seller from "models/Seller";
 import Store from "models/Store";
-import { randomNumber } from "utils/numbers";
+import shortId from "shortid";
 import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function resendEmailConfirmationLink(req: any, res: any) {
@@ -51,7 +51,8 @@ export default async function resendEmailConfirmationLink(req: any, res: any) {
 
     if (existingEmailConfirmation === null) {
       // then an email confirmation document was not saved for this email, which is almost never possible
-      const generatedHash = randomNumber();
+      const generatedHash =
+        shortId.generate() + shortId.generate() + shortId.generate();
       const newEmailToBeConfirmed = new EmailConfirmation({
         generatedHash,
         user_id: user._id,

@@ -7,7 +7,7 @@ import Buyer from "models/Buyer";
 import ResetPassword from "models/ResetPassword";
 import Seller from "models/Seller";
 import Store from "models/Store";
-import { randomNumber } from "utils/numbers";
+import shortId from "shortid";
 import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function resetPasswordRequest(req: any, res: any) {
@@ -44,7 +44,8 @@ export default async function resetPasswordRequest(req: any, res: any) {
     let hash;
 
     if (existingResetPassword === null) {
-      const generatedHash = randomNumber();
+      const generatedHash =
+        shortId.generate() + shortId.generate() + shortId.generate();
       const newPasswordReset = new ResetPassword({
         generatedHash,
         user_id: user._id,

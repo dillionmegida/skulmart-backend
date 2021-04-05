@@ -6,8 +6,8 @@ import Buyer from "models/Buyer";
 import EmailConfirmation from "models/EmailConfirmation";
 import Product from "models/Product";
 import Seller from "models/Seller";
-import { randomNumber } from "utils/numbers";
 import { allParametersExist } from "utils/validateBodyParameters";
+import shortId from "shortid";
 
 export default async function updateUserEmail(req: any, res: any) {
   const userId = req.user._id;
@@ -80,7 +80,8 @@ export default async function updateUserEmail(req: any, res: any) {
       });
     }
 
-    const generatedHash = randomNumber();
+    const generatedHash =
+      shortId.generate() + shortId.generate() + shortId.generate();
 
     const newEmailToBeConfirmed = new EmailConfirmation({
       generatedHash,

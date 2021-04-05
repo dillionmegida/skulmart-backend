@@ -23,9 +23,7 @@ export default async function onboarding1(req: any, res: any) {
         str: brand_name,
         replace: " ",
         _with: "-",
-      }).toLowerCase() +
-      "-" +
-      shortid.generate();
+      }).toLowerCase() + shortid.generate();
 
     const uploadImageResult = await uploadImage({
       path: req.file.path,

@@ -8,10 +8,10 @@ import Seller from "models/Seller";
 import Store from "models/Store";
 import shortid from "shortid";
 import { consoleMessage } from "utils/logs";
-import { randomNumber } from "utils/numbers";
 import { bcryptPromise } from "utils/strings";
 import { getToken } from "utils/token";
 import { allParametersExist } from "utils/validateBodyParameters";
+import shortId from "shortid";
 
 export default async function createUser(req: any, res: any) {
   const body: SellerInterface | BuyerInterface = { ...req.body };
@@ -77,7 +77,8 @@ export default async function createUser(req: any, res: any) {
         .status(400)
         .json({ message: "An error occured. Please try again." });
 
-    const generatedHash = randomNumber();
+    const generatedHash =
+      shortId.generate() + shortId.generate() + shortId.generate();
 
     const newEmailToBeConfirmed = new EmailConfirmation({
       generatedHash,
