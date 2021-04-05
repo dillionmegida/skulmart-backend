@@ -4,17 +4,19 @@ import BuyerInterface from "interfaces/Buyer";
 import Buyer from "models/Buyer";
 import { uploadImage } from "utils/image";
 import { capitalize, replaceString } from "utils/strings";
+import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function onboarding(req: any, res: any) {
   const user = req.user as BuyerInterface;
 
-  const body: BuyerInterface = { ...req.body };
-
-  const { fullname: _fullname, phone } = body;
-
-  const fullname = capitalize(_fullname.trim());
-
   try {
+    allParametersExist(req.body, "fullname", "phone");
+
+    const body: BuyerInterface = { ...req.body };
+
+    const { fullname: _fullname, phone } = body;
+
+    const fullname = capitalize(_fullname.trim());
     const imageInfo: { public_id: string | null; url: string | null } = {
       public_id: null,
       url: null,

@@ -6,78 +6,82 @@ import Buyer from "models/Buyer";
 import EmailConfirmation from "models/EmailConfirmation";
 import Product from "models/Product";
 import Seller from "models/Seller";
-import { randomNumber } from "utils/numbers";
+import { allParametersExist } from "utils/validateBodyParameters";
+import shortId from "shortid";
 
 export default async function updateUserEmail(req: any, res: any) {
-  let { email, user_type } = req.body as {
-    email: string;
-    user_type: "seller" | "buyer";
-  };
-
-  email = email.trim();
-
-  // check if user already exists
-  const buyerWithSameEmail = await Buyer.findOne({ email });
-  if (buyerWithSameEmail) {
-    return res.status(400).json({
-      message: `User with the email '${email}' already exists.`,
-    });
-  }
-
-  const sellerWithSameEmail = await Seller.findOne({ email });
-  if (sellerWithSameEmail) {
-    return res.status(400).json({
-      message: `User with the email '${email}' already exists.`,
-    });
-  }
-
   const userId = req.user._id;
 
-  let existingUser: BuyerInterface | SellerInterface | null = null;
-
-  if (user_type === "seller") {
-    existingUser = await Seller.findOne({
-      _id: userId,
-    });
-  } else if (user_type === "buyer") {
-    existingUser = await Buyer.findOne({
-      _id: userId,
-    });
-  }
-
-  if (!existingUser)
-    return res.status(400).json({
-      message: "User not found",
-    });
-
-  if (user_type === "seller") {
-    await Seller.findByIdAndUpdate(userId, {
-      $set: {
-        email,
-        email_confirm: false,
-      },
-    });
-
-    // make all seller's product hidden
-    await Product.updateMany(
-      { seller: existingUser._id },
-      {
-        $set: {
-          visible: false,
-        },
-      }
-    );
-  } else if (user_type === "buyer") {
-    await Buyer.findByIdAndUpdate(userId, {
-      $set: {
-        email,
-        email_confirm: false,
-      },
-    });
-  }
-
   try {
-    const generatedHash = randomNumber();
+    allParametersExist(req.body, "email", "user_type");
+
+    let { email, user_type } = req.body as {
+      email: string;
+      user_type: "seller" | "buyer";
+    };
+
+    email = email.trim();
+
+    // check if user already exists
+    const buyerWithSameEmail = await Buyer.findOne({ email });
+    if (buyerWithSameEmail) {
+      return res.status(400).json({
+        message: `User with the email '${email}' already exists.`,
+      });
+    }
+
+    const sellerWithSameEmail = await Seller.findOne({ email });
+    if (sellerWithSameEmail) {
+      return res.status(400).json({
+        message: `User with the email '${email}' already exists.`,
+      });
+    }
+
+    let existingUser: BuyerInterface | SellerInterface | null = null;
+
+    if (user_type === "seller") {
+      existingUser = await Seller.findOne({
+        _id: userId,
+      });
+    } else if (user_type === "buyer") {
+      existingUser = await Buyer.findOne({
+        _id: userId,
+      });
+    }
+
+    if (!existingUser)
+      return res.status(400).json({
+        message: "User not found",
+      });
+
+    if (user_type === "seller") {
+      await Seller.findByIdAndUpdate(userId, {
+        $set: {
+          email,
+          email_confirm: false,
+        },
+      });
+
+      // make all seller's product hidden
+      await Product.updateMany(
+        { seller: existingUser._id },
+        {
+          $set: {
+            visible: false,
+          },
+        }
+      );
+    } else if (user_type === "buyer") {
+      await Buyer.findByIdAndUpdate(userId, {
+        $set: {
+          email,
+          email_confirm: false,
+        },
+      });
+    }
+
+    const generatedHash =
+      shortId.generate() + shortId.generate() + shortId.generate();
 
     const newEmailToBeConfirmed = new EmailConfirmation({
       generatedHash,

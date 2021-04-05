@@ -7,43 +7,57 @@ import Product from "models/Product";
 import Store from "models/Store";
 import { deleteImage, uploadImage } from "utils/image";
 import { capitalize, replaceString } from "utils/strings";
+import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function updateProduct(req: any, res: any) {
-  const {
-    name: _name,
-    desc: _desc,
-    category: _category,
-    price: _price,
-    delivery_fee: _delivery_fee,
-    img_public_id,
-    img_url,
-    quantity: _quantity,
-    is_negotiable: _is_negotiable,
-  } = req.body as {
-    name: string;
-    desc: string;
-    category: string;
-    price: string;
-    img_public_id: string;
-    img_url: string;
-    delivery_fee: string;
-    quantity: string;
-    is_negotiable: string;
-  };
-
-  const name = capitalize(_name.trim());
-  const category = _category.toLowerCase().trim();
-  const desc = _desc.trim();
-  const quantity = parseInt(_quantity, 10);
-  const price = parseInt(_price, 10);
-  const delivery_fee = isNaN(parseInt(_delivery_fee, 10))
-    ? 0
-    : parseInt(_delivery_fee, 10);
-  const is_negotiable = _is_negotiable === "true";
-
-  const authUser = req.user as SellerInterface;
-
   try {
+    allParametersExist(
+      req.body,
+      "name",
+      "desc",
+      "category",
+      "price",
+      "delivery_fee",
+      "img_public_id",
+      "img_url",
+      "quantity",
+      "is_negotiable"
+    );
+
+    const {
+      name: _name,
+      desc: _desc,
+      category: _category,
+      price: _price,
+      delivery_fee: _delivery_fee,
+      img_public_id,
+      img_url,
+      quantity: _quantity,
+      is_negotiable: _is_negotiable,
+    } = req.body as {
+      name: string;
+      desc: string;
+      category: string;
+      price: string;
+      img_public_id: string;
+      img_url: string;
+      delivery_fee: string;
+      quantity: string;
+      is_negotiable: string;
+    };
+
+    const name = capitalize(_name.trim());
+    const category = _category.toLowerCase().trim();
+    const desc = _desc.trim();
+    const quantity = parseInt(_quantity, 10);
+    const price = parseInt(_price, 10);
+    const delivery_fee = isNaN(parseInt(_delivery_fee, 10))
+      ? 0
+      : parseInt(_delivery_fee, 10);
+    const is_negotiable = _is_negotiable === "true";
+
+    const authUser = req.user as SellerInterface;
+
     const existingProduct = await Product.findOne({
       name,
       seller: authUser._id,

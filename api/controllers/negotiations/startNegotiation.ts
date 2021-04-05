@@ -1,7 +1,9 @@
 import BuyerInterface from "interfaces/Buyer";
+import buyerStartsANegotiationMail from "mails/buyerStartsANegotiationMail";
 import Negotiation from "models/Negotiation";
 import Product from "models/Product";
 import Seller from "models/Seller";
+import smsAfterBuyerStartsNegotiation from "sms/smsAfterBuyerStartsNegotiation";
 import { consoleMessage } from "utils/logs";
 
 export default async function startNegotiation(req: any, res: any) {
@@ -49,6 +51,18 @@ export default async function startNegotiation(req: any, res: any) {
     res.json({
       message: "Negotation has been started.",
       negotation_id: newNegotiation._id,
+    });
+
+    await buyerStartsANegotiationMail({
+      product: { name: product.name },
+      seller: { email: seller.email },
+      buyer: { name: buyer.fullname },
+    });
+
+    await smsAfterBuyerStartsNegotiation({
+      buyer: { name: buyer.fullname },
+      seller: { phone: seller.whatsapp },
+      product: { name: product.name },
     });
   } catch (err) {
     consoleMessage({

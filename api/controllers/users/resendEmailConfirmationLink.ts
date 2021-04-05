@@ -7,25 +7,28 @@ import Buyer from "models/Buyer";
 import EmailConfirmation from "models/EmailConfirmation";
 import Seller from "models/Seller";
 import Store from "models/Store";
-import { randomNumber } from "utils/numbers";
+import shortId from "shortid";
+import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function resendEmailConfirmationLink(req: any, res: any) {
-  let { email, user_type } = req.body as {
-    email: string;
-    user_type: "seller" | "buyer";
-  };
-
-  email = email.trim();
-
-  let user: BuyerInterface | SellerInterface | null = null;
-
-  if (user_type === "buyer") {
-    user = await Buyer.findOne({ email });
-  } else if (user_type === "seller") {
-    user = await Seller.findOne({ email });
-  }
-
   try {
+    allParametersExist(req.body, "email", "user_type");
+
+    let { email, user_type } = req.body as {
+      email: string;
+      user_type: "seller" | "buyer";
+    };
+
+    email = email.trim();
+
+    let user: BuyerInterface | SellerInterface | null = null;
+
+    if (user_type === "buyer") {
+      user = await Buyer.findOne({ email });
+    } else if (user_type === "seller") {
+      user = await Seller.findOne({ email });
+    }
+
     if (!user) {
       // then email does not exist
       return res.status(400).json({
@@ -48,7 +51,8 @@ export default async function resendEmailConfirmationLink(req: any, res: any) {
 
     if (existingEmailConfirmation === null) {
       // then an email confirmation document was not saved for this email, which is almost never possible
-      const generatedHash = randomNumber();
+      const generatedHash =
+        shortId.generate() + shortId.generate() + shortId.generate();
       const newEmailToBeConfirmed = new EmailConfirmation({
         generatedHash,
         user_id: user._id,

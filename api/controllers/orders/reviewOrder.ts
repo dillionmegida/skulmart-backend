@@ -6,16 +6,20 @@ import Order from "models/Order";
 import ProductReview from "models/ProductReview";
 import Seller from "models/Seller";
 import { saveActivity } from "utils/activities";
+import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function reviewOrder(req: any, res: any) {
   const buyer = req.user as BuyerInterface;
   const { id } = req.params;
-  const { rating, review } = req.body as {
-    rating: number;
-    review: string;
-  };
 
   try {
+    allParametersExist(req.body, "rating", "review");
+
+    const { rating, review } = req.body as {
+      rating: number;
+      review: string;
+    };
+
     const order = await Order.findOne({ _id: id });
     if (!order) return res.status(400).json({ message: "Order not found" });
 

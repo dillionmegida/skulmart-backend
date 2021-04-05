@@ -3,7 +3,7 @@ import mongoose, { Document } from "mongoose";
 export type ActivityType =
   | "PASSWORD_CHANGED"
   | "EMAIL_CHANGED"
-  | "ORDER_BOUGHT"
+  | "ORDERS_BOUGHT"
   | "ORDER_RECEIVED"
   | "ORDER_REVIEWED"
   | "ITEM_LISTED"

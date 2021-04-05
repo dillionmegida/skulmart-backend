@@ -9,4 +9,5 @@ export default interface ValidationDocumentInterface extends Document {
   img: ImageInterface;
   createdAt: Date;
   status: STATUS;
+  error_msg?: string;
 }

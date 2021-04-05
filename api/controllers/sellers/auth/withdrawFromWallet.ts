@@ -8,60 +8,62 @@ import { saveActivity } from "utils/activities";
 import { chargeOnTransfer } from "utils/chargeFee";
 import { formatCurrency } from "utils/currency";
 import { convertToKobo } from "utils/money";
+import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function withdrawFromWallet(req: any, res: any) {
   const seller = req.user as SellerInterface;
-  const { amount: _amount, account_number } = req.body as {
-    amount: string;
-    account_number: string;
-  };
 
-  if (!seller.wallet.last_income)
-    return res
-      .status(400)
-      .json({
+  try {
+    allParametersExist(req.body, "amount", "account_number");
+
+    const { amount: _amount, account_number } = req.body as {
+      amount: string;
+      account_number: string;
+    };
+
+    if (!seller.wallet.last_income)
+      return res.status(400).json({
         message:
           "You cannot withdraw because you have not received any income.",
       });
 
-  const amount = parseInt(_amount, 10);
+    const amount = parseInt(_amount, 10);
 
-  if (isNaN(amount) || amount === 0)
-    return res.status(400).json({
-      message: "You cannot withdraw " + formatCurrency(0),
-    });
+    if (isNaN(amount) || amount === 0)
+      return res.status(400).json({
+        message: "You cannot withdraw " + formatCurrency(0),
+      });
 
-  if (amount > seller.wallet.balance)
-    return res.status(400).json({
-      message:
-        "You cannot withdraw more than your current balance (" +
-        formatCurrency(seller.wallet.balance) +
-        ")",
-    });
+    if (amount > seller.wallet.balance)
+      return res.status(400).json({
+        message:
+          "You cannot withdraw more than your current balance (" +
+          formatCurrency(seller.wallet.balance) +
+          ")",
+      });
 
-  const amountToWithdraw =
-    !seller.wallet.last_withdraw || // then seller has not withdrawn before
-    (seller.wallet.last_income as Date) > seller.wallet.last_withdraw // seller has not withdrawn since new income
-      ? amount // free withdraw
-      : amount - chargeOnTransfer(amount).fee;
+    const amountToWithdraw =
+      !seller.wallet.last_withdraw || // then seller has not withdrawn before
+      (seller.wallet.last_income as Date) > seller.wallet.last_withdraw // seller has not withdrawn since new income
+        ? amount // free withdraw
+        : amount - chargeOnTransfer(amount).fee;
 
-  const amountToWithdrawInKobo = convertToKobo(amountToWithdraw);
+    const amountToWithdrawInKobo = convertToKobo(amountToWithdraw);
 
-  if (seller.banks.length === 0)
-    return res.status(400).json({
-      message: "No bank account found",
-    });
+    if (seller.banks.length === 0)
+      return res.status(400).json({
+        message: "No bank account found",
+      });
 
-  const selectedBank = seller.banks.find(
-    (b) => b.account_number === account_number
-  );
+    const selectedBank = seller.banks.find(
+      (b) => b.account_number === account_number
+    );
 
-  if (!selectedBank)
-    return res
-      .status(400)
-      .json({ message: "Selected bank account does not exist" });
+    if (!selectedBank)
+      return res
+        .status(400)
+        .json({ message: "Selected bank account does not exist" });
 
-  try {
     // verify account number
     const verifyAcctNumberResponse = await verifyAccountNumber({
       account_number: selectedBank.account_number,

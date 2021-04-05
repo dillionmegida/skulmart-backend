@@ -8,7 +8,7 @@ const ActivitySchema: Schema = new Schema(
       enum: [
         "PASSWORD_CHANGED",
         "EMAIL_CHANGED",
-        "ORDER_BOUGHT",
+        "ORDERS_BOUGHT",
         "ORDER_RECEIVED",
         "ORDER_REVIEWED",
         "ITEM_LISTED",

@@ -1,5 +1,4 @@
 import chalk from "chalk";
-import { CLOUDINARY_USER_IMAGES_FOLDER } from "constants/index";
 import BuyerInterface from "interfaces/Buyer";
 import SellerInterface from "interfaces/Seller";
 import emailConfirmation from "mails/emailConfirmation";
@@ -8,19 +7,22 @@ import EmailConfirmation from "models/EmailConfirmation";
 import Seller from "models/Seller";
 import Store from "models/Store";
 import shortid from "shortid";
-import { uploadImage } from "utils/image";
-import { randomNumber } from "utils/numbers";
-import { bcryptPromise, capitalize, replaceString } from "utils/strings";
+import { consoleMessage } from "utils/logs";
+import { bcryptPromise } from "utils/strings";
 import { getToken } from "utils/token";
+import { allParametersExist } from "utils/validateBodyParameters";
+import shortId from "shortid";
 
 export default async function createUser(req: any, res: any) {
   const body: SellerInterface | BuyerInterface = { ...req.body };
 
-  const { email: _email, store: store_id, password, user_type } = body;
-
-  const email = _email.trim();
-
   try {
+    allParametersExist(req.body, "email", "store", "password", "user_type");
+
+    const { email: _email, store: store_id, password, user_type } = body;
+
+    const email = _email.trim();
+
     const store = await Store.findOne({
       _id: store_id,
     });
@@ -75,7 +77,8 @@ export default async function createUser(req: any, res: any) {
         .status(400)
         .json({ message: "An error occured. Please try again." });
 
-    const generatedHash = randomNumber();
+    const generatedHash =
+      shortId.generate() + shortId.generate() + shortId.generate();
 
     const newEmailToBeConfirmed = new EmailConfirmation({
       generatedHash,
@@ -111,7 +114,11 @@ export default async function createUser(req: any, res: any) {
       );
     }
   } catch (err) {
-    console.log(chalk.red("An error occured during user creation >> "), err);
+    consoleMessage({
+      message: "An error occured during user creation",
+      error: err,
+      type: "error",
+    });
     res.status(500).json({
       error: err,
       message: "Error occured. Please try again",

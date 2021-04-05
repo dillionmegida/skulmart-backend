@@ -6,25 +6,28 @@ import Negotation from "models/Negotiation";
 import Product from "models/Product";
 import Seller from "models/Seller";
 import mongoose from "mongoose";
+import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function addToCart(req: any, res: any) {
   const { product_id } = req.params;
 
-  const {
-    quantity = 1,
-    seller_id,
-    buyer_desc = "",
-    negotiation_id = null,
-  } = req.body as {
-    quantity: number;
-    seller_id: string;
-    buyer_desc?: string;
-    negotiation_id?: string;
-  };
-
-  const sellerId = mongoose.Types.ObjectId(seller_id);
-
   try {
+    allParametersExist(req.body, "quantity", "seller_id", "buyer_desc");
+
+    const {
+      quantity = 1,
+      seller_id,
+      buyer_desc = "",
+      negotiation_id = null,
+    } = req.body as {
+      quantity: number;
+      seller_id: string;
+      buyer_desc?: string;
+      negotiation_id?: string;
+    };
+
+    const sellerId = mongoose.Types.ObjectId(seller_id);
+
     const buyer = req.user as BuyerInterface;
 
     const buyerCart = await Cart.find({ buyer: buyer._id });

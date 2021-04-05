@@ -8,22 +8,23 @@ import Store from "models/Store";
 import shortid from "shortid";
 import { deleteImage, uploadImage } from "utils/image";
 import { capitalize, replaceString } from "utils/strings";
+import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function updateUser(req: any, res: any) {
-  const body = { ...req.body } as
-    | (BuyerInterface & {
-        img_public_id: string;
-        img_url: string;
-      })
-    | (SellerInterface & {
-        img_public_id: string;
-        img_url: string;
-      });
-
   const authUser = req.user as SellerInterface | BuyerInterface;
   const seller = authUser as SellerInterface;
 
   try {
+    const body = { ...req.body } as
+      | (BuyerInterface & {
+          img_public_id: string;
+          img_url: string;
+        })
+      | (SellerInterface & {
+          img_public_id: string;
+          img_url: string;
+        });
+
     const store = await Store.findOne({
       _id: authUser.store,
     });
@@ -67,6 +68,14 @@ export default async function updateUser(req: any, res: any) {
     }
 
     if (body.user_type === "seller") {
+      allParametersExist(
+        body,
+        "fullname",
+        "brand_name",
+        "brand_desc",
+        "whatsapp"
+      );
+
       let {
         fullname,
         brand_name,
@@ -109,6 +118,8 @@ export default async function updateUser(req: any, res: any) {
         },
       });
     } else if (body.user_type === "buyer") {
+      allParametersExist(body, "fullname", "phone");
+
       let { fullname, phone } = body;
 
       fullname = capitalize(fullname.trim());

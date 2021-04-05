@@ -4,15 +4,19 @@ import { PAYSTACK_HOSTNAME } from "constants/index";
 import BuyerInterface from "interfaces/Buyer";
 import SellerInterface from "interfaces/Seller";
 import addPaystackAuth from "utils/addPaystackAuth";
+import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function addAtmCardInitialize(req: any, res: any) {
   const user = req.user as BuyerInterface | SellerInterface;
 
-  const { amount, callback_url } = req.body as {
-    amount: number;
-    callback_url: string;
-  };
   try {
+    allParametersExist(req.body, "amount", "callback_url");
+
+    const { amount, callback_url } = req.body as {
+      amount: number;
+      callback_url: string;
+    };
+
     const payRes = await axios({
       method: "post",
       url: PAYSTACK_HOSTNAME + "/transaction/initialize",

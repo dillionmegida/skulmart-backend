@@ -5,25 +5,26 @@ import Seller from "models/Seller";
 import shortid from "shortid";
 import { uploadImage } from "utils/image";
 import { capitalize, replaceString } from "utils/strings";
+import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function onboarding1(req: any, res: any) {
   const user = req.user as SellerInterface;
 
-  const body: SellerInterface = { ...req.body };
-
-  const { brand_name: _brand_name, brand_desc, brand_category } = body;
-
-  const brand_name = capitalize(_brand_name.trim());
-  const username =
-    replaceString({
-      str: brand_name,
-      replace: " ",
-      _with: "-",
-    }).toLowerCase() +
-    "-" +
-    shortid.generate();
-
   try {
+    allParametersExist(req.body, "brand_name", "brand_desc", "brand_category");
+
+    const body: SellerInterface = { ...req.body };
+
+    const { brand_name: _brand_name, brand_desc, brand_category } = body;
+
+    const brand_name = capitalize(_brand_name.trim());
+    const username =
+      replaceString({
+        str: brand_name,
+        replace: " ",
+        _with: "-",
+      }).toLowerCase() + shortid.generate();
+
     const uploadImageResult = await uploadImage({
       path: req.file.path,
       filename: username,

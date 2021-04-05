@@ -8,13 +8,16 @@ import SellerInterface from "interfaces/Seller";
 import Buyer from "models/Buyer";
 import Seller from "models/Seller";
 import addPaystackAuth from "utils/addPaystackAuth";
+import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function addAtmCardComplete(req: any, res: any) {
   const user = req.user as BuyerInterface | SellerInterface;
 
-  const { reference } = req.body as { reference: string };
-
   try {
+    allParametersExist(req.body, "reference");
+
+    const { reference } = req.body as { reference: string };
+
     const verifyRes = await axios({
       method: "get",
       url: PAYSTACK_HOSTNAME + "/transaction/verify/" + reference,
@@ -30,7 +33,6 @@ export default async function addAtmCardComplete(req: any, res: any) {
           "Verification failed. If you have been debited, please send us an email @" +
             email
         );
-
 
     if (verifyRes.data.data.customer.email !== user.email)
       // just incase it's another user trying to verify charge

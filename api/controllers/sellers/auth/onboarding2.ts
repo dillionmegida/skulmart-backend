@@ -4,27 +4,37 @@ import welcomeEmail from "mails/welcomeEmail";
 import Seller from "models/Seller";
 import Store from "models/Store";
 import { capitalize } from "utils/strings";
+import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function onboarding2(req: any, res: any) {
   const user = req.user as SellerInterface;
 
-  const body: SellerInterface = { ...req.body };
-
-  const {
-    fullname: _fullname,
-    whatsapp: _whatsapp,
-    twitter: _twitter,
-    instagram: _instagram,
-    facebook: _facebook,
-  } = body;
-
-  const fullname = capitalize(_fullname.trim());
-  const whatsapp = capitalize(_whatsapp.trim());
-  const twitter = _twitter ? capitalize(_twitter.trim()) : "";
-  const facebook = _facebook ? capitalize(_facebook.trim()) : "";
-  const instagram = _instagram ? capitalize(_instagram.trim()) : "";
-
   try {
+    allParametersExist(
+      req.body,
+      "fullname",
+      "whatsapp",
+      "twitter",
+      "instagram",
+      "facebook"
+    );
+
+    const body: SellerInterface = { ...req.body };
+
+    const {
+      fullname: _fullname,
+      whatsapp: _whatsapp,
+      twitter: _twitter,
+      instagram: _instagram,
+      facebook: _facebook,
+    } = body;
+
+    const fullname = capitalize(_fullname.trim());
+    const whatsapp = capitalize(_whatsapp.trim());
+    const twitter = _twitter ? capitalize(_twitter.trim()) : "";
+    const facebook = _facebook ? capitalize(_facebook.trim()) : "";
+    const instagram = _instagram ? capitalize(_instagram.trim()) : "";
+
     const store = await Store.findById(user.store);
 
     if (!store)

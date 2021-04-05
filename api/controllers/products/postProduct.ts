@@ -5,10 +5,22 @@ import Product from "models/Product";
 import Seller from "models/Seller";
 import Store from "models/Store";
 import { uploadImage } from "utils/image";
+import { allParametersExist } from "utils/validateBodyParameters";
 import { capitalize, replaceString } from "utils/strings";
 
 export default async function postProduct(req: any, res: any) {
   try {
+    allParametersExist(
+      req.body,
+      "name",
+      "desc",
+      "category",
+      "price",
+      "quantity",
+      "delivery_fee",
+      "is_negotiable"
+    );
+
     const {
       name: _name,
       desc: _desc,

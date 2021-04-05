@@ -1,12 +1,16 @@
 import Cart from "models/Cart";
 import Negotation from "models/Negotiation";
 import { consoleMessage } from "utils/logs";
+import { allParametersExist } from "utils/validateBodyParameters";
 
 export default async function updateNegotiationPrice(req: any, res: any) {
   const { id } = req.params;
-  const { price: _price } = req.body as { price: string };
-  const price = parseInt(_price, 10);
   try {
+    allParametersExist(req.body, "price");
+
+    const { price: _price } = req.body as { price: string };
+    const price = parseInt(_price, 10);
+
     const negotiation = await Negotation.findById(id);
 
     if (!negotiation)

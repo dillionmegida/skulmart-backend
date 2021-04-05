@@ -28,6 +28,14 @@ type Args =
         who: "seller" | "buyer";
         user_id: mongoose.Types.ObjectId;
       };
+    }
+  | {
+      type: "ORDERS_BOUGHT";
+      options: {
+        nOrders: number;
+        ordersRef: string;
+        buyer_id: mongoose.Types.ObjectId;
+      };
     };
 
 export async function saveActivity(args: Args) {
@@ -70,6 +78,21 @@ export async function saveActivity(args: Args) {
     if (who === "seller") {
       activity.seller = user_id;
     }
+    return await activity.save();
+  }
+
+  if (args.type === "ORDERS_BOUGHT") {
+    const { nOrders, ordersRef, buyer_id } = args.options;
+    const activity = new Activity();
+    activity.buyer = buyer_id;
+    activity.type = args.type;
+    activity.for_buyer = true;
+    activity.for_seller = false;
+    activity.meta = {
+      ordersRef,
+      nOrders,
+    };
+
     return await activity.save();
   }
 
