@@ -12,6 +12,10 @@ const ValidationDocumentSchema: Schema = new Schema(
       enum: ["TO_BE_UPDATED", "TO_BE_REVIEWED"],
       default: "TO_BE_REVIEWED",
     },
+    error_msg: {
+      type: String,
+      default: null,
+    },
     seller: {
       type: Schema.Types.ObjectId,
       ref: "Seller",
