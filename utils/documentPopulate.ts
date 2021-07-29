@@ -50,7 +50,7 @@ export const buyerPopulate = ({
 });
 
 // product select and populate
-type ProductFields = "views_devices" | "cards" | "password";
+type ProductFields = "views_devices";
 
 export const selectProductStr = ({ remove = [] }: SelectArgs<ProductFields>) =>
   joinRemoveSelectStr(["views_devices", ...remove]);

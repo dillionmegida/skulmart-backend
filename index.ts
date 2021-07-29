@@ -64,8 +64,8 @@ import shorten_url from "api/routers/shorten_url";
 import paystackWebhook from "api/routers/paystackWebhook";
 
 import admin from "api/routers/admin";
+import main from "api/routers/main";
 import { PAYSTACK_WEBHOOK } from "./constants";
-import Seller from "models/Seller";
 
 // api routes
 
@@ -80,6 +80,7 @@ app.use("/api/shorten_url", shorten_url);
 app.use(PAYSTACK_WEBHOOK, paystackWebhook);
 
 app.use("/api/admin", admin);
+app.use("/api/main", main);
 
 // @title Listen port set to 5000
 
