@@ -1,6 +1,11 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
+import Seller from "./models/Seller";
+import Buyer from "./models/Buyer";
+import StoreInterface from "interfaces/Store";
+import fs from "fs";
+import Engage from "@engage_so/js";
 
 import { config } from "dotenv";
 config();
@@ -15,6 +20,12 @@ import expressip from "express-ip";
 import { v2 as cloudinary } from "cloudinary";
 
 import cleanups from "./cleanups";
+
+Engage.init({
+  key: process.env.ENGAGE_PRIVATE_KEY,
+  secret: process.env.ENGAGE_SECRET_KEY,
+});
+
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -39,7 +50,41 @@ app.get("/test", async (req: any, res: any) => {
   //   }
   //   console.log({ emailString });
 
-  await cleanups();
+  //   get all verified phone numbers
+  //   const numbers = await Seller.find({ email_confirm: true })
+  //     .select("whatsapp brand_name fullname store")
+  //     .populate("store");
+  //   let phoneStr = "";
+  //   for (let i = 0; i < numbers.length; i++) {
+  //     const { whatsapp, brand_name, fullname } = numbers[i];
+  //     // @ts-ignore
+  //     const store = numbers[i].store as StoreInterface;
+
+  //     if (whatsapp)
+  //       phoneStr +=
+  //         whatsapp +
+  //         " - " +
+  //         brand_name +
+  //         " - " +
+  //         fullname +
+  //         " - " +
+  //         store.shortname +
+  //         "\n";
+  //   }
+  //   console.log({ phoneStr });
+
+  //   await cleanups();
+
+  //   const sellers = await Seller.find({ email_confirm: true }).select(
+  //     "verified brand_category fullname brand_name email visible ratings store views_count createdAt"
+  //   );
+  //   fs.writeFileSync("sellers.json", JSON.stringify(sellers, null, 2));
+
+//   const buyers = await Buyer.find({ email_confirm: true }).select(
+//     "createdAt fullname email store user_type"
+//   );
+//   fs.writeFileSync("buyers.json", JSON.stringify(buyers, null, 2));
+  //   console.log(JSON.stringify(sellers, null, 2));
 });
 
 app.use(getStore);

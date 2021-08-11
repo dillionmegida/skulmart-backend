@@ -16,4 +16,5 @@ export default interface BuyerInterface extends Document {
   phone: string;
   store: mongoose.Types.ObjectId;
   user_type: "buyer";
+  createdAt: Date;
 }

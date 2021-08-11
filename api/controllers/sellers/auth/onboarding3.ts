@@ -6,6 +6,7 @@ import Seller from "models/Seller";
 import ValidationDocument from "models/ValidationDocument";
 import { uploadImage } from "utils/image";
 import { replaceString } from "utils/strings";
+import { updateEngageSeller } from "helpers/engage-so";
 
 export default async function onboarding3(req: any, res: any) {
   const user = req.user as SellerInterface;
@@ -36,11 +37,13 @@ export default async function onboarding3(req: any, res: any) {
     };
     await newSellerToBeVerified.save();
 
-    await Seller.findByIdAndUpdate(user._id, {
+    const updateSeller = await Seller.findByIdAndUpdate(user._id, {
       $set: {
         verified: "AWAITING_REVIEW",
       },
     });
+
+    await updateEngageSeller(updateSeller as SellerInterface);
 
     await newVerificationDocument();
 

@@ -12,6 +12,7 @@ import { bcryptPromise } from "utils/strings";
 import { getToken } from "utils/token";
 import { allParametersExist } from "utils/validateBodyParameters";
 import shortId from "shortid";
+import { addEngageBuyer, addEngageSeller } from "helpers/engage-so";
 
 export default async function createUser(req: any, res: any) {
   const body: SellerInterface | BuyerInterface = { ...req.body };
@@ -63,6 +64,8 @@ export default async function createUser(req: any, res: any) {
         username: shortid.generate(),
       });
       await newUser.save();
+
+      await addEngageSeller(newUser, shortname);
     } else {
       newUser = new Buyer({
         email,
@@ -70,6 +73,8 @@ export default async function createUser(req: any, res: any) {
         store: store_id,
       });
       await newUser.save();
+
+      await addEngageBuyer(newUser, shortname);
     }
 
     if (!newUser)

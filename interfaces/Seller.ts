@@ -42,4 +42,5 @@ export default interface SellerInterface extends Document {
   user_type: "seller";
   visible: boolean;
   ratings: Ratings;
+  createdAt: Date;
 }
