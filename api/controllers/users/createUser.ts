@@ -65,7 +65,7 @@ export default async function createUser(req: any, res: any) {
       });
       await newUser.save();
 
-      await addEngageSeller(newUser, shortname);
+      await addEngageSeller(newUser, store._id);
     } else {
       newUser = new Buyer({
         email,
@@ -74,7 +74,7 @@ export default async function createUser(req: any, res: any) {
       });
       await newUser.save();
 
-      await addEngageBuyer(newUser, shortname);
+      await addEngageBuyer(newUser, store._id);
     }
 
     if (!newUser)

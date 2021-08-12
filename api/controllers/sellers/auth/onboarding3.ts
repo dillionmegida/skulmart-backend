@@ -37,13 +37,13 @@ export default async function onboarding3(req: any, res: any) {
     };
     await newSellerToBeVerified.save();
 
-    const updateSeller = await Seller.findByIdAndUpdate(user._id, {
+    const updatedSeller = await Seller.findByIdAndUpdate(user._id, {
       $set: {
         verified: "AWAITING_REVIEW",
       },
     });
 
-    await updateEngageSeller(updateSeller as SellerInterface);
+    if (updatedSeller) await updateEngageSeller(updatedSeller);
 
     await newVerificationDocument();
 

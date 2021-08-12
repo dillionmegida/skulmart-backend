@@ -43,7 +43,7 @@ export default async function onboarding2(req: any, res: any) {
         message: "Selected store does not exist. Please contact support.",
       });
 
-    const updateSeller = await Seller.findByIdAndUpdate(user._id, {
+    const updatedSeller = await Seller.findByIdAndUpdate(user._id, {
       $set: {
         fullname,
         whatsapp,
@@ -54,7 +54,7 @@ export default async function onboarding2(req: any, res: any) {
       },
     });
 
-    await updateEngageSeller(updateSeller as SellerInterface);
+    if (updatedSeller) await updateEngageSeller(updatedSeller);
 
     const sendWelcomeEmailResponse = await welcomeEmail({
       email: user.email,

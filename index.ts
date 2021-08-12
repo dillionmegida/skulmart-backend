@@ -5,6 +5,8 @@ import Seller from "./models/Seller";
 import Buyer from "./models/Buyer";
 import StoreInterface from "interfaces/Store";
 import fs from "fs";
+
+//@ts-ignore
 import Engage from "@engage_so/js";
 
 import { config } from "dotenv";
@@ -75,16 +77,16 @@ app.get("/test", async (req: any, res: any) => {
 
   //   await cleanups();
 
-  //   const sellers = await Seller.find({ email_confirm: true }).select(
-  //     "verified brand_category fullname brand_name email visible ratings store views_count createdAt"
-  //   );
-  //   fs.writeFileSync("sellers.json", JSON.stringify(sellers, null, 2));
+    const sellers = await Seller.find().select(
+      "verified brand_category fullname brand_name email visible store views_count createdAt whatsapp user_type email_confirm"
+    );
+    fs.writeFileSync("sellers.json", JSON.stringify(sellers, null, 2));
 
-//   const buyers = await Buyer.find({ email_confirm: true }).select(
-//     "createdAt fullname email store user_type"
+//   const buyers = await Buyer.find().select(
+//     "createdAt fullname email store user_type phone email_confirm"
 //   );
 //   fs.writeFileSync("buyers.json", JSON.stringify(buyers, null, 2));
-  //   console.log(JSON.stringify(sellers, null, 2));
+//     console.log(JSON.stringify(sellers, null, 2));
 });
 
 app.use(getStore);

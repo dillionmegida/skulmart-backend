@@ -39,7 +39,7 @@ export default async function onboarding1(req: any, res: any) {
 
     const { public_id, url } = uploadImageResult;
 
-    const updateSeller = await Seller.findByIdAndUpdate(user._id, {
+    const updatedSeller = await Seller.findByIdAndUpdate(user._id, {
       $set: {
         img: {
           public_id,
@@ -52,7 +52,7 @@ export default async function onboarding1(req: any, res: any) {
       },
     });
 
-    await updateEngageSeller(updateSeller as SellerInterface);
+    if (updatedSeller) await updateEngageSeller(updatedSeller);
 
     res.json({
       message: "Business Information submitted successfully ✔",

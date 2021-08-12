@@ -54,7 +54,7 @@ export default async function onboarding(req: any, res: any) {
       },
     });
 
-    updateEngageBuyer(updatedBuyer as BuyerInterface);
+    if (updatedBuyer) updateEngageBuyer(updatedBuyer);
 
     res.json({
       message: "Profile updated successfully ✔",

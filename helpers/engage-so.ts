@@ -1,26 +1,38 @@
 import SellerInterface from "interfaces/Seller";
+//@ts-ignore
 import Engage from "@engage_so/js";
 import BuyerInterface from "interfaces/Buyer";
 import { splitFullname } from "utils/strings";
 import { getAcceptablePhoneNo } from "utils/phoneNo";
+import mongoose from "mongoose";
 
-export function addEngageSeller(seller: SellerInterface, store: string) {
-  Engage.identity({
-    id: seller._id,
-    email: seller.email,
-    created_at: seller.createdAt,
-    verified: "NONE",
-    store,
-  });
+export function addEngageSeller(
+  seller: SellerInterface,
+  store: mongoose.Types.ObjectId
+) {
+  try {
+    Engage.identity({
+      id: seller._id,
+      email: seller.email,
+      created_at: seller.createdAt,
+      verified: "NONE",
+      store,
+    });
+  } catch {}
 }
 
-export function addEngageBuyer(buyer: BuyerInterface, store: string) {
-  Engage.identity({
-    id: buyer._id,
-    email: buyer.email,
-    created_at: buyer.createdAt,
-    store,
-  });
+export function addEngageBuyer(
+  buyer: BuyerInterface,
+  store: mongoose.Types.ObjectId
+) {
+  try {
+    Engage.identity({
+      id: buyer._id,
+      email: buyer.email,
+      created_at: buyer.createdAt,
+      store,
+    });
+  } catch {}
 }
 
 export function updateEngageSeller(seller: SellerInterface) {
@@ -37,16 +49,19 @@ export function updateEngageSeller(seller: SellerInterface) {
 
   if (seller.whatsapp) number = getAcceptablePhoneNo(seller.whatsapp);
 
-  Engage.addAttributes(seller._id, {
-    first_name,
-    last_name,
-    brand_name: seller.brand_name || "",
-    number,
-    verified: seller.verified || "NONE",
-    views_count: seller.views_count || 0,
-    brand_category: seller.brand_category || "",
-    visible: seller.visible || false,
-  });
+  try {
+    Engage.addAttributes(seller._id, {
+      first_name,
+      last_name,
+      brand_name: seller.brand_name || "",
+      number,
+      verified: seller.verified || "NONE",
+      views_count: seller.views_count || 0,
+      brand_category: seller.brand_category || "",
+      visible: seller.visible || false,
+      email_confirm: seller.email_confirm || false,
+    });
+  } catch {}
 }
 
 export function updateEngageBuyer(buyer: BuyerInterface) {
@@ -63,9 +78,12 @@ export function updateEngageBuyer(buyer: BuyerInterface) {
 
   if (buyer.phone) number = getAcceptablePhoneNo(buyer.phone);
 
-  Engage.addAttributes(buyer._id, {
-    first_name,
-    last_name,
-    number,
-  });
+  try {
+    Engage.addAttributes(buyer._id, {
+      first_name,
+      last_name,
+      number,
+      email_confirm: buyer.email_confirm || false,
+    });
+  } catch {}
 }
