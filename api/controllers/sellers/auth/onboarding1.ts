@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import { CLOUDINARY_USER_IMAGES_FOLDER } from "constants/index";
+import { updateEngageSeller } from "helpers/engage-so";
 import SellerInterface from "interfaces/Seller";
 import Seller from "models/Seller";
 import shortid from "shortid";
@@ -38,7 +39,7 @@ export default async function onboarding1(req: any, res: any) {
 
     const { public_id, url } = uploadImageResult;
 
-    await Seller.findByIdAndUpdate(user._id, {
+    const updatedSeller = await Seller.findByIdAndUpdate(user._id, {
       $set: {
         img: {
           public_id,
@@ -50,6 +51,8 @@ export default async function onboarding1(req: any, res: any) {
         brand_category,
       },
     });
+
+    if (updatedSeller) await updateEngageSeller(updatedSeller);
 
     res.json({
       message: "Business Information submitted successfully ✔",

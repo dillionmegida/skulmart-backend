@@ -48,3 +48,11 @@ type AnchorLinkTextArgs = {
 };
 export const anchorLinkText = ({ link, text }: AnchorLinkTextArgs) =>
   `<a href="${link}">${text ?? link}</a>`;
+
+export const splitFullname = (fullname: string) => {
+  const split = fullname.split(" ");
+  return {
+    first: split[0],
+    last: split[1],
+  };
+};

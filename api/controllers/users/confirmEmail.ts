@@ -1,6 +1,9 @@
 import chalk from "chalk";
 import { links } from "constants/index";
 import { FREE_PLAN } from "constants/subscriptionTypes";
+import { updateEngageBuyer, updateEngageSeller } from "helpers/engage-so";
+import BuyerInterface from "interfaces/Buyer";
+import SellerInterface from "interfaces/Seller";
 import Buyer from "models/Buyer";
 import EmailConfirmation from "models/EmailConfirmation";
 import Product from "models/Product";
@@ -30,6 +33,8 @@ export default async function confirmEmail(req: any, res: any) {
         email_confirm: true,
       },
     });
+
+    if (updateEmailStatus) updateEngageBuyer(updateEmailStatus);
   } else if (user_type === "seller") {
     updateEmailStatus = await Seller.findByIdAndUpdate(user_id, {
       $set: {
@@ -37,6 +42,8 @@ export default async function confirmEmail(req: any, res: any) {
         subscription_type: FREE_PLAN.name,
       },
     });
+
+    if (updateEmailStatus) updateEngageSeller(updateEmailStatus);
 
     // after verification, all seller's views should be visible
     // TODO if a new plan comes out, that prolly supports more products, remember to

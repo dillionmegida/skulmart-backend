@@ -5,6 +5,7 @@ import Seller from "models/Seller";
 import Store from "models/Store";
 import { capitalize } from "utils/strings";
 import { allParametersExist } from "utils/validateBodyParameters";
+import { updateEngageSeller } from "helpers/engage-so";
 
 export default async function onboarding2(req: any, res: any) {
   const user = req.user as SellerInterface;
@@ -42,7 +43,7 @@ export default async function onboarding2(req: any, res: any) {
         message: "Selected store does not exist. Please contact support.",
       });
 
-    await Seller.findByIdAndUpdate(user._id, {
+    const updatedSeller = await Seller.findByIdAndUpdate(user._id, {
       $set: {
         fullname,
         whatsapp,
@@ -52,6 +53,8 @@ export default async function onboarding2(req: any, res: any) {
         visible: true,
       },
     });
+
+    if (updatedSeller) await updateEngageSeller(updatedSeller);
 
     const sendWelcomeEmailResponse = await welcomeEmail({
       email: user.email,

@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import { updateEngageSeller } from "helpers/engage-so";
 import sellerVerification from "mails/sellerVerification";
 import Seller from "models/Seller";
 import ValidationDocument from "models/ValidationDocument";
@@ -26,11 +27,17 @@ export default async function submitValidationReview(req: any, res: any) {
       });
 
     if (type === "success") {
-      await Seller.findByIdAndUpdate(validationDocument.seller, {
-        $set: {
-          verified: "VERIFIED",
-        },
-      });
+      const updatedSeller = await Seller.findByIdAndUpdate(
+        validationDocument.seller,
+        {
+          $set: {
+            verified: "VERIFIED",
+          },
+        }
+      );
+
+      if (updatedSeller) await updateEngageSeller(updatedSeller);
+
       // delete identification image submitted
       await deleteImage({
         public_id: validationDocument.img.public_id as string,

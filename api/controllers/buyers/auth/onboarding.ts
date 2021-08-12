@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import { CLOUDINARY_USER_IMAGES_FOLDER } from "constants/index";
+import { addEngageBuyer, updateEngageBuyer } from "helpers/engage-so";
 import BuyerInterface from "interfaces/Buyer";
 import Buyer from "models/Buyer";
 import { uploadImage } from "utils/image";
@@ -42,7 +43,7 @@ export default async function onboarding(req: any, res: any) {
       imageInfo.url = uploadImageResult.url;
     }
 
-    await Buyer.findByIdAndUpdate(user._id, {
+    const updatedBuyer = await Buyer.findByIdAndUpdate(user._id, {
       $set: {
         fullname,
         phone,
@@ -52,6 +53,8 @@ export default async function onboarding(req: any, res: any) {
         },
       },
     });
+
+    if (updatedBuyer) updateEngageBuyer(updatedBuyer);
 
     res.json({
       message: "Profile updated successfully ✔",
