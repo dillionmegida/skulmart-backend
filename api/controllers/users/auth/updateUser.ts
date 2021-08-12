@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import { CLOUDINARY_USER_IMAGES_FOLDER } from "constants/index";
+import { updateEngageBuyer, updateEngageSeller } from "helpers/engage-so";
 import BuyerInterface from "interfaces/Buyer";
 import SellerInterface from "interfaces/Seller";
 import Buyer from "models/Buyer";
@@ -100,7 +101,7 @@ export default async function updateUser(req: any, res: any) {
             "-" +
             shortid.generate();
 
-      await Seller.findByIdAndUpdate(authUser._id, {
+      const updatedSeller = await Seller.findByIdAndUpdate(authUser._id, {
         $set: {
           img: {
             public_id,
@@ -117,6 +118,8 @@ export default async function updateUser(req: any, res: any) {
           facebook,
         },
       });
+
+      if (updatedSeller) updateEngageSeller(updatedSeller);
     } else if (body.user_type === "buyer") {
       allParametersExist(body, "fullname", "phone");
 
@@ -124,7 +127,7 @@ export default async function updateUser(req: any, res: any) {
 
       fullname = capitalize(fullname.trim());
 
-      await Buyer.findByIdAndUpdate(req.user._id, {
+      const updatedBuyer = await Buyer.findByIdAndUpdate(req.user._id, {
         $set: {
           img: {
             public_id,
@@ -134,6 +137,8 @@ export default async function updateUser(req: any, res: any) {
           phone,
         },
       });
+
+      if (updatedBuyer) updateEngageBuyer(updatedBuyer);
     }
     return res.json({
       message: "Updated account successfully",

@@ -12,7 +12,6 @@ export function addEngageSeller(
 ) {
   try {
     Engage.identity({
-      id: seller._id,
       email: seller.email,
       created_at: seller.createdAt,
       verified: "NONE",
@@ -27,7 +26,6 @@ export function addEngageBuyer(
 ) {
   try {
     Engage.identity({
-      id: buyer._id,
       email: buyer.email,
       created_at: buyer.createdAt,
       store,
@@ -50,7 +48,7 @@ export function updateEngageSeller(seller: SellerInterface) {
   if (seller.whatsapp) number = getAcceptablePhoneNo(seller.whatsapp);
 
   try {
-    Engage.addAttributes(seller._id, {
+    Engage.addAttributes(seller.email, {
       first_name,
       last_name,
       brand_name: seller.brand_name || "",
@@ -79,7 +77,7 @@ export function updateEngageBuyer(buyer: BuyerInterface) {
   if (buyer.phone) number = getAcceptablePhoneNo(buyer.phone);
 
   try {
-    Engage.addAttributes(buyer._id, {
+    Engage.addAttributes(buyer.email, {
       first_name,
       last_name,
       number,
