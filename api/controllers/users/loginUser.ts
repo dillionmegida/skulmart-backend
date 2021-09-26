@@ -4,6 +4,10 @@ import bcrypt from "bcryptjs";
 import { getToken } from "utils/token";
 import { consoleMessage } from "utils/logs";
 import { allParametersExist } from "utils/validateBodyParameters";
+import BuyerInterface from "interfaces/Buyer";
+import SellerInterface from "interfaces/Seller";
+import Store from "models/Store";
+import StoreInterface from "interfaces/Store";
 
 export default async function loginUser(req: any, res: any) {
   try {
@@ -17,7 +21,7 @@ export default async function loginUser(req: any, res: any) {
 
     email = email.trim();
 
-    let user = null;
+    let user: null | BuyerInterface | SellerInterface = null;
 
     if (user_type === "seller") {
       const seller = await Seller.findOne({
@@ -56,11 +60,18 @@ export default async function loginUser(req: any, res: any) {
       });
     }
 
+    const store = (await Store.findOne({
+      _id: user.store,
+    })) as StoreInterface;
+
     const token = getToken({ _id: user._id, user_type });
 
     return res.json({
       token,
       message: "Authenticated 👍",
+      data: {
+        store_name: store.shortname,
+      },
     });
   } catch (err) {
     consoleMessage({

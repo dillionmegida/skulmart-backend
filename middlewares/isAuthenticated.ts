@@ -12,7 +12,8 @@ import {
 } from "utils/documentPopulate";
 import chalk from "chalk";
 
-export default async function isAuthenticated(req: any, res: any, next: any) {
+export default async function 
+isAuthenticated(req: any, res: any, next: any) {
   const token = getTokenFromCookie(req);
 
   const tokenString = token ? token.split(" ")[1] : undefined;

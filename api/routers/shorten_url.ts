@@ -12,6 +12,7 @@ router.post("/", shortenAndSave);
 // get the details of a short url
 router.get("/:hash", getShortUrlDetails);
 
+
 // get a short url and redirect to long url
 router.get("/redirect/:short_url", redirectShortUrl);
 
