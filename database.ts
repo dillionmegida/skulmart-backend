@@ -1,12 +1,9 @@
 import mongoose from "mongoose";
 
-// connect to mongo atlas cluster
-import { MongoURI } from "config/keys";
-
 // @title Uplink connection to Mongoose ATLAS
 
 mongoose
-  .connect(MongoURI, {
+  .connect(process.env.MONGO_URI as string, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
