@@ -137,6 +137,10 @@ export default async function postProduct(req: any, res: any) {
 
     res.json({
       message: "Product uploaded successfully",
+      data: {
+        product: newProduct,
+        store_name: store.shortname,
+      },
     });
   } catch (err) {
     console.log("An error occured during product upload >> ", err);
