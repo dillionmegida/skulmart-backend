@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import Seller from "./models/Seller";
 import Buyer from "./models/Buyer";
+import Product from "./models/Product";
 import StoreInterface from "interfaces/Store";
 import fs from "fs";
 
@@ -13,7 +14,6 @@ import { config } from "dotenv";
 config();
 
 import("./database");
-import("helpers/dashboard-monitor");
 
 //@ts-ignore
 import expressip from "express-ip";
@@ -27,7 +27,6 @@ Engage.init({
   key: process.env.ENGAGE_PRIVATE_KEY,
   secret: process.env.ENGAGE_SECRET_KEY,
 });
-
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -77,16 +76,16 @@ app.get("/test", async (req: any, res: any) => {
 
   //   await cleanups();
 
-    const sellers = await Seller.find().select(
-      "verified brand_category fullname brand_name email visible store views_count createdAt whatsapp user_type email_confirm"
-    );
-    fs.writeFileSync("sellers.json", JSON.stringify(sellers, null, 2));
+  // const sellers = await Seller.find().select(
+  //   "verified brand_category fullname brand_name email visible store views_count createdAt whatsapp user_type email_confirm"
+  // );
+  // fs.writeFileSync("sellers.json", JSON.stringify(sellers, null, 2));
 
-//   const buyers = await Buyer.find().select(
-//     "createdAt fullname email store user_type phone email_confirm"
-//   );
-//   fs.writeFileSync("buyers.json", JSON.stringify(buyers, null, 2));
-//     console.log(JSON.stringify(sellers, null, 2));
+  //   const buyers = await Buyer.find().select(
+  //     "createdAt fullname email store user_type phone email_confirm"
+  //   );
+  //   fs.writeFileSync("buyers.json", JSON.stringify(buyers, null, 2));
+  //     console.log(JSON.stringify(sellers, null, 2));
 });
 
 app.use(getStore);

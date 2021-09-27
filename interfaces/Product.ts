@@ -3,6 +3,7 @@ import ImageInterface from "./Image";
 import Ratings from "./Ratings";
 
 export default interface ProductInterface extends Document {
+  images: ImageInterface[];
   img: ImageInterface;
   _id: mongoose.Types.ObjectId;
   name: string;

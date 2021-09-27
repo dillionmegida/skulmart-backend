@@ -127,10 +127,12 @@ export default async function updateProduct(req: any, res: any) {
 
     await Product.findByIdAndUpdate(req.params.id, {
       $set: {
-        img: {
-          public_id,
-          url,
-        },
+        images: [
+          {
+            public_id,
+            url,
+          },
+        ],
         name,
         desc,
         category,

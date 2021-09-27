@@ -120,7 +120,7 @@ export default async function postProduct(req: any, res: any) {
     const { public_id, url } = imageDetails;
 
     const newProduct = new Product({
-      img: { public_id, url },
+      images: [{ public_id, url }],
       name,
       desc,
       category,
